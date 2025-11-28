@@ -13,22 +13,19 @@ public partial class MainViewModel : ViewModelBase
 {
     private readonly SundyDbContext _db;
     private readonly BlockingEngine _blockingEngine;
-    private readonly Func<EventEditViewModel>? _eventEditFactory;
     private readonly Action? _openSettingsAction;
 
     public MainViewModel(
         SundyDbContext db,
         BlockingEngine blockingEngine,
-        Func<EventEditViewModel>? eventEditFactory = null,
         Action? openSettingsAction = null)
     {
         _db = db;
         _blockingEngine = blockingEngine;
-        _eventEditFactory = eventEditFactory;
         _openSettingsAction = openSettingsAction;
 
         CalendarViewModel = new CalendarViewModel(blockingEngine, db);
-        CalendarViewModel.PropertyChanged += (s, e) =>
+        CalendarViewModel.PropertyChanged += (_, e) =>
         {
             if (e.PropertyName == nameof(CalendarViewModel.SelectedDate) ||
                 e.PropertyName == nameof(CalendarViewModel.ViewMode))
@@ -48,6 +45,12 @@ public partial class MainViewModel : ViewModelBase
 
     [ObservableProperty]
     private ObservableCollection<CalendarListItemViewModel> _calendars = new();
+
+    [ObservableProperty]
+    private bool _isEventDialogOpen;
+
+    [ObservableProperty]
+    private EventEditViewModel? _eventEditViewModel;
 
     public int ViewModeIndex
     {
@@ -155,16 +158,38 @@ public partial class MainViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private void CreateEvent()
+    private async Task CreateEvent()
     {
-        if (_eventEditFactory != null)
-        {
-            var editVm = _eventEditFactory();
-            _ = editVm.InitializeAsync(
-                existingEvent: null,
-                defaultCalendarId: CalendarViewModel.SelectedCalendar?.Id);
-            // Show dialog with editVm - implementation depends on your dialog service
-        }
+        var editVm = new EventEditViewModel(
+            _db,
+            _blockingEngine,
+            onSaved: () => OnEventSaved(),
+            onCancelled: () =>
+            {
+                IsEventDialogOpen = false;
+                EventEditViewModel = null;
+            });
+        
+        await editVm.InitializeAsync(
+            existingEvent: null,
+            defaultCalendarId: CalendarViewModel.SelectedCalendar?.Id);
+        
+        EventEditViewModel = editVm;
+        IsEventDialogOpen = true;
+    }
+
+    private async void OnEventSaved()
+    {
+        IsEventDialogOpen = false;
+        EventEditViewModel = null;
+        await CalendarViewModel.RefreshViewAsync();
+    }
+
+    [RelayCommand]
+    private void CloseEventDialog()
+    {
+        IsEventDialogOpen = false;
+        EventEditViewModel = null;
     }
 }
 

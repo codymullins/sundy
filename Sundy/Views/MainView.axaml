@@ -9,7 +9,9 @@
         <vm:MainViewModel/>
     </Design.DataContext>
     
-    <Grid RowDefinitions="Auto,*">
+    <!-- Root Grid with Dialog Overlay -->
+    <Grid>
+        <Grid RowDefinitions="Auto,*">
         <!-- Top Navigation Bar -->
         <Border Grid.Row="0" Background="#F5F5F5" Padding="10">
             <Grid ColumnDefinitions="*,Auto">
@@ -88,5 +90,23 @@
                 </ContentControl.ContentTemplate>
             </ContentControl>
         </Grid>
+        </Grid>
+        
+        <!-- Dialog Overlay -->
+        <Border IsVisible="{Binding IsEventDialogOpen}"
+                Background="#80000000"
+                Tapped="OnOverlayTapped">
+            <Grid HorizontalAlignment="Center" 
+                  VerticalAlignment="Center"
+                  Tapped="OnDialogContentTapped">
+                <ContentControl Content="{Binding EventEditViewModel}">
+                    <ContentControl.ContentTemplate>
+                        <DataTemplate>
+                            <views:EventEditView/>
+                        </DataTemplate>
+                    </ContentControl.ContentTemplate>
+                </ContentControl>
+            </Grid>
+        </Border>
     </Grid>
 </UserControl>
