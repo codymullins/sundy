@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -13,16 +13,13 @@ public partial class MainViewModel : ViewModelBase
 {
     private readonly SundyDbContext _db;
     private readonly BlockingEngine _blockingEngine;
-    private readonly Action? _openSettingsAction;
 
     public MainViewModel(
         SundyDbContext db,
-        BlockingEngine blockingEngine,
-        Action? openSettingsAction = null)
+        BlockingEngine blockingEngine)
     {
         _db = db;
         _blockingEngine = blockingEngine;
-        _openSettingsAction = openSettingsAction;
 
         CalendarViewModel = new CalendarViewModel(blockingEngine, db);
         CalendarViewModel.PropertyChanged += (_, e) =>
@@ -51,6 +48,12 @@ public partial class MainViewModel : ViewModelBase
 
     [ObservableProperty]
     private EventEditViewModel? _eventEditViewModel;
+
+    [ObservableProperty]
+    private bool _isSettingsDialogOpen;
+
+    [ObservableProperty]
+    private CalendarSettingsViewModel? _calendarSettingsViewModel;
 
     public bool HasNoCalendars => Calendars?.Count == 0;
 
@@ -155,9 +158,22 @@ public partial class MainViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private void OpenSettings()
+    private async Task OpenSettings()
     {
-        _openSettingsAction?.Invoke();
+        var settingsVm = new CalendarSettingsViewModel(
+            _db,
+            onClosed: async () =>
+            {
+                IsSettingsDialogOpen = false;
+                CalendarSettingsViewModel = null;
+                await LoadCalendarListAsync();
+                await CalendarViewModel.LoadCalendarsAsync();
+                await CalendarViewModel.RefreshViewAsync();
+            });
+        
+        await settingsVm.LoadCalendarsAsync();
+        CalendarSettingsViewModel = settingsVm;
+        IsSettingsDialogOpen = true;
     }
 
     [RelayCommand]
@@ -193,6 +209,16 @@ public partial class MainViewModel : ViewModelBase
     {
         IsEventDialogOpen = false;
         EventEditViewModel = null;
+    }
+
+    [RelayCommand]
+    private async void CloseSettingsDialog()
+    {
+        IsSettingsDialogOpen = false;
+        CalendarSettingsViewModel = null;
+        await LoadCalendarListAsync();
+        await CalendarViewModel.LoadCalendarsAsync();
+        await CalendarViewModel.RefreshViewAsync();
     }
 
     [RelayCommand]

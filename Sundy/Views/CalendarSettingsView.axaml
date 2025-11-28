@@ -1,0 +1,163 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Sundy.ViewModels"
+             x:Class="Sundy.Views.CalendarSettingsView"
+             x:DataType="vm:CalendarSettingsViewModel"
+             Width="700">
+    
+    <Grid>
+        <Border Background="White" 
+                CornerRadius="8" 
+                Padding="24"
+                BoxShadow="0 4 16 #30000000">
+            <Grid RowDefinitions="Auto,*,Auto,Auto">
+                <!-- Header -->
+                <TextBlock Grid.Row="0" 
+                           Text="Calendar Settings"
+                           FontSize="24"
+                           FontWeight="SemiBold"
+                           Margin="0,0,0,24"/>
+                
+                <!-- Calendar List -->
+                <ScrollViewer Grid.Row="1" MaxHeight="400">
+                    <StackPanel Spacing="12">
+                        <TextBlock Text="Calendars"
+                                   FontWeight="SemiBold"
+                                   FontSize="16"
+                                   Margin="0,0,0,8"/>
+                        
+                        <!-- Empty state -->
+                        <TextBlock Text="No calendars yet. Create one below."
+                                   Foreground="#999999"
+                                   FontStyle="Italic"
+                                   IsVisible="{Binding !Calendars.Count}"/>
+                        
+                        <!-- Calendar items -->
+                        <ItemsControl ItemsSource="{Binding Calendars}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border BorderBrush="#E0E0E0"
+                                            BorderThickness="1"
+                                            CornerRadius="6"
+                                            Padding="16"
+                                            Margin="0,0,0,8">
+                                        <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,*,Auto">
+                                            <!-- Calendar Color and Name -->
+                                            <Border Grid.Row="0" Grid.Column="0"
+                                                    Width="24"
+                                                    Height="24"
+                                                    Background="{Binding Color}"
+                                                    CornerRadius="4"
+                                                    VerticalAlignment="Center"
+                                                    Margin="0,0,12,0"/>
+                                            
+                                            <TextBlock Grid.Row="0" Grid.Column="1"
+                                                       Text="{Binding Name}"
+                                                       FontSize="16"
+                                                       FontWeight="SemiBold"
+                                                       VerticalAlignment="Center"/>
+                                            
+                                            <!-- Delete Button -->
+                                            <Button Grid.Row="0" Grid.Column="2"
+                                                    Content="Delete"
+                                                    Command="{Binding DeleteCommand}"
+                                                    Classes="danger"
+                                                    VerticalAlignment="Center"/>
+                                            
+                                            <!-- Calendar Settings -->
+                                            <StackPanel Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2"
+                                                        Margin="0,12,0,0"
+                                                        Spacing="8">
+                                                <CheckBox Content="Enable blocking (block time in other calendars)"
+                                                          IsChecked="{Binding EnableBlocking}"
+                                                          FontSize="13"/>
+                                                <CheckBox Content="Receive blocks (allow other calendars to block time here)"
+                                                          IsChecked="{Binding ReceiveBlocks}"
+                                                          FontSize="13"/>
+                                            </StackPanel>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </ScrollViewer>
+                
+                <!-- New Calendar Section -->
+                <Border Grid.Row="2"
+                        BorderBrush="#E0E0E0"
+                        BorderThickness="0,1,0,0"
+                        Padding="0,20,0,0"
+                        Margin="0,20,0,0">
+                    <StackPanel Spacing="12">
+                        <TextBlock Text="Create New Calendar"
+                                   FontWeight="SemiBold"
+                                   FontSize="16"/>
+                        
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                            <TextBox Grid.Column="0"
+                                     Text="{Binding NewCalendarName}"
+                                     Watermark="Calendar name"
+                                     Height="36"/>
+                            <Button Grid.Column="1"
+                                    Content="Create"
+                                    Command="{Binding CreateCalendarCommand}"
+                                    Classes="accent"
+                                    Height="36"
+                                    Width="100"/>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+                
+                <!-- Close Button -->
+                <Button Grid.Row="3"
+                        Content="Close"
+                        Command="{Binding CloseCommand}"
+                        Classes="modern"
+                        HorizontalAlignment="Right"
+                        Width="100"
+                        Margin="0,20,0,0"/>
+            </Grid>
+        </Border>
+        
+        <!-- Delete Confirmation Dialog Overlay -->
+        <Border IsVisible="{Binding IsDeleteConfirmationOpen}"
+                Background="#80000000"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch">
+            <Border Background="White"
+                    CornerRadius="8"
+                    Padding="24"
+                    MaxWidth="400"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    BoxShadow="0 4 16 #40000000">
+                <StackPanel Spacing="16">
+                    <TextBlock Text="Delete Calendar?"
+                               FontSize="20"
+                               FontWeight="SemiBold"/>
+                    
+                    <TextBlock TextWrapping="Wrap">
+                        <Run Text="Are you sure you want to delete "/>
+                        <Run Text="{Binding CalendarToDelete.Name}" FontWeight="SemiBold"/>
+                        <Run Text="? This will permanently delete all events in this calendar and cannot be undone."/>
+                    </TextBlock>
+                    
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                        <Button Grid.Column="0"
+                                Content="Cancel"
+                                Command="{Binding CancelDeleteCommand}"
+                                Classes="modern"
+                                HorizontalAlignment="Stretch"/>
+                        <Button Grid.Column="1"
+                                Content="Delete"
+                                Command="{Binding ConfirmDeleteCommand}"
+                                Classes="danger"
+                                HorizontalAlignment="Stretch"/>
+                    </Grid>
+                </StackPanel>
+            </Border>
+        </Border>
+    </Grid>
+</UserControl>
+

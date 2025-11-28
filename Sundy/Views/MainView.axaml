@@ -100,7 +100,7 @@
         </Grid>
         </Grid>
         
-        <!-- Dialog Overlay -->
+        <!-- Event Dialog Overlay -->
         <Border IsVisible="{Binding IsEventDialogOpen}"
                 Background="#80000000"
                 Tapped="OnOverlayTapped">
@@ -111,6 +111,23 @@
                     <ContentControl.ContentTemplate>
                         <DataTemplate>
                             <views:EventEditView/>
+                        </DataTemplate>
+                    </ContentControl.ContentTemplate>
+                </ContentControl>
+            </Grid>
+        </Border>
+        
+        <!-- Settings Dialog Overlay -->
+        <Border IsVisible="{Binding IsSettingsDialogOpen}"
+                Background="#80000000"
+                Tapped="OnSettingsOverlayTapped">
+            <Grid HorizontalAlignment="Center" 
+                  VerticalAlignment="Center"
+                  Tapped="OnDialogContentTapped">
+                <ContentControl Content="{Binding CalendarSettingsViewModel}">
+                    <ContentControl.ContentTemplate>
+                        <DataTemplate>
+                            <views:CalendarSettingsView/>
                         </DataTemplate>
                     </ContentControl.ContentTemplate>
                 </ContentControl>

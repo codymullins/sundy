@@ -1,24 +1,37 @@
+using System;
+using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Sundy.Core;
 
 namespace Sundy.ViewModels;
 
-public partial class CalendarItemViewModel(Calendar calendar, SundyDbContext db) : ObservableObject
+public partial class CalendarItemViewModel : ObservableObject
 {
+    private readonly Calendar _calendar;
+    private readonly SundyDbContext _db;
+    private readonly Func<CalendarItemViewModel, Task>? _onDeleteRequested;
 
-    public string Id => calendar.Id;
-    public string Name => calendar.Name;
-    public string Color => calendar.Color;
+    public CalendarItemViewModel(Calendar calendar, SundyDbContext db, Func<CalendarItemViewModel, Task>? onDeleteRequested = null)
+    {
+        _calendar = calendar;
+        _db = db;
+        _onDeleteRequested = onDeleteRequested;
+    }
+
+    public string Id => _calendar.Id;
+    public string Name => _calendar.Name;
+    public string Color => _calendar.Color;
     
     public bool EnableBlocking
     {
-        get => calendar.EnableBlocking;
+        get => _calendar.EnableBlocking;
         set
         {
-            if (calendar.EnableBlocking != value)
+            if (_calendar.EnableBlocking != value)
             {
-                calendar.EnableBlocking = value;
-                db.SaveChangesAsync();
+                _calendar.EnableBlocking = value;
+                _db.SaveChangesAsync();
                 OnPropertyChanged();
             }
         }
@@ -26,15 +39,25 @@ public partial class CalendarItemViewModel(Calendar calendar, SundyDbContext db)
     
     public bool ReceiveBlocks
     {
-        get => calendar.ReceiveBlocks;
+        get => _calendar.ReceiveBlocks;
         set
         {
-            if (calendar.ReceiveBlocks != value)
+            if (_calendar.ReceiveBlocks != value)
             {
-                calendar.ReceiveBlocks = value;
-                db.SaveChangesAsync();
+                _calendar.ReceiveBlocks = value;
+                _db.SaveChangesAsync();
                 OnPropertyChanged();
             }
         }
     }
+
+    [RelayCommand]
+    private async Task Delete()
+    {
+        if (_onDeleteRequested != null)
+        {
+            await _onDeleteRequested(this);
+        }
+    }
 }
+
