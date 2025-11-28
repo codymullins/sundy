@@ -67,6 +67,9 @@ public partial class App : Application
             {
                 DataContext = mainViewModel
             };
+            
+            // Initialize the view model asynchronously
+            _ = mainViewModel.InitializeAsync();
         }
         else if (ApplicationLifetime is ISingleViewApplicationLifetime singleViewPlatform)
         {
@@ -77,6 +80,9 @@ public partial class App : Application
             {
                 DataContext = mainViewModel
             };
+            
+            // Initialize the view model asynchronously
+            _ = mainViewModel.InitializeAsync();
         }
 
         base.OnFrameworkInitializationCompleted();

@@ -77,6 +77,14 @@
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
+                    
+                    <!-- Show "New Local Calendar" link when no calendars exist -->
+                    <Button Content="+ New Local Calendar"
+                            Command="{Binding CreateNewCalendarCommand}"
+                            IsVisible="{Binding HasNoCalendars}"
+                            Classes="link"
+                            HorizontalAlignment="Left"
+                            Margin="0,10,0,0"/>
                 </StackPanel>
             </Border>
             

@@ -52,6 +52,8 @@ public partial class MainViewModel : ViewModelBase
     [ObservableProperty]
     private EventEditViewModel? _eventEditViewModel;
 
+    public bool HasNoCalendars => Calendars?.Count == 0;
+
     public int ViewModeIndex
     {
         get => CalendarViewModel.ViewMode switch
@@ -126,6 +128,7 @@ public partial class MainViewModel : ViewModelBase
         var calendars = await _db.Calendars.ToListAsync();
         Calendars = new ObservableCollection<CalendarListItemViewModel>(
             calendars.Select(c => new CalendarListItemViewModel(c, OnCalendarVisibilityChanged)));
+        OnPropertyChanged(nameof(HasNoCalendars));
     }
 
     private async void OnCalendarVisibilityChanged()
@@ -190,6 +193,27 @@ public partial class MainViewModel : ViewModelBase
     {
         IsEventDialogOpen = false;
         EventEditViewModel = null;
+    }
+
+    [RelayCommand]
+    private async Task CreateNewCalendar()
+    {
+        var calendar = new Calendar
+        {
+            Id = Guid.NewGuid().ToString(),
+            Name = "My Calendar",
+            Color = "#4A90E2", // Default blue
+            Type = CalendarType.Local,
+            EnableBlocking = true,
+            ReceiveBlocks = true
+        };
+        
+        _db.Calendars.Add(calendar);
+        await _db.SaveChangesAsync();
+        
+        await LoadCalendarListAsync();
+        await CalendarViewModel.LoadCalendarsAsync();
+        await CalendarViewModel.RefreshViewAsync();
     }
 }
 
