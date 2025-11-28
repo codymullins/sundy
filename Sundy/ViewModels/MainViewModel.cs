@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Sundy.Core;
 
 namespace Sundy.ViewModels;
@@ -13,13 +14,18 @@ public partial class MainViewModel : ViewModelBase
 {
     private readonly SundyDbContext _db;
     private readonly BlockingEngine _blockingEngine;
+    private readonly ILogger<MainViewModel> _logger;
 
     public MainViewModel(
         SundyDbContext db,
-        BlockingEngine blockingEngine)
+        BlockingEngine blockingEngine,
+        ILogger<MainViewModel> logger)
     {
         _db = db;
         _blockingEngine = blockingEngine;
+        _logger = logger;
+
+        _logger.LogInformation("MainViewModel initialized");
 
         CalendarViewModel = new CalendarViewModel(blockingEngine, db);
         CalendarViewModel.PropertyChanged += (_, e) =>
@@ -33,7 +39,7 @@ public partial class MainViewModel : ViewModelBase
     }
 
     // For design-time support
-    public MainViewModel() : this(null!, null!)
+    public MainViewModel() : this(null!, null!, null!)
     {
     }
 
@@ -212,13 +218,20 @@ public partial class MainViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private async void CloseSettingsDialog()
+    private async Task CloseSettingsDialog()
     {
-        IsSettingsDialogOpen = false;
-        CalendarSettingsViewModel = null;
-        await LoadCalendarListAsync();
-        await CalendarViewModel.LoadCalendarsAsync();
-        await CalendarViewModel.RefreshViewAsync();
+        try
+        {
+            IsSettingsDialogOpen = false;
+            CalendarSettingsViewModel = null;
+            await LoadCalendarListAsync();
+            await CalendarViewModel.LoadCalendarsAsync();
+            await CalendarViewModel.RefreshViewAsync();
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error closing settings: {ex.Message}");
+        }
     }
 
     [RelayCommand]

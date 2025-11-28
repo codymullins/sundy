@@ -139,7 +139,7 @@
                     
                     <TextBlock TextWrapping="Wrap">
                         <Run Text="Are you sure you want to delete "/>
-                        <Run Text="{Binding CalendarToDelete.Name}" FontWeight="SemiBold"/>
+                        <Run Text="{Binding CalendarToDelete.Name, FallbackValue='this calendar'}" FontWeight="SemiBold"/>
                         <Run Text="? This will permanently delete all events in this calendar and cannot be undone."/>
                     </TextBlock>
                     
@@ -148,11 +148,13 @@
                                 Content="Cancel"
                                 Command="{Binding CancelDeleteCommand}"
                                 Classes="modern"
+                                IsEnabled="{Binding !IsDeleting}"
                                 HorizontalAlignment="Stretch"/>
                         <Button Grid.Column="1"
                                 Content="Delete"
                                 Command="{Binding ConfirmDeleteCommand}"
                                 Classes="danger"
+                                IsEnabled="{Binding !IsDeleting}"
                                 HorizontalAlignment="Stretch"/>
                     </Grid>
                 </StackPanel>

@@ -1,12 +1,12 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Data.Core;
 using Avalonia.Data.Core.Plugins;
 using System;
 using System.Linq;
 using Avalonia.Markup.Xaml;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Serilog;
 using Sundy.Core;
 using Sundy.ViewModels;
 using Sundy.Views;
@@ -23,6 +23,12 @@ public partial class App : Application
     public override void OnFrameworkInitializationCompleted()
     {
         var services = new ServiceCollection();
+        
+        // Add logging
+        services.AddLogging(builder =>
+        {
+            builder.AddSerilog(dispose: false);
+        });
         
         // Get the application data path
         var appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);

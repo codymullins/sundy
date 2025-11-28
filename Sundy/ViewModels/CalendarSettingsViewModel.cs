@@ -12,9 +12,9 @@ namespace Sundy.ViewModels;
 public partial class CalendarSettingsViewModel : ObservableObject
 {
     private readonly SundyDbContext _db;
-    private readonly Action? _onClosed;
+    private readonly Func<Task>? _onClosed;
 
-    public CalendarSettingsViewModel(SundyDbContext db, Action? onClosed = null)
+    public CalendarSettingsViewModel(SundyDbContext db, Func<Task>? onClosed = null)
     {
         _db = db;
         _onClosed = onClosed;
@@ -31,6 +31,9 @@ public partial class CalendarSettingsViewModel : ObservableObject
 
     [ObservableProperty]
     private string _newCalendarName = string.Empty;
+
+    [ObservableProperty]
+    private bool _isDeleting;
 
     [RelayCommand]
     private async Task CreateCalendar()
@@ -64,38 +67,86 @@ public partial class CalendarSettingsViewModel : ObservableObject
     [RelayCommand]
     private async Task ConfirmDelete()
     {
-        if (CalendarToDelete == null) return;
+        if (CalendarToDelete == null || IsDeleting) 
+            return;
 
-        // Find and remove the calendar from the database
-        var calendar = await _db.Calendars.FindAsync(CalendarToDelete.Id);
-        if (calendar != null)
+        IsDeleting = true;
+        try
         {
-            // Also delete all events in this calendar
-            var events = await _db.Events
-                .Where(e => e.CalendarId == calendar.Id)
+            var calendarId = CalendarToDelete.Id;
+            
+            // Get all event IDs for this calendar first
+            var eventIds = await _db.Events
+                .Where(e => e.CalendarId == calendarId)
+                .Select(e => e.Id)
                 .ToListAsync();
-            _db.Events.RemoveRange(events);
 
-            // Delete all blocking relationships for this calendar
+            // Delete all blocking relationships involving this calendar or its events
             var blockingRelationships = await _db.BlockingRelationships
-                .Where(br => br.SourceCalendarId == calendar.Id)
+                .Where(br => br.SourceCalendarId == calendarId || 
+                             eventIds.Contains(br.SourceEventId))
                 .ToListAsync();
-            _db.BlockingRelationships.RemoveRange(blockingRelationships);
+            
+            if (blockingRelationships.Any())
+            {
+                _db.BlockingRelationships.RemoveRange(blockingRelationships);
+            }
 
-            // Delete all blocked events for this calendar
+            // Delete all blocked events targeting this calendar or its events
             var blockedEvents = await _db.BlockedEvents
-                .Where(be => be.TargetCalendarId == calendar.Id)
+                .Where(be => be.TargetCalendarId == calendarId || 
+                             eventIds.Contains(be.TargetEventId))
                 .ToListAsync();
-            _db.BlockedEvents.RemoveRange(blockedEvents);
+            
+            if (blockedEvents.Any())
+            {
+                _db.BlockedEvents.RemoveRange(blockedEvents);
+            }
 
-            _db.Calendars.Remove(calendar);
+            // Delete all events in this calendar
+            var events = await _db.Events
+                .Where(e => e.CalendarId == calendarId)
+                .ToListAsync();
+            
+            if (events.Any())
+            {
+                _db.Events.RemoveRange(events);
+            }
+
+            // Find and delete the calendar itself
+            var calendar = await _db.Calendars
+                .FirstOrDefaultAsync(c => c.Id == calendarId);
+            
+            if (calendar != null)
+            {
+                _db.Calendars.Remove(calendar);
+            }
+            
+            // Save all changes to the database
             await _db.SaveChangesAsync();
 
+            // Remove from UI collection
             Calendars.Remove(CalendarToDelete);
-        }
 
-        IsDeleteConfirmationOpen = false;
-        CalendarToDelete = null;
+            IsDeleteConfirmationOpen = false;
+            CalendarToDelete = null;
+        }
+        catch (Exception ex)
+        {
+            // Log the error
+            System.Diagnostics.Debug.WriteLine($"Error deleting calendar: {ex.Message}");
+            System.Diagnostics.Debug.WriteLine($"Stack trace: {ex.StackTrace}");
+            if (ex.InnerException != null)
+            {
+                System.Diagnostics.Debug.WriteLine($"Inner exception: {ex.InnerException.Message}");
+            }
+        }
+        finally
+        {
+            IsDeleting = false;
+            IsDeleteConfirmationOpen = false;
+            CalendarToDelete = null;
+        }
     }
 
     [RelayCommand]
@@ -106,9 +157,12 @@ public partial class CalendarSettingsViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void Close()
+    private async Task Close()
     {
-        _onClosed?.Invoke();
+        if (_onClosed != null)
+        {
+            await _onClosed();
+        }
     }
     
     public async Task LoadCalendarsAsync()

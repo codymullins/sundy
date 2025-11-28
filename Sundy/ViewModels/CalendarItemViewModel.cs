@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -11,6 +12,7 @@ public partial class CalendarItemViewModel : ObservableObject
     private readonly Calendar _calendar;
     private readonly SundyDbContext _db;
     private readonly Func<CalendarItemViewModel, Task>? _onDeleteRequested;
+    private CancellationTokenSource? _saveCts;
 
     public CalendarItemViewModel(Calendar calendar, SundyDbContext db, Func<CalendarItemViewModel, Task>? onDeleteRequested = null)
     {
@@ -31,8 +33,8 @@ public partial class CalendarItemViewModel : ObservableObject
             if (_calendar.EnableBlocking != value)
             {
                 _calendar.EnableBlocking = value;
-                _db.SaveChangesAsync();
                 OnPropertyChanged();
+                DebouncedSave();
             }
         }
     }
@@ -45,10 +47,36 @@ public partial class CalendarItemViewModel : ObservableObject
             if (_calendar.ReceiveBlocks != value)
             {
                 _calendar.ReceiveBlocks = value;
-                _db.SaveChangesAsync();
                 OnPropertyChanged();
+                DebouncedSave();
             }
         }
+    }
+
+    private void DebouncedSave()
+    {
+        _saveCts?.Cancel();
+        _saveCts = new CancellationTokenSource();
+        var token = _saveCts.Token;
+
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                await Task.Delay(500, token);
+                if (!token.IsCancellationRequested)
+                {
+                    await _db.SaveChangesAsync(token);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error saving calendar changes: {ex.Message}");
+            }
+        }, token);
     }
 
     [RelayCommand]
