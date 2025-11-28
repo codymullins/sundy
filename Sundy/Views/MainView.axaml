@@ -1,0 +1,92 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Sundy.ViewModels"
+             xmlns:views="using:Sundy.Views"
+             x:Class="Sundy.Views.MainView"
+             x:DataType="vm:MainViewModel">
+    
+    <Design.DataContext>
+        <vm:MainViewModel/>
+    </Design.DataContext>
+    
+    <Grid RowDefinitions="Auto,*">
+        <!-- Top Navigation Bar -->
+        <Border Grid.Row="0" Background="#F5F5F5" Padding="10">
+            <Grid ColumnDefinitions="*,Auto">
+                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="10">
+                    <Button Content="Today" 
+                            Command="{Binding GoToTodayCommand}"
+                            Classes="modern"/>
+                    <Button Content="◄" 
+                            Command="{Binding PreviousPeriodCommand}"
+                            Classes="modern"/>
+                    <Button Content="►" 
+                            Command="{Binding NextPeriodCommand}"
+                            Classes="modern"/>
+                    <TextBlock Text="{Binding CurrentPeriodDisplay}" 
+                               VerticalAlignment="Center"
+                               FontSize="18"
+                               FontWeight="SemiBold"
+                               Margin="10,0,0,0"/>
+                </StackPanel>
+                
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10">
+                    <ComboBox SelectedIndex="{Binding ViewModeIndex}"
+                              Width="120">
+                        <ComboBoxItem Content="Day"/>
+                        <ComboBoxItem Content="Week"/>
+                        <ComboBoxItem Content="Month"/>
+                    </ComboBox>
+                    <Button Content="⚙ Settings" 
+                            Command="{Binding OpenSettingsCommand}"
+                            Classes="modern"/>
+                    <Button Content="+ New Event" 
+                            Command="{Binding CreateEventCommand}"
+                            Classes="accent"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+        
+        <!-- Main Content Area -->
+        <Grid Grid.Row="1" ColumnDefinitions="200,*">
+            <!-- Sidebar: Calendar List -->
+            <Border Grid.Column="0" 
+                    Background="#FAFAFA" 
+                    BorderBrush="#E0E0E0" 
+                    BorderThickness="0,0,1,0"
+                    Padding="10">
+                <StackPanel Spacing="10">
+                    <TextBlock Text="My Calendars" 
+                               FontWeight="Bold" 
+                               FontSize="14"/>
+                    
+                    <ItemsControl ItemsSource="{Binding Calendars}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <CheckBox IsChecked="{Binding IsVisible}"
+                                          Margin="0,5">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <Ellipse Width="12" 
+                                                 Height="12" 
+                                                 Fill="{Binding Color}"/>
+                                        <TextBlock Text="{Binding Name}"/>
+                                    </StackPanel>
+                                </CheckBox>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+            
+            <!-- Calendar View Area -->
+            <ContentControl Grid.Column="1" 
+                            Content="{Binding CalendarViewModel}">
+                <ContentControl.ContentTemplate>
+                    <DataTemplate>
+                        <views:CalendarView/>
+                    </DataTemplate>
+                </ContentControl.ContentTemplate>
+            </ContentControl>
+        </Grid>
+    </Grid>
+</UserControl>
