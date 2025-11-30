@@ -3,13 +3,13 @@
         xmlns:scheduler="using:Sundy.Controls.Scheduler">
 
     <Design.PreviewWith>
-        <Border Padding="20" Background="#1a1a1a" Width="300" Height="50">
-            <scheduler:CurrentTimeIndicator IndicatorBrush="#FF3B82F6"/>
+        <Border Padding="20" Background="{DynamicResource BackgroundPrimary}" Width="300" Height="50">
+            <scheduler:CurrentTimeIndicator IndicatorBrush="{DynamicResource AccentPrimary}"/>
         </Border>
     </Design.PreviewWith>
 
     <Style Selector="scheduler|CurrentTimeIndicator">
-        <Setter Property="IndicatorBrush" Value="#FF3B82F6"/>
+        <Setter Property="IndicatorBrush" Value="{DynamicResource AccentPrimary}"/>
         <Setter Property="Height" Value="20"/>
         <Setter Property="Template">
             <ControlTemplate>

@@ -15,26 +15,26 @@
             <Grid RowDefinitions="Auto,*">
                 <!-- Day Headers -->
                 <Grid Grid.Row="0" ColumnDefinitions="*,*,*,*,*,*,*" Height="40">
-                    <Border Grid.Column="0" Background="#F0F0F0" BorderBrush="#E0E0E0" BorderThickness="0,0,1,1">
-                        <TextBlock Text="Sunday" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                    <Border Grid.Column="0" Background="{DynamicResource BackgroundHover}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,1">
+                        <TextBlock Text="Sunday" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="SemiBold" Foreground="{DynamicResource ForegroundPrimary}"/>
                     </Border>
-                    <Border Grid.Column="1" Background="#F0F0F0" BorderBrush="#E0E0E0" BorderThickness="0,0,1,1">
-                        <TextBlock Text="Monday" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                    <Border Grid.Column="1" Background="{DynamicResource BackgroundHover}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,1">
+                        <TextBlock Text="Monday" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="SemiBold" Foreground="{DynamicResource ForegroundPrimary}"/>
                     </Border>
-                    <Border Grid.Column="2" Background="#F0F0F0" BorderBrush="#E0E0E0" BorderThickness="0,0,1,1">
-                        <TextBlock Text="Tuesday" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                    <Border Grid.Column="2" Background="{DynamicResource BackgroundHover}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,1">
+                        <TextBlock Text="Tuesday" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="SemiBold" Foreground="{DynamicResource ForegroundPrimary}"/>
                     </Border>
-                    <Border Grid.Column="3" Background="#F0F0F0" BorderBrush="#E0E0E0" BorderThickness="0,0,1,1">
-                        <TextBlock Text="Wednesday" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                    <Border Grid.Column="3" Background="{DynamicResource BackgroundHover}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,1">
+                        <TextBlock Text="Wednesday" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="SemiBold" Foreground="{DynamicResource ForegroundPrimary}"/>
                     </Border>
-                    <Border Grid.Column="4" Background="#F0F0F0" BorderBrush="#E0E0E0" BorderThickness="0,0,1,1">
-                        <TextBlock Text="Thursday" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                    <Border Grid.Column="4" Background="{DynamicResource BackgroundHover}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,1">
+                        <TextBlock Text="Thursday" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="SemiBold" Foreground="{DynamicResource ForegroundPrimary}"/>
                     </Border>
-                    <Border Grid.Column="5" Background="#F0F0F0" BorderBrush="#E0E0E0" BorderThickness="0,0,1,1">
-                        <TextBlock Text="Friday" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                    <Border Grid.Column="5" Background="{DynamicResource BackgroundHover}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,1">
+                        <TextBlock Text="Friday" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="SemiBold" Foreground="{DynamicResource ForegroundPrimary}"/>
                     </Border>
-                    <Border Grid.Column="6" Background="#F0F0F0" BorderBrush="#E0E0E0" BorderThickness="0,0,0,1">
-                        <TextBlock Text="Saturday" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                    <Border Grid.Column="6" Background="{DynamicResource BackgroundHover}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1">
+                        <TextBlock Text="Saturday" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="SemiBold" Foreground="{DynamicResource ForegroundPrimary}"/>
                     </Border>
                 </Grid>
                 
@@ -47,7 +47,7 @@
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Border BorderBrush="#E0E0E0" 
+                            <Border BorderBrush="{DynamicResource BorderBrush}" 
                                     BorderThickness="0,0,1,1"
                                     Background="{Binding Background}"
                                     Padding="5">
@@ -97,10 +97,10 @@
                     <ItemsControl Grid.Row="1" Grid.Column="0" ItemsSource="{Binding TimeSlots}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Border Height="60" BorderBrush="#E0E0E0" BorderThickness="0,0,1,1">
+                                <Border Height="60" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,1">
                                     <TextBlock Text="{Binding TimeLabel}" 
                                                FontSize="11"
-                                               Foreground="#666"
+                                               Foreground="{DynamicResource ForegroundMuted}"
                                                Margin="5,0"/>
                                 </Border>
                             </DataTemplate>
@@ -116,14 +116,15 @@
                         </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Border Background="#F0F0F0" 
-                                        BorderBrush="#E0E0E0" 
+                                <Border Background="{DynamicResource BackgroundHover}" 
+                                        BorderBrush="{DynamicResource BorderBrush}" 
                                         BorderThickness="0,0,1,1"
                                         Padding="8">
                                     <StackPanel HorizontalAlignment="Center">
                                         <TextBlock Text="{Binding DayName}" 
                                                    FontSize="12"
-                                                   FontWeight="SemiBold"/>
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource ForegroundPrimary}"/>
                                         <TextBlock Text="{Binding Date}" 
                                                    FontSize="20"
                                                    Foreground="{Binding DateColor}"/>
@@ -145,7 +146,7 @@
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <Border Height="60" 
-                                            BorderBrush="#E0E0E0" 
+                                            BorderBrush="{DynamicResource BorderBrush}" 
                                             BorderThickness="0,0,1,1"/>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
@@ -194,10 +195,10 @@
                     <ItemsControl Grid.Column="0" ItemsSource="{Binding TimeSlots}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Border Height="60" BorderBrush="#E0E0E0" BorderThickness="0,0,1,1">
+                                <Border Height="60" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,1">
                                     <TextBlock Text="{Binding TimeLabel}" 
                                                FontSize="11"
-                                               Foreground="#666"
+                                               Foreground="{DynamicResource ForegroundMuted}"
                                                Margin="5,0"/>
                                 </Border>
                             </DataTemplate>
@@ -211,7 +212,7 @@
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <Border Height="60" 
-                                            BorderBrush="#E0E0E0" 
+                                            BorderBrush="{DynamicResource BorderBrush}" 
                                             BorderThickness="0,0,1,1"/>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>

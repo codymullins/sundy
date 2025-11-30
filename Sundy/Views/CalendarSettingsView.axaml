@@ -6,7 +6,7 @@
              Width="700">
     
     <Grid>
-        <Border Background="White" 
+        <Border Background="{DynamicResource BackgroundPrimary}" 
                 CornerRadius="8" 
                 Padding="24"
                 BoxShadow="0 4 16 #30000000">
@@ -16,6 +16,7 @@
                            Text="Calendar Settings"
                            FontSize="24"
                            FontWeight="SemiBold"
+                           Foreground="{DynamicResource ForegroundPrimary}"
                            Margin="0,0,0,24"/>
                 
                 <!-- Calendar List -->
@@ -24,11 +25,12 @@
                         <TextBlock Text="Calendars"
                                    FontWeight="SemiBold"
                                    FontSize="16"
+                                   Foreground="{DynamicResource ForegroundPrimary}"
                                    Margin="0,0,0,8"/>
                         
                         <!-- Empty state -->
                         <TextBlock Text="No calendars yet. Create one below."
-                                   Foreground="#999999"
+                                   Foreground="{DynamicResource ForegroundDisabled}"
                                    FontStyle="Italic"
                                    IsVisible="{Binding !Calendars.Count}"/>
                         
@@ -36,7 +38,7 @@
                         <ItemsControl ItemsSource="{Binding Calendars}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <Border BorderBrush="#E0E0E0"
+                                    <Border BorderBrush="{DynamicResource BorderBrush}"
                                             BorderThickness="1"
                                             CornerRadius="6"
                                             Padding="16"
@@ -55,6 +57,7 @@
                                                        Text="{Binding Name}"
                                                        FontSize="16"
                                                        FontWeight="SemiBold"
+                                                       Foreground="{DynamicResource ForegroundPrimary}"
                                                        VerticalAlignment="Center"/>
                                             
                                             <!-- Delete Button -->
@@ -85,14 +88,15 @@
                 
                 <!-- New Calendar Section -->
                 <Border Grid.Row="2"
-                        BorderBrush="#E0E0E0"
+                        BorderBrush="{DynamicResource BorderBrush}"
                         BorderThickness="0,1,0,0"
                         Padding="0,20,0,0"
                         Margin="0,20,0,0">
                     <StackPanel Spacing="12">
                         <TextBlock Text="Create New Calendar"
                                    FontWeight="SemiBold"
-                                   FontSize="16"/>
+                                   FontSize="16"
+                                   Foreground="{DynamicResource ForegroundPrimary}"/>
                         
                         <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
                             <TextBox Grid.Column="0"
@@ -125,7 +129,7 @@
                 Background="#80000000"
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Stretch">
-            <Border Background="White"
+            <Border Background="{DynamicResource BackgroundPrimary}"
                     CornerRadius="8"
                     Padding="24"
                     MaxWidth="400"
@@ -135,9 +139,11 @@
                 <StackPanel Spacing="16">
                     <TextBlock Text="Delete Calendar?"
                                FontSize="20"
-                               FontWeight="SemiBold"/>
+                               FontWeight="SemiBold"
+                               Foreground="{DynamicResource ForegroundPrimary}"/>
                     
-                    <TextBlock TextWrapping="Wrap">
+                    <TextBlock TextWrapping="Wrap"
+                               Foreground="{DynamicResource ForegroundPrimary}">
                         <Run Text="Are you sure you want to delete "/>
                         <Run Text="{Binding CalendarToDelete.Name, FallbackValue='this calendar'}" FontWeight="SemiBold"/>
                         <Run Text="? This will permanently delete all events in this calendar and cannot be undone."/>

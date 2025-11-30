@@ -1,0 +1,80 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    
+    <!-- Background Colors -->
+    <Color x:Key="BackgroundPrimaryColor">#1a1a1a</Color>
+    <Color x:Key="BackgroundSecondaryColor">#2d2d2d</Color>
+    <Color x:Key="BackgroundTertiaryColor">#3d3d3d</Color>
+    <Color x:Key="BackgroundHoverColor">#4d4d4d</Color>
+    <Color x:Key="BackgroundPressedColor">#5d5d5d</Color>
+    
+    <SolidColorBrush x:Key="BackgroundPrimary" Color="{StaticResource BackgroundPrimaryColor}"/>
+    <SolidColorBrush x:Key="BackgroundSecondary" Color="{StaticResource BackgroundSecondaryColor}"/>
+    <SolidColorBrush x:Key="BackgroundTertiary" Color="{StaticResource BackgroundTertiaryColor}"/>
+    <SolidColorBrush x:Key="BackgroundHover" Color="{StaticResource BackgroundHoverColor}"/>
+    <SolidColorBrush x:Key="BackgroundPressed" Color="{StaticResource BackgroundPressedColor}"/>
+    
+    <!-- Foreground Colors -->
+    <Color x:Key="ForegroundPrimaryColor">#FFFFFF</Color>
+    <Color x:Key="ForegroundSecondaryColor">#E0E0E0</Color>
+    <Color x:Key="ForegroundMutedColor">#B0B0B0</Color>
+    <Color x:Key="ForegroundDisabledColor">#808080</Color>
+    <Color x:Key="ForegroundOnAccentColor">#FFFFFF</Color>
+    
+    <SolidColorBrush x:Key="ForegroundPrimary" Color="{StaticResource ForegroundPrimaryColor}"/>
+    <SolidColorBrush x:Key="ForegroundSecondary" Color="{StaticResource ForegroundSecondaryColor}"/>
+    <SolidColorBrush x:Key="ForegroundMuted" Color="{StaticResource ForegroundMutedColor}"/>
+    <SolidColorBrush x:Key="ForegroundDisabled" Color="{StaticResource ForegroundDisabledColor}"/>
+    <SolidColorBrush x:Key="ForegroundOnAccent" Color="{StaticResource ForegroundOnAccentColor}"/>
+    
+    <!-- Border Colors -->
+    <Color x:Key="BorderBrushColor">#404040</Color>
+    <Color x:Key="BorderBrushFocusColor">#4A90E2</Color>
+    <Color x:Key="BorderBrushHoverColor">#505050</Color>
+    
+    <SolidColorBrush x:Key="BorderBrush" Color="{StaticResource BorderBrushColor}"/>
+    <SolidColorBrush x:Key="BorderBrushFocus" Color="{StaticResource BorderBrushFocusColor}"/>
+    <SolidColorBrush x:Key="BorderBrushHover" Color="{StaticResource BorderBrushHoverColor}"/>
+    
+    <!-- Accent Colors -->
+    <Color x:Key="AccentPrimaryColor">#3B82F6</Color>
+    <Color x:Key="AccentHoverColor">#2563EB</Color>
+    <Color x:Key="AccentPressedColor">#1D4ED8</Color>
+    
+    <SolidColorBrush x:Key="AccentPrimary" Color="{StaticResource AccentPrimaryColor}"/>
+    <SolidColorBrush x:Key="AccentHover" Color="{StaticResource AccentHoverColor}"/>
+    <SolidColorBrush x:Key="AccentPressed" Color="{StaticResource AccentPressedColor}"/>
+    
+    <!-- Danger/Error Colors -->
+    <Color x:Key="DangerPrimaryColor">#EF4444</Color>
+    <Color x:Key="DangerBackgroundColor">#450a0a</Color>
+    <Color x:Key="DangerHoverColor">#7f1d1d</Color>
+    
+    <SolidColorBrush x:Key="DangerPrimary" Color="{StaticResource DangerPrimaryColor}"/>
+    <SolidColorBrush x:Key="DangerBackground" Color="{StaticResource DangerBackgroundColor}"/>
+    <SolidColorBrush x:Key="DangerHover" Color="{StaticResource DangerHoverColor}"/>
+    
+    <!-- Warning Colors -->
+    <Color x:Key="WarningBackgroundColor">#451a03</Color>
+    <Color x:Key="WarningBorderColor">#F59E0B</Color>
+    
+    <SolidColorBrush x:Key="WarningBackground" Color="{StaticResource WarningBackgroundColor}"/>
+    <SolidColorBrush x:Key="WarningBorder" Color="{StaticResource WarningBorderColor}"/>
+    
+    <!-- Shadow Colors -->
+    <Color x:Key="ShadowColor">#60000000</Color>
+    <Color x:Key="ShadowLightColor">#40000000</Color>
+    
+    <!-- Scheduler Specific -->
+    <Color x:Key="SchedulerTimeTextColor">#808080</Color>
+    <Color x:Key="SchedulerLineColor">#404040</Color>
+    
+    <SolidColorBrush x:Key="SchedulerTimeText" Color="{StaticResource SchedulerTimeTextColor}"/>
+    <SolidColorBrush x:Key="SchedulerLine" Color="{StaticResource SchedulerLineColor}"/>
+    
+    <!-- Time Block Colors -->
+    <Color x:Key="TimeBlockHandleColor">#FFFFFF</Color>
+    <SolidColorBrush x:Key="TimeBlockHandle" Color="{StaticResource TimeBlockHandleColor}"/>
+    
+</ResourceDictionary>
+

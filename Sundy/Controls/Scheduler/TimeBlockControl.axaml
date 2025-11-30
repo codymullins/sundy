@@ -3,16 +3,16 @@
         xmlns:scheduler="using:Sundy.Controls.Scheduler">
 
     <Design.PreviewWith>
-        <Border Padding="20" Background="#1a1a1a" Width="300" Height="200">
+        <Border Padding="20" Background="{DynamicResource BackgroundPrimary}" Width="300" Height="200">
             <scheduler:TimeBlockControl Width="280" Height="120"
                                         BlockBrush="#CC3B82F6"
-                                        HandleBrush="White"/>
+                                        HandleBrush="{DynamicResource TimeBlockHandle}"/>
         </Border>
     </Design.PreviewWith>
 
     <Style Selector="scheduler|TimeBlockControl">
         <Setter Property="BlockBrush" Value="#CC3B82F6"/>
-        <Setter Property="HandleBrush" Value="White"/>
+        <Setter Property="HandleBrush" Value="{DynamicResource TimeBlockHandle}"/>
         <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="Template">
             <ControlTemplate>
@@ -47,10 +47,11 @@
                                 <TextBlock Text="{Binding TimeBlock.TimeRangeText, RelativeSource={RelativeSource TemplatedParent}}"
                                            FontWeight="SemiBold"
                                            FontSize="14"
-                                           Foreground="White"/>
+                                           Foreground="{DynamicResource ForegroundOnAccent}"/>
                                 <TextBlock Text="{Binding TimeBlock.DurationText, RelativeSource={RelativeSource TemplatedParent}}"
                                            FontSize="12"
-                                           Foreground="#CCFFFFFF"/>
+                                           Foreground="{DynamicResource ForegroundOnAccent}"
+                                           Opacity="0.8"/>
                             </StackPanel>
                         </Border>
                         

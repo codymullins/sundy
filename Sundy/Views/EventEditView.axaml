@@ -6,7 +6,7 @@
              xmlns:scheduler="using:Sundy.Controls.Scheduler"
              Width="600">
 
-    <Border Background="White"
+    <Border Background="{DynamicResource BackgroundPrimary}"
             CornerRadius="8"
             Padding="24"
             BoxShadow="0 4 16 #30000000">
@@ -19,6 +19,7 @@
                            Text="{Binding DialogTitle}"
                            FontSize="24"
                            FontWeight="SemiBold"
+                           Foreground="{DynamicResource ForegroundPrimary}"
                            VerticalAlignment="Center"
                            Margin="0,0,12,0" />
 
@@ -33,8 +34,8 @@
                         x:Name="CalendarSelectorButton">
                     <Button.Flyout>
                         <Flyout Placement="Bottom">
-                            <Border Background="White"
-                                    BorderBrush="#E0E0E0"
+                            <Border Background="{DynamicResource BackgroundPrimary}"
+                                    BorderBrush="{DynamicResource BorderBrush}"
                                     BorderThickness="1"
                                     CornerRadius="4"
                                     Padding="4"
@@ -53,7 +54,7 @@
                                                 Cursor="Hand">
                                                 <Button.Styles>
                                                     <Style Selector="Button:pointerover">
-                                                        <Setter Property="Background" Value="#F5F5F5" />
+                                                        <Setter Property="Background" Value="{DynamicResource BackgroundSecondary}" />
                                                     </Style>
                                                 </Button.Styles>
                                                 <StackPanel Orientation="Horizontal" Spacing="8">
@@ -62,7 +63,8 @@
                                                             Background="{Binding Color}"
                                                             CornerRadius="3" />
                                                     <TextBlock Text="{Binding Name}"
-                                                               VerticalAlignment="Center" />
+                                                               VerticalAlignment="Center"
+                                                               Foreground="{DynamicResource ForegroundPrimary}" />
                                                 </StackPanel>
                                             </Button>
                                         </DataTemplate>
@@ -79,10 +81,10 @@
                                 IsVisible="{Binding SelectedCalendar, Converter={x:Static ObjectConverters.IsNotNull}}" />
                         <TextBlock Text="{Binding SelectedCalendar.Name, FallbackValue='Select Calendar'}"
                                    FontSize="16"
-                                   Foreground="#666"
+                                   Foreground="{DynamicResource ForegroundMuted}"
                                    VerticalAlignment="Center" />
                         <Path Data="M 0 0 L 4 4 L 8 0"
-                              Stroke="#666"
+                              Stroke="{DynamicResource ForegroundMuted}"
                               StrokeThickness="1.5"
                               VerticalAlignment="Center"
                               Margin="4,2,0,0" />
@@ -95,15 +97,15 @@
                 <StackPanel Spacing="16" Margin="2,0,2,8">
                     <!-- Blocking Event Warning -->
                     <Border IsVisible="{Binding IsEditMode}"
-                            Background="#FFF3E0"
-                            BorderBrush="#FFB74D"
+                            Background="{DynamicResource WarningBackground}"
+                            BorderBrush="{DynamicResource WarningBorder}"
                             BorderThickness="1"
                             CornerRadius="4"
                             Padding="12">
                         <TextBlock Text="{Binding BlockingSourceText}"
                                    TextWrapping="Wrap"
                                    FontSize="12"
-                                   Foreground="#E65100"
+                                   Foreground="{DynamicResource WarningBorder}"
                                    IsVisible="{Binding IsBlockingEvent}" />
                     </Border>
 
@@ -111,7 +113,8 @@
                     <StackPanel Spacing="6">
                         <TextBlock Text="Title *"
                                    FontWeight="SemiBold"
-                                   FontSize="14" />
+                                   FontSize="14"
+                                   Foreground="{DynamicResource ForegroundPrimary}" />
                         <TextBox Text="{Binding Title}"
                                  Watermark="Event title"
                                  IsEnabled="{Binding !IsBlockingEvent}" />
@@ -121,12 +124,13 @@
                     <StackPanel Spacing="12">
                         <TextBlock Text="Date &amp; Time *"
                                    FontWeight="SemiBold"
-                                   FontSize="14" />
+                                   FontSize="14"
+                                   Foreground="{DynamicResource ForegroundPrimary}" />
     
                         <!-- Time Selection Preview -->
                         <Button Command="{Binding OpenSchedulerCommand}"
                                 Background="Transparent"
-                                BorderBrush="#E0E0E0"
+                                BorderBrush="{DynamicResource BorderBrush}"
                                 BorderThickness="1"
                                 CornerRadius="8"
                                 Padding="16"
@@ -136,7 +140,7 @@
                                 IsEnabled="{Binding !IsBlockingEvent}">
                             <Button.Styles>
                                 <Style Selector="Button:pointerover">
-                                    <Setter Property="Background" Value="#F5F5F5" />
+                                    <Setter Property="Background" Value="{DynamicResource BackgroundSecondary}" />
                                 </Style>
                             </Button.Styles>
                             <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="16">
@@ -160,25 +164,25 @@
                                     <TextBlock Text="{Binding Scheduler.SelectedDate, StringFormat='{}{0:dddd, MMMM d, yyyy}'}"
                                                FontSize="16"
                                                FontWeight="SemiBold"
-                                               Foreground="#1a1a1a" />
+                                               Foreground="{DynamicResource ForegroundPrimary}" />
                                     <TextBlock Text="{Binding Scheduler.TimeBlock.TimeRangeText}"
                                                FontSize="14"
-                                               Foreground="#666" />
+                                               Foreground="{DynamicResource ForegroundMuted}" />
                                     <TextBlock Text="{Binding Scheduler.TimeBlock.DurationText, StringFormat='Duration: {0}'}"
                                                FontSize="12"
-                                               Foreground="#999" />
+                                               Foreground="{DynamicResource ForegroundDisabled}" />
                                 </StackPanel>
                                 
                                 <!-- Edit Icon -->
                                 <Border Grid.Column="2"
                                         Width="32"
                                         Height="32"
-                                        Background="#E8E8E8"
+                                        Background="{DynamicResource BackgroundPressed}"
                                         CornerRadius="6"
                                         VerticalAlignment="Center">
                                     <Viewbox Width="16" Height="16">
                                         <Path Data="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"
-                                              Stroke="#666"
+                                              Stroke="{DynamicResource ForegroundMuted}"
                                               StrokeThickness="2"
                                               Fill="Transparent" />
                                     </Viewbox>
@@ -197,7 +201,8 @@
                     <StackPanel Spacing="6">
                         <TextBlock Text="Description"
                                    FontWeight="SemiBold"
-                                   FontSize="14" />
+                                   FontSize="14"
+                                   Foreground="{DynamicResource ForegroundPrimary}" />
                         <TextBox Text="{Binding Description}"
                                  Watermark="Add description"
                                  TextWrapping="Wrap"

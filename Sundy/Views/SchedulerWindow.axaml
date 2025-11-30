@@ -9,7 +9,7 @@
         Height="700"
         CanResize="False"
         WindowStartupLocation="CenterOwner"
-        Background="#1a1a1a">
+        Background="{DynamicResource BackgroundPrimary}">
     
     <Grid RowDefinitions="*,Auto">
         <!-- Scheduler View -->
@@ -18,9 +18,9 @@
         
         <!-- Action Buttons -->
         <Border Grid.Row="1" 
-                Background="#2d2d2d" 
+                Background="{DynamicResource BackgroundSecondary}" 
                 Padding="16"
-                BorderBrush="#404040"
+                BorderBrush="{DynamicResource BorderBrush}"
                 BorderThickness="0,1,0,0">
             <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="12">
                 <!-- Spacer -->
@@ -32,14 +32,14 @@
                         Command="{Binding CancelCommand}"
                         Width="100"
                         Height="36"
-                        Background="#3d3d3d"
-                        Foreground="White"
+                        Background="{DynamicResource BackgroundTertiary}"
+                        Foreground="{DynamicResource ForegroundPrimary}"
                         BorderThickness="0"
                         CornerRadius="6"
                         Cursor="Hand">
                     <Button.Styles>
                         <Style Selector="Button:pointerover">
-                            <Setter Property="Background" Value="#4d4d4d" />
+                            <Setter Property="Background" Value="{DynamicResource BackgroundHover}" />
                         </Style>
                     </Button.Styles>
                 </Button>
@@ -50,14 +50,14 @@
                         Command="{Binding ConfirmCommand}"
                         Width="100"
                         Height="36"
-                        Background="#3B82F6"
-                        Foreground="White"
+                        Background="{DynamicResource AccentPrimary}"
+                        Foreground="{DynamicResource ForegroundOnAccent}"
                         BorderThickness="0"
                         CornerRadius="6"
                         Cursor="Hand">
                     <Button.Styles>
                         <Style Selector="Button:pointerover">
-                            <Setter Property="Background" Value="#2563EB" />
+                            <Setter Property="Background" Value="{DynamicResource AccentHover}" />
                         </Style>
                     </Button.Styles>
                 </Button>

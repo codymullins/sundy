@@ -13,7 +13,7 @@
     <Grid>
         <Grid RowDefinitions="Auto,*">
         <!-- Top Navigation Bar -->
-        <Border Grid.Row="0" Background="#F5F5F5" Padding="10">
+        <Border Grid.Row="0" Background="{DynamicResource BackgroundSecondary}" Padding="10">
             <Grid ColumnDefinitions="*,Auto">
                 <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="10">
                     <Button Content="Today" 
@@ -29,6 +29,7 @@
                                VerticalAlignment="Center"
                                FontSize="18"
                                FontWeight="SemiBold"
+                               Foreground="{DynamicResource ForegroundPrimary}"
                                Margin="10,0,0,0"/>
                 </StackPanel>
                 
@@ -53,14 +54,15 @@
         <Grid Grid.Row="1" ColumnDefinitions="200,*">
             <!-- Sidebar: Calendar List -->
             <Border Grid.Column="0" 
-                    Background="#FAFAFA" 
-                    BorderBrush="#E0E0E0" 
+                    Background="{DynamicResource BackgroundTertiary}" 
+                    BorderBrush="{DynamicResource BorderBrush}" 
                     BorderThickness="0,0,1,0"
                     Padding="10">
                 <StackPanel Spacing="10">
                     <TextBlock Text="My Calendars" 
                                FontWeight="Bold" 
-                               FontSize="14"/>
+                               FontSize="14"
+                               Foreground="{DynamicResource ForegroundPrimary}"/>
                     
                     <ItemsControl ItemsSource="{Binding Calendars}">
                         <ItemsControl.ItemTemplate>
