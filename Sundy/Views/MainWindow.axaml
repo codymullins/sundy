@@ -7,6 +7,6 @@
         x:Class="Sundy.Views.MainWindow"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         Icon="/Assets/avalonia-logo.ico"
-        Title="AvaloniaApplication1">
+        Title="Sundy Calendar">
     <views1:MainView />
 </Window>

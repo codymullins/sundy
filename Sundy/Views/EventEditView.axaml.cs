@@ -1,4 +1,6 @@
+using System;
 using Avalonia.Controls;
+using Sundy.ViewModels;
 
 namespace Sundy.Views;
 
@@ -7,6 +9,71 @@ public partial class EventEditView : UserControl
     public EventEditView()
     {
         InitializeComponent();
+        
+        // Subscribe to DataContext changes to wire up the close flyout logic
+        this.DataContextChanged += OnDataContextChanged;
+    }
+
+    private void OnDataContextChanged(object? sender, EventArgs e)
+    {
+        if (DataContext is EventEditViewModel viewModel)
+        {
+            // Unsubscribe from previous if needed
+            viewModel.CalendarSelected -= OnCalendarSelected;
+            viewModel.SchedulerOpenRequested -= OnSchedulerOpenRequested;
+            
+            // Subscribe to new ViewModel
+            viewModel.CalendarSelected += OnCalendarSelected;
+            viewModel.SchedulerOpenRequested += OnSchedulerOpenRequested;
+        }
+    }
+
+    private void OnCalendarSelected(object? sender, EventArgs e)
+    {
+        // Close the flyout when a calendar is selected
+        var button = this.FindControl<Button>("CalendarSelectorButton");
+        if (button?.Flyout is Flyout flyout)
+        {
+            flyout.Hide();
+        }
+    }
+    
+    private async void OnSchedulerOpenRequested(object? sender, EventArgs e)
+    {
+        if (DataContext is not EventEditViewModel viewModel) return;
+        // DEBUG
+        Console.WriteLine($"Scheduler is null: {viewModel?.Scheduler == null}");
+        Console.WriteLine($"HourLines count: {viewModel?.Scheduler.HourLines.Count}");
+        Console.WriteLine($"PixelsPerHour: {viewModel?.Scheduler.PixelsPerHour}");
+        Console.WriteLine($"TotalHeight: {viewModel?.Scheduler.TotalHeight}");
+    
+        if (viewModel?.Scheduler.HourLines.Count > 0)
+        {
+            var first = viewModel.Scheduler.HourLines[0];
+            var last = viewModel.Scheduler.HourLines[^1];
+            Console.WriteLine($"First hour: {first.Hour}, Y={first.YPosition}, Label={first.Label}");
+            Console.WriteLine($"Last hour: {last.Hour}, Y={last.YPosition}, Label={last.Label}");
+        }
+
+        var schedulerWindow = new SchedulerWindow(viewModel.Scheduler);
+        
+        // Handle confirm
+        viewModel.Scheduler.Confirmed += (_, _) =>
+        {
+            schedulerWindow.Close();
+        };
+        
+        // Handle cancel
+        viewModel.Scheduler.Cancelled += (_, _) =>
+        {
+            schedulerWindow.Close();
+        };
+        
+        // Show dialog
+        var topLevel = TopLevel.GetTopLevel(this);
+        if (topLevel is Window owner)
+        {
+            await schedulerWindow.ShowDialog(owner);
+        }
     }
 }
-

@@ -3,23 +3,96 @@
              xmlns:vm="using:Sundy.ViewModels"
              x:Class="Sundy.Views.EventEditView"
              x:DataType="vm:EventEditViewModel"
+             xmlns:scheduler="using:Sundy.Controls.Scheduler"
              Width="600">
-    
-    <Border Background="White" 
-            CornerRadius="8" 
+
+    <Border Background="White"
+            CornerRadius="8"
             Padding="24"
             BoxShadow="0 4 16 #30000000">
         <Grid RowDefinitions="Auto,*,Auto">
-            <!-- Header -->
-            <TextBlock Grid.Row="0" 
-                       Text="{Binding DialogTitle}"
-                       FontSize="24"
-                       FontWeight="SemiBold"
-                       Margin="0,0,0,24"/>
-            
+            <!-- Header with Calendar Selection -->
+            <Grid Grid.Row="0"
+                  ColumnDefinitions="Auto,*"
+                  Margin="0,0,0,24">
+                <TextBlock Grid.Column="0"
+                           Text="{Binding DialogTitle}"
+                           FontSize="24"
+                           FontWeight="SemiBold"
+                           VerticalAlignment="Center"
+                           Margin="0,0,12,0" />
+
+                <!-- Calendar Selector as Clickable Label -->
+                <Button Grid.Column="1"
+                        IsEnabled="{Binding !IsBlockingEvent}"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        Padding="8,4"
+                        Cursor="Hand"
+                        VerticalAlignment="Center"
+                        x:Name="CalendarSelectorButton">
+                    <Button.Flyout>
+                        <Flyout Placement="Bottom">
+                            <Border Background="White"
+                                    BorderBrush="#E0E0E0"
+                                    BorderThickness="1"
+                                    CornerRadius="4"
+                                    Padding="4"
+                                    MinWidth="200">
+                                <ItemsControl ItemsSource="{Binding AvailableCalendars}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Button
+                                                Command="{Binding $parent[UserControl].((vm:EventEditViewModel)DataContext).SelectCalendarCommand}"
+                                                CommandParameter="{Binding}"
+                                                Background="Transparent"
+                                                BorderThickness="0"
+                                                HorizontalAlignment="Stretch"
+                                                HorizontalContentAlignment="Left"
+                                                Padding="8,6"
+                                                Cursor="Hand">
+                                                <Button.Styles>
+                                                    <Style Selector="Button:pointerover">
+                                                        <Setter Property="Background" Value="#F5F5F5" />
+                                                    </Style>
+                                                </Button.Styles>
+                                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                                    <Border Width="16"
+                                                            Height="16"
+                                                            Background="{Binding Color}"
+                                                            CornerRadius="3" />
+                                                    <TextBlock Text="{Binding Name}"
+                                                               VerticalAlignment="Center" />
+                                                </StackPanel>
+                                            </Button>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </Border>
+                        </Flyout>
+                    </Button.Flyout>
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Border Width="20"
+                                Height="20"
+                                Background="{Binding SelectedCalendar.Color}"
+                                CornerRadius="4"
+                                IsVisible="{Binding SelectedCalendar, Converter={x:Static ObjectConverters.IsNotNull}}" />
+                        <TextBlock Text="{Binding SelectedCalendar.Name, FallbackValue='Select Calendar'}"
+                                   FontSize="16"
+                                   Foreground="#666"
+                                   VerticalAlignment="Center" />
+                        <Path Data="M 0 0 L 4 4 L 8 0"
+                              Stroke="#666"
+                              StrokeThickness="1.5"
+                              VerticalAlignment="Center"
+                              Margin="4,2,0,0" />
+                    </StackPanel>
+                </Button>
+            </Grid>
+
             <!-- Form Content -->
-            <ScrollViewer Grid.Row="1" MaxHeight="500">
-                <StackPanel Spacing="16">
+            <ScrollViewer Grid.Row="1" MaxHeight="500" Padding="1">
+                <StackPanel Spacing="16" Margin="2,0,2,8">
                     <!-- Blocking Event Warning -->
                     <Border IsVisible="{Binding IsEditMode}"
                             Background="#FFF3E0"
@@ -31,119 +104,113 @@
                                    TextWrapping="Wrap"
                                    FontSize="12"
                                    Foreground="#E65100"
-                                   IsVisible="{Binding IsBlockingEvent}"/>
+                                   IsVisible="{Binding IsBlockingEvent}" />
                     </Border>
-                    
+
                     <!-- Title -->
                     <StackPanel Spacing="6">
-                        <TextBlock Text="Title *" 
+                        <TextBlock Text="Title *"
                                    FontWeight="SemiBold"
-                                   FontSize="14"/>
+                                   FontSize="14" />
                         <TextBox Text="{Binding Title}"
                                  Watermark="Event title"
-                                 IsEnabled="{Binding !IsBlockingEvent}"/>
+                                 IsEnabled="{Binding !IsBlockingEvent}" />
                     </StackPanel>
-                    
-                    <!-- Calendar Selection -->
-                    <StackPanel Spacing="6">
-                        <TextBlock Text="Calendar *" 
-                                   FontWeight="SemiBold"
-                                   FontSize="14"/>
-                        <ComboBox ItemsSource="{Binding AvailableCalendars}"
-                                  SelectedItem="{Binding SelectedCalendar}"
-                                  IsEnabled="{Binding !IsBlockingEvent}"
-                                  HorizontalAlignment="Stretch">
-                            <ComboBox.ItemTemplate>
-                                <DataTemplate>
-                                    <StackPanel Orientation="Horizontal" Spacing="8">
-                                        <Border Width="16" 
-                                                Height="16" 
-                                                Background="{Binding Color}"
-                                                CornerRadius="3"/>
-                                        <TextBlock Text="{Binding Name}" 
-                                                   VerticalAlignment="Center"/>
-                                    </StackPanel>
-                                </DataTemplate>
-                            </ComboBox.ItemTemplate>
-                        </ComboBox>
-                    </StackPanel>
-                    
+
                     <!-- Date and Time -->
-                    <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto" ColumnSpacing="12" RowSpacing="6">
-                        <!-- Start Date/Time -->
-                        <TextBlock Grid.Row="0" Grid.Column="0" 
-                                   Text="Start Date *" 
+                    <StackPanel Spacing="12">
+                        <TextBlock Text="Date &amp; Time *"
                                    FontWeight="SemiBold"
-                                   FontSize="14"/>
-                        <DatePicker Grid.Row="1" Grid.Column="0"
-                                    SelectedDate="{Binding StartDate}"
-                                    IsEnabled="{Binding !IsBlockingEvent}"
-                                    HorizontalAlignment="Stretch"/>
-                        
-                        <TextBlock Grid.Row="0" Grid.Column="1" 
-                                   Text="Start Time *" 
-                                   FontWeight="SemiBold"
-                                   FontSize="14"/>
-                        <TimePicker Grid.Row="1" Grid.Column="1"
-                                    SelectedTime="{Binding StartTime}"
-                                    IsEnabled="{Binding !IsBlockingEvent}"
-                                    HorizontalAlignment="Stretch"/>
-                        
-                        <!-- End Date/Time -->
-                        <TextBlock Grid.Row="2" Grid.Column="0" 
-                                   Text="End Date *" 
-                                   FontWeight="SemiBold"
-                                   FontSize="14"
-                                   Margin="0,12,0,0"/>
-                        <DatePicker Grid.Row="3" Grid.Column="0"
-                                    SelectedDate="{Binding EndDate}"
-                                    IsEnabled="{Binding !IsBlockingEvent}"
-                                    HorizontalAlignment="Stretch"/>
-                        
-                        <TextBlock Grid.Row="2" Grid.Column="1" 
-                                   Text="End Time *" 
-                                   FontWeight="SemiBold"
-                                   FontSize="14"
-                                   Margin="0,12,0,0"/>
-                        <TimePicker Grid.Row="3" Grid.Column="1"
-                                    SelectedTime="{Binding EndTime}"
-                                    IsEnabled="{Binding !IsBlockingEvent}"
-                                    HorizontalAlignment="Stretch"/>
-                    </Grid>
-                    
-                    <!-- All Day Checkbox -->
-                    <CheckBox Content="All day event"
-                              IsChecked="{Binding IsAllDay}"
-                              IsEnabled="{Binding !IsBlockingEvent}"/>
-                    
-                    <!-- Location -->
-                    <StackPanel Spacing="6">
-                        <TextBlock Text="Location" 
-                                   FontWeight="SemiBold"
-                                   FontSize="14"/>
-                        <TextBox Text="{Binding Location}"
-                                 Watermark="Add location"
-                                 IsEnabled="{Binding !IsBlockingEvent}"/>
+                                   FontSize="14" />
+    
+                        <!-- Time Selection Preview -->
+                        <Button Command="{Binding OpenSchedulerCommand}"
+                                Background="Transparent"
+                                BorderBrush="#E0E0E0"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="16"
+                                Cursor="Hand"
+                                HorizontalAlignment="Stretch"
+                                HorizontalContentAlignment="Stretch"
+                                IsEnabled="{Binding !IsBlockingEvent}">
+                            <Button.Styles>
+                                <Style Selector="Button:pointerover">
+                                    <Setter Property="Background" Value="#F5F5F5" />
+                                </Style>
+                            </Button.Styles>
+                            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="16">
+                                <!-- Calendar Icon -->
+                                <Border Grid.Column="0"
+                                        Width="48"
+                                        Height="48"
+                                        Background="#3B82F6"
+                                        CornerRadius="8"
+                                        VerticalAlignment="Center">
+                                    <Viewbox Width="24" Height="24">
+                                        <Path Data="M8 2v2m8-2v2M3 8h18M5 4h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2z"
+                                              Stroke="White"
+                                              StrokeThickness="2"
+                                              Fill="Transparent" />
+                                    </Viewbox>
+                                </Border>
+                                
+                                <!-- Time Details -->
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="4">
+                                    <TextBlock Text="{Binding Scheduler.SelectedDate, StringFormat='{}{0:dddd, MMMM d, yyyy}'}"
+                                               FontSize="16"
+                                               FontWeight="SemiBold"
+                                               Foreground="#1a1a1a" />
+                                    <TextBlock Text="{Binding Scheduler.TimeBlock.TimeRangeText}"
+                                               FontSize="14"
+                                               Foreground="#666" />
+                                    <TextBlock Text="{Binding Scheduler.TimeBlock.DurationText, StringFormat='Duration: {0}'}"
+                                               FontSize="12"
+                                               Foreground="#999" />
+                                </StackPanel>
+                                
+                                <!-- Edit Icon -->
+                                <Border Grid.Column="2"
+                                        Width="32"
+                                        Height="32"
+                                        Background="#E8E8E8"
+                                        CornerRadius="6"
+                                        VerticalAlignment="Center">
+                                    <Viewbox Width="16" Height="16">
+                                        <Path Data="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"
+                                              Stroke="#666"
+                                              StrokeThickness="2"
+                                              Fill="Transparent" />
+                                    </Viewbox>
+                                </Border>
+                            </Grid>
+                        </Button>
+    
+                        <!-- All Day Checkbox -->
+                        <CheckBox Content="All day event"
+                                  IsChecked="{Binding IsAllDay}"
+                                  IsEnabled="{Binding !IsBlockingEvent}" />
                     </StackPanel>
-                    
+
+
                     <!-- Description -->
                     <StackPanel Spacing="6">
-                        <TextBlock Text="Description" 
+                        <TextBlock Text="Description"
                                    FontWeight="SemiBold"
-                                   FontSize="14"/>
+                                   FontSize="14" />
                         <TextBox Text="{Binding Description}"
                                  Watermark="Add description"
                                  TextWrapping="Wrap"
                                  AcceptsReturn="True"
                                  Height="100"
-                                 IsEnabled="{Binding !IsBlockingEvent}"/>
+                                 IsEnabled="{Binding !IsBlockingEvent}" />
                     </StackPanel>
                 </StackPanel>
             </ScrollViewer>
-            
+
             <!-- Action Buttons -->
-            <Grid Grid.Row="2" 
-                  ColumnDefinitions="Auto,*,Auto,Auto" 
+            <Grid Grid.Row="2"
+                  ColumnDefinitions="Auto,*,Auto,Auto"
                   ColumnSpacing="10"
                   Margin="0,24,0,0">
                 <!-- Delete Button (only in edit mode) -->
@@ -151,26 +218,25 @@
                         Content="Delete"
                         Command="{Binding DeleteCommand}"
                         Classes="danger"
-                        IsVisible="{Binding IsEditMode}"/>
-                
+                        IsVisible="{Binding IsEditMode}" />
+
                 <!-- Spacer -->
-                <Panel Grid.Column="1"/>
-                
+                <Panel Grid.Column="1" />
+
                 <!-- Cancel Button -->
                 <Button Grid.Column="2"
                         Content="Cancel"
                         Command="{Binding CancelCommand}"
                         Classes="modern"
-                        Width="100"/>
-                
+                        Width="100" />
+
                 <!-- Save Button -->
                 <Button Grid.Column="3"
                         Content="{Binding SaveButtonText}"
                         Command="{Binding SaveCommand}"
                         Classes="accent"
-                        Width="100"/>
+                        Width="100" />
             </Grid>
         </Grid>
     </Border>
 </UserControl>
-

@@ -1,0 +1,78 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:scheduler="using:Sundy.Controls.Scheduler">
+
+    <Design.PreviewWith>
+        <Border Padding="20" Background="#1a1a1a" Width="300" Height="200">
+            <scheduler:TimeBlockControl Width="280" Height="120"
+                                        BlockBrush="#CC3B82F6"
+                                        HandleBrush="White"/>
+        </Border>
+    </Design.PreviewWith>
+
+    <Style Selector="scheduler|TimeBlockControl">
+        <Setter Property="BlockBrush" Value="#CC3B82F6"/>
+        <Setter Property="HandleBrush" Value="White"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border x:Name="PART_Root"
+                        Background="{TemplateBinding BlockBrush}"
+                        CornerRadius="8"
+                        BoxShadow="0 2 8 0 #40000000">
+                    <Grid RowDefinitions="Auto,*,Auto">
+                        
+                        <!-- Top resize handle -->
+                        <Border x:Name="PART_TopHandle"
+                                Grid.Row="0"
+                                Height="20"
+                                Cursor="SizeNorthSouth"
+                                Background="Transparent">
+                            <Ellipse Width="12" Height="12"
+                                     Fill="{TemplateBinding HandleBrush}"
+                                     Stroke="#40000000"
+                                     StrokeThickness="1"
+                                     HorizontalAlignment="Center"
+                                     VerticalAlignment="Center"
+                                     Margin="0,4,0,0"/>
+                        </Border>
+                        
+                        <!-- Body / Content area -->
+                        <Border x:Name="PART_Body"
+                                Grid.Row="1"
+                                Padding="12,4"
+                                Cursor="SizeAll"
+                                Background="Transparent">
+                            <StackPanel VerticalAlignment="Top" Spacing="2">
+                                <TextBlock Text="{Binding TimeBlock.TimeRangeText, RelativeSource={RelativeSource TemplatedParent}}"
+                                           FontWeight="SemiBold"
+                                           FontSize="14"
+                                           Foreground="White"/>
+                                <TextBlock Text="{Binding TimeBlock.DurationText, RelativeSource={RelativeSource TemplatedParent}}"
+                                           FontSize="12"
+                                           Foreground="#CCFFFFFF"/>
+                            </StackPanel>
+                        </Border>
+                        
+                        <!-- Bottom resize handle -->
+                        <Border x:Name="PART_BottomHandle"
+                                Grid.Row="2"
+                                Height="20"
+                                Cursor="SizeNorthSouth"
+                                Background="Transparent">
+                            <Ellipse Width="12" Height="12"
+                                     Fill="{TemplateBinding HandleBrush}"
+                                     Stroke="#40000000"
+                                     StrokeThickness="1"
+                                     HorizontalAlignment="Center"
+                                     VerticalAlignment="Center"
+                                     Margin="0,0,0,4"/>
+                        </Border>
+                        
+                    </Grid>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+
+</Styles>

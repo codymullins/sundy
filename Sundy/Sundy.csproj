@@ -28,4 +28,8 @@
     <ItemGroup>
       <ProjectReference Include="..\Sundy.Core\Sundy.Core.csproj" />
     </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Controls\" />
+    </ItemGroup>
 </Project>

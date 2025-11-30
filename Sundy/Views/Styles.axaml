@@ -1,101 +1,108 @@
 <Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    
+<Style Selector="DatePicker">
+    <Setter Property="BorderBrush" Value="#CCCCCC" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="4" />
+</Style>
+
+<Style Selector="DatePicker:focus">
+    <Setter Property="BorderBrush" Value="#4A90E2" />
+</Style>
     <!-- Modern Button Style -->
     <Style Selector="Button.modern">
-        <Setter Property="Background" Value="White"/>
-        <Setter Property="BorderBrush" Value="#CCCCCC"/>
-        <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="Padding" Value="12,6"/>
-        <Setter Property="CornerRadius" Value="4"/>
-        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Background" Value="White" />
+        <Setter Property="BorderBrush" Value="#CCCCCC" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="12,6" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="Cursor" Value="Hand" />
     </Style>
-    
     <Style Selector="Button.modern:pointerover">
-        <Setter Property="Background" Value="#F5F5F5"/>
+        <Setter Property="Background" Value="#F5F5F5" />
     </Style>
-    
+
     <Style Selector="Button.modern:pressed">
-        <Setter Property="Background" Value="#E0E0E0"/>
+        <Setter Property="Background" Value="#E0E0E0" />
     </Style>
-    
+
     <!-- Accent Button Style -->
     <Style Selector="Button.accent">
-        <Setter Property="Background" Value="#4A90E2"/>
-        <Setter Property="Foreground" Value="White"/>
-        <Setter Property="BorderThickness" Value="0"/>
-        <Setter Property="Padding" Value="16,8"/>
-        <Setter Property="CornerRadius" Value="4"/>
-        <Setter Property="FontWeight" Value="SemiBold"/>
-        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Background" Value="#4A90E2" />
+        <Setter Property="Foreground" Value="White" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="16,8" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Cursor" Value="Hand" />
     </Style>
-    
+
     <Style Selector="Button.accent:pointerover">
-        <Setter Property="Background" Value="#357ABD"/>
+        <Setter Property="Background" Value="#357ABD" />
     </Style>
-    
+
     <Style Selector="Button.accent:pressed">
-        <Setter Property="Background" Value="#2A5F8F"/>
+        <Setter Property="Background" Value="#2A5F8F" />
     </Style>
-    
+
     <!-- Danger Button Style -->
     <Style Selector="Button.danger">
-        <Setter Property="Background" Value="White"/>
-        <Setter Property="Foreground" Value="#D32F2F"/>
-        <Setter Property="BorderBrush" Value="#D32F2F"/>
-        <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="Padding" Value="12,6"/>
-        <Setter Property="CornerRadius" Value="4"/>
-        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Background" Value="White" />
+        <Setter Property="Foreground" Value="#D32F2F" />
+        <Setter Property="BorderBrush" Value="#D32F2F" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="12,6" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="Cursor" Value="Hand" />
     </Style>
-    
+
     <Style Selector="Button.danger:pointerover">
-        <Setter Property="Background" Value="#FFEBEE"/>
+        <Setter Property="Background" Value="#FFEBEE" />
     </Style>
-    
+
     <Style Selector="Button.danger:pressed">
-        <Setter Property="Background" Value="#FFCDD2"/>
+        <Setter Property="Background" Value="#FFCDD2" />
     </Style>
-    
+
     <!-- Link Button Style (looks like a hyperlink) -->
     <Style Selector="Button.link">
-        <Setter Property="Background" Value="Transparent"/>
-        <Setter Property="Foreground" Value="#4A90E2"/>
-        <Setter Property="BorderThickness" Value="0"/>
-        <Setter Property="Padding" Value="0"/>
-        <Setter Property="Cursor" Value="Hand"/>
-        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="#4A90E2" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="FontSize" Value="13" />
     </Style>
-    
+
     <Style Selector="Button.link:pointerover">
-        <Setter Property="Foreground" Value="#357ABD"/>
+        <Setter Property="Foreground" Value="#357ABD" />
     </Style>
-    
+
     <Style Selector="Button.link:pressed">
-        <Setter Property="Foreground" Value="#2A5F8F"/>
+        <Setter Property="Foreground" Value="#2A5F8F" />
     </Style>
-    
+
     <!-- TextBox Styling -->
     <Style Selector="TextBox">
-        <Setter Property="Padding" Value="8"/>
-        <Setter Property="BorderBrush" Value="#CCCCCC"/>
-        <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="CornerRadius" Value="4"/>
+        <Setter Property="Padding" Value="8" />
+        <Setter Property="BorderBrush" Value="#CCCCCC" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="4" />
     </Style>
-    
+
     <Style Selector="TextBox:focus">
-        <Setter Property="BorderBrush" Value="#4A90E2"/>
+        <Setter Property="BorderBrush" Value="#4A90E2" />
     </Style>
-    
+
     <!-- ComboBox Styling -->
     <Style Selector="ComboBox">
-        <Setter Property="Padding" Value="8"/>
-        <Setter Property="BorderBrush" Value="#CCCCCC"/>
-        <Setter Property="CornerRadius" Value="4"/>
+        <Setter Property="Padding" Value="8" />
+        <Setter Property="BorderBrush" Value="#CCCCCC" />
+        <Setter Property="CornerRadius" Value="4" />
     </Style>
-    
+
     <!-- CheckBox Styling -->
     <Style Selector="CheckBox">
-        <Setter Property="Padding" Value="6,0,0,0"/>
+        <Setter Property="Padding" Value="6,0,0,0" />
     </Style>
 </Styles>

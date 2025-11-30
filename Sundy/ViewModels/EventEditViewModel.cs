@@ -6,6 +6,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.EntityFrameworkCore;
 using Sundy.Core;
+using Sundy.ViewModels.Scheduler;
 
 namespace Sundy.ViewModels;
 
@@ -17,6 +18,23 @@ public partial class EventEditViewModel : ObservableObject
     private readonly Action? _onCancelled;
     private CalendarEvent? _originalEvent;
     private bool _isEditMode;
+
+    public event EventHandler? CalendarSelected;
+    [ObservableProperty]
+    private SchedulerViewModel _scheduler = new();
+
+// Sync the scheduler's TimeBlock with your event times
+    partial void OnSchedulerChanged(SchedulerViewModel value)
+    {
+        // When scheduler selection changes, update the event times
+        value.TimeBlock.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName == nameof(TimeBlockViewModel.StartTime))
+                StartTime = value.TimeBlock.StartTime.ToTimeSpan();
+            if (e.PropertyName == nameof(TimeBlockViewModel.EndTime))
+                EndTime = value.TimeBlock.EndTime.ToTimeSpan();
+        };
+    }
 
     public EventEditViewModel(
         SundyDbContext db,
@@ -245,6 +263,21 @@ public partial class EventEditViewModel : ObservableObject
     {
         _onCancelled?.Invoke();
     }
+
+    [RelayCommand]
+    private void SelectCalendar(CalendarItemViewModel calendar)
+    {
+        SelectedCalendar = calendar;
+        CalendarSelected?.Invoke(this, EventArgs.Empty);
+    }
+    
+    [RelayCommand]
+    private void OpenScheduler()
+    {
+        SchedulerOpenRequested?.Invoke(this, EventArgs.Empty);
+    }
+    
+    public event EventHandler? SchedulerOpenRequested;
 
     private DateTime CombineDateAndTime(DateTimeOffset date, TimeSpan time)
     {
