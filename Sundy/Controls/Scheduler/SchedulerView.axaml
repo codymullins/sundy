@@ -14,15 +14,16 @@
         <!-- Week Header -->
         <Border Grid.Row="0" Background="{DynamicResource BackgroundSecondary}" Padding="8,12">
             <Grid ColumnDefinitions="Auto,*,Auto">
-                <!-- Back button -->
+                <!-- Previous Week button -->
                 <Button Grid.Column="0"
+                        Command="{Binding NavigatePreviousWeekCommand}"
                         Background="Transparent"
                         BorderThickness="0"
                         Padding="8"
                         VerticalAlignment="Center"
                         Cursor="Hand">
-                    <PathIcon Data="M15 19l-7-7 7-7" 
-                              Width="16" Height="16"
+                    <PathIcon Data="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" 
+                              Width="20" Height="20"
                               Foreground="{DynamicResource ForegroundPrimary}"/>
                 </Button>
                 
@@ -131,14 +132,15 @@
                     </UniformGrid>
                 </StackPanel>
                 
-                <!-- Confirm button -->
+                <!-- Next Week button -->
                 <Button Grid.Column="2"
+                        Command="{Binding NavigateNextWeekCommand}"
                         Background="Transparent"
                         BorderThickness="0"
                         Padding="8"
                         VerticalAlignment="Center"
                         Cursor="Hand">
-                    <PathIcon Data="M5 13l4 4L19 7" 
+                    <PathIcon Data="M8.59 16.59L10 18l6-6-6-6-1.41 1.41L13.17 12z" 
                               Width="20" Height="20"
                               Foreground="{DynamicResource ForegroundPrimary}"/>
                 </Button>
@@ -146,7 +148,8 @@
         </Border>
         
         <!-- Time Grid with ScrollViewer -->
-        <ScrollViewer Grid.Row="1" 
+        <ScrollViewer x:Name="TimeGridScrollViewer"
+                      Grid.Row="1" 
                       VerticalScrollBarVisibility="Auto"
                       HorizontalScrollBarVisibility="Disabled">
             <Canvas Height="{Binding TotalHeight}" 
