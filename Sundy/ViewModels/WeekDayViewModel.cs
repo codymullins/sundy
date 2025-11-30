@@ -14,5 +14,6 @@ public class WeekDayViewModel
     public string DayName { get; }
     public string Date { get; }
     public bool IsToday { get; }
-    public string DateColor => IsToday ? "#1976D2" : "Black";
+    // Return null to let XAML handle foreground colors with DynamicResource
+    public string? DateColor => null;
 }

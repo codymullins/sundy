@@ -22,6 +22,8 @@ public partial class MonthDayViewModel : ObservableObject
     public bool IsToday { get; }
     public ObservableCollection<EventViewModel> Events { get; }
 
-    public string Background => IsToday ? "#E3F2FD" : (IsCurrentMonth ? "White" : "#F5F5F5");
-    public string DayForeground => IsCurrentMonth ? (IsToday ? "#1976D2" : "Black") : "#999";
+    // Return null to use the default background from theme resources
+    // Today highlighting will be done in XAML using DynamicResource
+    public string? Background => IsCurrentMonth ? null : "#00000000"; // Transparent for non-current month
+    public string? DayForeground => null; // Let XAML handle foreground colors
 }

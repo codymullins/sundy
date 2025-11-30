@@ -9,7 +9,7 @@
         <designData:DesignCalendarViewModel/>
     </Design.DataContext>
     
-    <Grid>
+    <Grid Background="{DynamicResource BackgroundPrimary}">
         <!-- Month View -->
         <Panel IsVisible="{Binding IsMonthView}">
             <Grid RowDefinitions="Auto,*">
@@ -49,15 +49,26 @@
                         <DataTemplate>
                             <Border BorderBrush="{DynamicResource BorderBrush}" 
                                     BorderThickness="0,0,1,1"
-                                    Background="{Binding Background}"
                                     Padding="5">
+                                <Border.Styles>
+                                    <!-- Default background for current month days -->
+                                    <Style Selector="Border">
+                                        <Setter Property="Background" Value="{DynamicResource BackgroundPrimary}"/>
+                                    </Style>
+                                </Border.Styles>
                                 <Grid RowDefinitions="Auto,*">
                                     <TextBlock Grid.Row="0" 
                                                Text="{Binding Day}"
                                                FontSize="12"
-                                               Foreground="{Binding DayForeground}"
                                                HorizontalAlignment="Right"
-                                               Margin="0,0,5,5"/>
+                                               Margin="0,0,5,5">
+                                        <TextBlock.Styles>
+                                            <!-- Default text color for current month -->
+                                            <Style Selector="TextBlock">
+                                                <Setter Property="Foreground" Value="{DynamicResource ForegroundPrimary}"/>
+                                            </Style>
+                                        </TextBlock.Styles>
+                                    </TextBlock>
                                     
                                     <ItemsControl Grid.Row="1" 
                                                   ItemsSource="{Binding Events}">
@@ -97,7 +108,10 @@
                     <ItemsControl Grid.Row="1" Grid.Column="0" ItemsSource="{Binding TimeSlots}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Border Height="60" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,1">
+                                <Border Height="60" 
+                                        Background="{DynamicResource BackgroundPrimary}"
+                                        BorderBrush="{DynamicResource BorderBrush}" 
+                                        BorderThickness="0,0,1,1">
                                     <TextBlock Text="{Binding TimeLabel}" 
                                                FontSize="11"
                                                Foreground="{DynamicResource ForegroundMuted}"
@@ -127,7 +141,7 @@
                                                    Foreground="{DynamicResource ForegroundPrimary}"/>
                                         <TextBlock Text="{Binding Date}" 
                                                    FontSize="20"
-                                                   Foreground="{Binding DateColor}"/>
+                                                   Foreground="{DynamicResource ForegroundPrimary}"/>
                                     </StackPanel>
                                 </Border>
                             </DataTemplate>
@@ -146,6 +160,7 @@
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <Border Height="60" 
+                                            Background="{DynamicResource BackgroundPrimary}"
                                             BorderBrush="{DynamicResource BorderBrush}" 
                                             BorderThickness="0,0,1,1"/>
                                 </DataTemplate>
@@ -195,7 +210,10 @@
                     <ItemsControl Grid.Column="0" ItemsSource="{Binding TimeSlots}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Border Height="60" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,1">
+                                <Border Height="60" 
+                                        Background="{DynamicResource BackgroundPrimary}"
+                                        BorderBrush="{DynamicResource BorderBrush}" 
+                                        BorderThickness="0,0,1,1">
                                     <TextBlock Text="{Binding TimeLabel}" 
                                                FontSize="11"
                                                Foreground="{DynamicResource ForegroundMuted}"
@@ -212,6 +230,7 @@
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <Border Height="60" 
+                                            Background="{DynamicResource BackgroundPrimary}"
                                             BorderBrush="{DynamicResource BorderBrush}" 
                                             BorderThickness="0,0,1,1"/>
                                 </DataTemplate>

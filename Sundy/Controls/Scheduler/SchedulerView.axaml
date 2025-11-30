@@ -199,59 +199,59 @@
                 
                 <!-- 11 AM -->
                 <TextBlock Text="11 AM" Canvas.Left="8" Canvas.Top="660" Foreground="{DynamicResource SchedulerTimeText}" FontSize="11"/>
-                <Rectangle Height="1" Fill="#303030" Width="1000" Canvas.Left="60" Canvas.Top="660"/>
+                <Rectangle Height="1" Fill="{DynamicResource SchedulerLine}" Width="1000" Canvas.Left="60" Canvas.Top="660"/>
                 
                 <!-- 12 PM -->
-                <TextBlock Text="12 PM" Canvas.Left="8" Canvas.Top="720" Foreground="#606060" FontSize="11"/>
-                <Rectangle Height="1" Fill="#303030" Width="1000" Canvas.Left="60" Canvas.Top="720"/>
+                <TextBlock Text="12 PM" Canvas.Left="8" Canvas.Top="720" Foreground="{DynamicResource SchedulerTimeText}" FontSize="11"/>
+                <Rectangle Height="1" Fill="{DynamicResource SchedulerLine}" Width="1000" Canvas.Left="60" Canvas.Top="720"/>
                 
                 <!-- 1 PM -->
-                <TextBlock Text="1 PM" Canvas.Left="8" Canvas.Top="780" Foreground="#606060" FontSize="11"/>
-                <Rectangle Height="1" Fill="#303030" Width="1000" Canvas.Left="60" Canvas.Top="780"/>
+                <TextBlock Text="1 PM" Canvas.Left="8" Canvas.Top="780" Foreground="{DynamicResource SchedulerTimeText}" FontSize="11"/>
+                <Rectangle Height="1" Fill="{DynamicResource SchedulerLine}" Width="1000" Canvas.Left="60" Canvas.Top="780"/>
                 
                 <!-- 2 PM -->
-                <TextBlock Text="2 PM" Canvas.Left="8" Canvas.Top="840" Foreground="#606060" FontSize="11"/>
-                <Rectangle Height="1" Fill="#303030" Width="1000" Canvas.Left="60" Canvas.Top="840"/>
+                <TextBlock Text="2 PM" Canvas.Left="8" Canvas.Top="840" Foreground="{DynamicResource SchedulerTimeText}" FontSize="11"/>
+                <Rectangle Height="1" Fill="{DynamicResource SchedulerLine}" Width="1000" Canvas.Left="60" Canvas.Top="840"/>
                 
                 <!-- 3 PM -->
-                <TextBlock Text="3 PM" Canvas.Left="8" Canvas.Top="900" Foreground="#606060" FontSize="11"/>
-                <Rectangle Height="1" Fill="#303030" Width="1000" Canvas.Left="60" Canvas.Top="900"/>
+                <TextBlock Text="3 PM" Canvas.Left="8" Canvas.Top="900" Foreground="{DynamicResource SchedulerTimeText}" FontSize="11"/>
+                <Rectangle Height="1" Fill="{DynamicResource SchedulerLine}" Width="1000" Canvas.Left="60" Canvas.Top="900"/>
                 
                 <!-- 4 PM -->
-                <TextBlock Text="4 PM" Canvas.Left="8" Canvas.Top="960" Foreground="#606060" FontSize="11"/>
-                <Rectangle Height="1" Fill="#303030" Width="1000" Canvas.Left="60" Canvas.Top="960"/>
+                <TextBlock Text="4 PM" Canvas.Left="8" Canvas.Top="960" Foreground="{DynamicResource SchedulerTimeText}" FontSize="11"/>
+                <Rectangle Height="1" Fill="{DynamicResource SchedulerLine}" Width="1000" Canvas.Left="60" Canvas.Top="960"/>
                 
                 <!-- 5 PM -->
-                <TextBlock Text="5 PM" Canvas.Left="8" Canvas.Top="1020" Foreground="#606060" FontSize="11"/>
-                <Rectangle Height="1" Fill="#303030" Width="1000" Canvas.Left="60" Canvas.Top="1020"/>
+                <TextBlock Text="5 PM" Canvas.Left="8" Canvas.Top="1020" Foreground="{DynamicResource SchedulerTimeText}" FontSize="11"/>
+                <Rectangle Height="1" Fill="{DynamicResource SchedulerLine}" Width="1000" Canvas.Left="60" Canvas.Top="1020"/>
                 
                 <!-- 6 PM -->
-                <TextBlock Text="6 PM" Canvas.Left="8" Canvas.Top="1080" Foreground="#606060" FontSize="11"/>
-                <Rectangle Height="1" Fill="#303030" Width="1000" Canvas.Left="60" Canvas.Top="1080"/>
+                <TextBlock Text="6 PM" Canvas.Left="8" Canvas.Top="1080" Foreground="{DynamicResource SchedulerTimeText}" FontSize="11"/>
+                <Rectangle Height="1" Fill="{DynamicResource SchedulerLine}" Width="1000" Canvas.Left="60" Canvas.Top="1080"/>
                 
                 <!-- 7 PM -->
-                <TextBlock Text="7 PM" Canvas.Left="8" Canvas.Top="1140" Foreground="#606060" FontSize="11"/>
-                <Rectangle Height="1" Fill="#303030" Width="1000" Canvas.Left="60" Canvas.Top="1140"/>
+                <TextBlock Text="7 PM" Canvas.Left="8" Canvas.Top="1140" Foreground="{DynamicResource SchedulerTimeText}" FontSize="11"/>
+                <Rectangle Height="1" Fill="{DynamicResource SchedulerLine}" Width="1000" Canvas.Left="60" Canvas.Top="1140"/>
                 
                 <!-- 8 PM -->
-                <TextBlock Text="8 PM" Canvas.Left="8" Canvas.Top="1200" Foreground="#606060" FontSize="11"/>
-                <Rectangle Height="1" Fill="#303030" Width="1000" Canvas.Left="60" Canvas.Top="1200"/>
+                <TextBlock Text="8 PM" Canvas.Left="8" Canvas.Top="1200" Foreground="{DynamicResource SchedulerTimeText}" FontSize="11"/>
+                <Rectangle Height="1" Fill="{DynamicResource SchedulerLine}" Width="1000" Canvas.Left="60" Canvas.Top="1200"/>
                 
                 <!-- 9 PM -->
-                <TextBlock Text="9 PM" Canvas.Left="8" Canvas.Top="1260" Foreground="#606060" FontSize="11"/>
-                <Rectangle Height="1" Fill="#303030" Width="1000" Canvas.Left="60" Canvas.Top="1260"/>
+                <TextBlock Text="9 PM" Canvas.Left="8" Canvas.Top="1260" Foreground="{DynamicResource SchedulerTimeText}" FontSize="11"/>
+                <Rectangle Height="1" Fill="{DynamicResource SchedulerLine}" Width="1000" Canvas.Left="60" Canvas.Top="1260"/>
                 
                 <!-- 10 PM -->
-                <TextBlock Text="10 PM" Canvas.Left="8" Canvas.Top="1320" Foreground="#606060" FontSize="11"/>
-                <Rectangle Height="1" Fill="#303030" Width="1000" Canvas.Left="60" Canvas.Top="1320"/>
+                <TextBlock Text="10 PM" Canvas.Left="8" Canvas.Top="1320" Foreground="{DynamicResource SchedulerTimeText}" FontSize="11"/>
+                <Rectangle Height="1" Fill="{DynamicResource SchedulerLine}" Width="1000" Canvas.Left="60" Canvas.Top="1320"/>
                 
                 <!-- 11 PM -->
-                <TextBlock Text="11 PM" Canvas.Left="8" Canvas.Top="1380" Foreground="#606060" FontSize="11"/>
-                <Rectangle Height="1" Fill="#303030" Width="1000" Canvas.Left="60" Canvas.Top="1380"/>
+                <TextBlock Text="11 PM" Canvas.Left="8" Canvas.Top="1380" Foreground="{DynamicResource SchedulerTimeText}" FontSize="11"/>
+                <Rectangle Height="1" Fill="{DynamicResource SchedulerLine}" Width="1000" Canvas.Left="60" Canvas.Top="1380"/>
                 
                 <!-- Current time indicator -->
                 <scheduler:CurrentTimeIndicator CurrentTime="{Binding CurrentTime}"
-                                                 IndicatorBrush="#3B82F6"
+                                                 IndicatorBrush="{DynamicResource AccentPrimary}"
                                                  Width="1000"
                                                  Canvas.Left="0">
                     <Canvas.Top>

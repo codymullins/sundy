@@ -92,7 +92,8 @@
             
             <!-- Calendar View Area -->
             <ContentControl Grid.Column="1" 
-                            Content="{Binding CalendarViewModel}">
+                            Content="{Binding CalendarViewModel}"
+                            Background="{DynamicResource BackgroundPrimary}">
                 <ContentControl.ContentTemplate>
                     <DataTemplate>
                         <views:CalendarView/>
