@@ -25,13 +25,11 @@ public partial class MainViewModel : ViewModelBase
         _blockingEngine = blockingEngine;
         _logger = logger;
 
-        _logger.LogInformation("MainViewModel initialized");
-
         CalendarViewModel = new CalendarViewModel(blockingEngine, db);
         CalendarViewModel.PropertyChanged += (_, e) =>
         {
-            if (e.PropertyName == nameof(CalendarViewModel.SelectedDate) ||
-                e.PropertyName == nameof(CalendarViewModel.ViewMode))
+            if (e.PropertyName is nameof(CalendarViewModel.SelectedDate) 
+                or nameof(CalendarViewModel.ViewMode))
             {
                 OnPropertyChanged(nameof(CurrentPeriodDisplay));
             }
@@ -188,7 +186,7 @@ public partial class MainViewModel : ViewModelBase
         var editVm = new EventEditViewModel(
             _db,
             _blockingEngine,
-            onSaved: () => OnEventSaved(),
+            onSaved: OnEventSaved,
             onCancelled: () =>
             {
                 IsEventDialogOpen = false;

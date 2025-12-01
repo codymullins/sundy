@@ -10,12 +10,13 @@ using Sundy.ViewModels.Scheduler;
 
 namespace Sundy.ViewModels;
 
-public partial class EventEditViewModel : ObservableObject
+public partial class EventEditViewModel(
+    SundyDbContext db,
+    BlockingEngine blockingEngine,
+    Action? onSaved = null,
+    Action? onCancelled = null)
+    : ObservableObject
 {
-    private readonly SundyDbContext _db;
-    private readonly BlockingEngine _blockingEngine;
-    private readonly Action? _onSaved;
-    private readonly Action? _onCancelled;
     private CalendarEvent? _originalEvent;
     private bool _isEditMode;
 
@@ -34,18 +35,6 @@ public partial class EventEditViewModel : ObservableObject
             if (e.PropertyName == nameof(TimeBlockViewModel.EndTime))
                 EndTime = value.TimeBlock.EndTime.ToTimeSpan();
         };
-    }
-
-    public EventEditViewModel(
-        SundyDbContext db,
-        BlockingEngine blockingEngine,
-        Action? onSaved = null,
-        Action? onCancelled = null)
-    {
-        _db = db;
-        _blockingEngine = blockingEngine;
-        _onSaved = onSaved;
-        _onCancelled = onCancelled;
     }
 
     [ObservableProperty]
@@ -95,9 +84,9 @@ public partial class EventEditViewModel : ObservableObject
     public async Task InitializeAsync(CalendarEvent? existingEvent = null, string? defaultCalendarId = null)
     {
         // Load available calendars
-        var calendars = await _db.Calendars.ToListAsync();
+        var calendars = await db.Calendars.ToListAsync();
         AvailableCalendars = new ObservableCollection<CalendarItemViewModel>(
-            calendars.Select(c => new CalendarItemViewModel(c, _db)));
+            calendars.Select(c => new CalendarItemViewModel(c, db)));
 
         if (existingEvent != null)
         {
@@ -124,10 +113,10 @@ public partial class EventEditViewModel : ObservableObject
             // If this is a blocking event, show source info
             if (existingEvent.IsBlockingEvent && !string.IsNullOrEmpty(existingEvent.SourceEventId))
             {
-                var sourceEvent = await _db.Events.FindAsync(existingEvent.SourceEventId);
+                var sourceEvent = await db.Events.FindAsync(existingEvent.SourceEventId);
                 if (sourceEvent != null)
                 {
-                    var sourceCalendar = await _db.Calendars.FindAsync(sourceEvent.CalendarId);
+                    var sourceCalendar = await db.Calendars.FindAsync(sourceEvent.CalendarId);
                     BlockingSourceText = $"This is an automatically created blocking event from '{sourceEvent.Title}' on {sourceCalendar?.Name ?? "Unknown Calendar"}";
                 }
             }
@@ -199,12 +188,12 @@ public partial class EventEditViewModel : ObservableObject
             if (_originalEvent.IsBlockingEvent)
             {
                 // If this is a blocking event, just update it directly
-                await _db.SaveChangesAsync();
+                await db.SaveChangesAsync();
             }
             else
             {
                 // Update with blocking logic
-                await _blockingEngine.UpdateEventWithBlockingAsync(
+                await blockingEngine.UpdateEventWithBlockingAsync(
                     SelectedCalendar.Id,
                     _originalEvent);
             }
@@ -225,12 +214,12 @@ public partial class EventEditViewModel : ObservableObject
                 SourceEventId = null
             };
 
-            await _blockingEngine.CreateEventWithBlockingAsync(
+            await blockingEngine.CreateEventWithBlockingAsync(
                 SelectedCalendar.Id,
                 newEvent);
         }
 
-        _onSaved?.Invoke();
+        onSaved?.Invoke();
     }
 
     [RelayCommand]
@@ -244,24 +233,24 @@ public partial class EventEditViewModel : ObservableObject
         {
             // If this is a blocking event, just delete it
             // Don't delete the source event
-            _db.Events.Remove(_originalEvent);
-            await _db.SaveChangesAsync();
+            db.Events.Remove(_originalEvent);
+            await db.SaveChangesAsync();
         }
         else
         {
             // Delete with blocking logic (will delete blocking events too)
-            await _blockingEngine.DeleteEventWithBlockingAsync(
+            await blockingEngine.DeleteEventWithBlockingAsync(
                 _originalEvent.CalendarId,
                 _originalEvent.Id);
         }
 
-        _onSaved?.Invoke();
+        onSaved?.Invoke();
     }
 
     [RelayCommand]
     private void Cancel()
     {
-        _onCancelled?.Invoke();
+        onCancelled?.Invoke();
     }
 
     [RelayCommand]
@@ -279,7 +268,7 @@ public partial class EventEditViewModel : ObservableObject
     
     public event EventHandler? SchedulerOpenRequested;
 
-    private DateTime CombineDateAndTime(DateTimeOffset date, TimeSpan time)
+    private static DateTime CombineDateAndTime(DateTimeOffset date, TimeSpan time)
     {
         return new DateTime(
             date.Year,

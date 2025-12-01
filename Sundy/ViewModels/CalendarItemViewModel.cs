@@ -7,32 +7,26 @@ using Sundy.Core;
 
 namespace Sundy.ViewModels;
 
-public partial class CalendarItemViewModel : ObservableObject
+public partial class CalendarItemViewModel(
+    Calendar calendar,
+    SundyDbContext db,
+    Func<CalendarItemViewModel, Task>? onDeleteRequested = null)
+    : ObservableObject
 {
-    private readonly Calendar _calendar;
-    private readonly SundyDbContext _db;
-    private readonly Func<CalendarItemViewModel, Task>? _onDeleteRequested;
     private CancellationTokenSource? _saveCts;
 
-    public CalendarItemViewModel(Calendar calendar, SundyDbContext db, Func<CalendarItemViewModel, Task>? onDeleteRequested = null)
-    {
-        _calendar = calendar;
-        _db = db;
-        _onDeleteRequested = onDeleteRequested;
-    }
-
-    public string Id => _calendar.Id;
-    public string Name => _calendar.Name;
-    public string Color => _calendar.Color;
+    public string Id => calendar.Id;
+    public string Name => calendar.Name;
+    public string Color => calendar.Color;
     
     public bool EnableBlocking
     {
-        get => _calendar.EnableBlocking;
+        get => calendar.EnableBlocking;
         set
         {
-            if (_calendar.EnableBlocking != value)
+            if (calendar.EnableBlocking != value)
             {
-                _calendar.EnableBlocking = value;
+                calendar.EnableBlocking = value;
                 OnPropertyChanged();
                 DebouncedSave();
             }
@@ -41,12 +35,12 @@ public partial class CalendarItemViewModel : ObservableObject
     
     public bool ReceiveBlocks
     {
-        get => _calendar.ReceiveBlocks;
+        get => calendar.ReceiveBlocks;
         set
         {
-            if (_calendar.ReceiveBlocks != value)
+            if (calendar.ReceiveBlocks != value)
             {
-                _calendar.ReceiveBlocks = value;
+                calendar.ReceiveBlocks = value;
                 OnPropertyChanged();
                 DebouncedSave();
             }
@@ -66,7 +60,7 @@ public partial class CalendarItemViewModel : ObservableObject
                 await Task.Delay(500, token);
                 if (!token.IsCancellationRequested)
                 {
-                    await _db.SaveChangesAsync(token);
+                    await db.SaveChangesAsync(token);
                 }
             }
             catch (OperationCanceledException)
@@ -82,9 +76,9 @@ public partial class CalendarItemViewModel : ObservableObject
     [RelayCommand]
     private async Task Delete()
     {
-        if (_onDeleteRequested != null)
+        if (onDeleteRequested != null)
         {
-            await _onDeleteRequested(this);
+            await onDeleteRequested(this);
         }
     }
 }
