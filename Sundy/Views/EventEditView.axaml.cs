@@ -54,10 +54,14 @@ public partial class EventEditView : UserControl
         var schedulerWindow = new SchedulerWindow(viewModel.Scheduler);
         
         // Handle confirm
-        viewModel.Scheduler.Confirmed += (_, _) =>
+        void OnConfirmed(object? s, EventArgs args)
         {
+            // Apply the scheduler selection back to the event
+            viewModel.ApplySchedulerSelection();
             schedulerWindow.Close();
-        };
+        }
+        
+        viewModel.Scheduler.Confirmed += OnConfirmed;
         
         // Handle cancel
         viewModel.Scheduler.Cancelled += (_, _) =>
@@ -71,5 +75,8 @@ public partial class EventEditView : UserControl
         {
             await schedulerWindow.ShowDialog(owner);
         }
+        
+        // Cleanup
+        viewModel.Scheduler.Confirmed -= OnConfirmed;
     }
 }

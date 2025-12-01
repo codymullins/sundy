@@ -24,19 +24,6 @@ public partial class EventEditViewModel(
     public event EventHandler? CalendarSelected;
     [ObservableProperty] private SchedulerViewModel _scheduler = new();
 
-// Sync the scheduler's TimeBlock with your event times
-    partial void OnSchedulerChanged(SchedulerViewModel value)
-    {
-        // When scheduler selection changes, update the event times
-        value.TimeBlock.PropertyChanged += (_, e) =>
-        {
-            if (e.PropertyName == nameof(TimeBlockViewModel.StartTime))
-                StartTime = value.TimeBlock.StartTime.ToTimeSpan();
-            if (e.PropertyName == nameof(TimeBlockViewModel.EndTime))
-                EndTime = value.TimeBlock.EndTime.ToTimeSpan();
-        };
-    }
-
     [ObservableProperty] private string _title = string.Empty;
 
     [ObservableProperty] private ObservableCollection<Calendar> _availableCalendars = [];
@@ -224,7 +211,33 @@ public partial class EventEditViewModel(
     [RelayCommand]
     private void OpenScheduler()
     {
+        // Initialize scheduler with current event date/time
+        Scheduler.SelectedDate = DateOnly.FromDateTime(StartDate.DateTime);
+        Scheduler.TimeBlock.StartTime = TimeOnly.FromTimeSpan(StartTime);
+        Scheduler.TimeBlock.EndTime = TimeOnly.FromTimeSpan(EndTime);
+        
         SchedulerOpenRequested?.Invoke(this, EventArgs.Empty);
+    }
+
+    public void ApplySchedulerSelection()
+    {
+        // Apply the scheduler selection back to the event
+        var selectedDateTime = Scheduler.SelectedDate.ToDateTime(TimeOnly.MinValue);
+        StartDate = new DateTimeOffset(selectedDateTime, StartDate.Offset);
+        StartTime = Scheduler.TimeBlock.StartTime.ToTimeSpan();
+        
+        // Check if the time block spans midnight
+        if (Scheduler.TimeBlock.EndTime < Scheduler.TimeBlock.StartTime)
+        {
+            // End time is next day
+            EndDate = StartDate.AddDays(1);
+        }
+        else
+        {
+            // Same day
+            EndDate = StartDate;
+        }
+        EndTime = Scheduler.TimeBlock.EndTime.ToTimeSpan();
     }
 
     public event EventHandler? SchedulerOpenRequested;

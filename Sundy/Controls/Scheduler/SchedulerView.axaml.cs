@@ -17,28 +17,9 @@ public partial class SchedulerView : UserControl
         
         DataContextChanged += (_, _) =>
         {
-            Console.WriteLine("DataContext changed!");
-            if (DataContext is SchedulerViewModel vm)
-            {
-                Console.WriteLine($"HourLines count: {vm.HourLines.Count}");
-                Console.WriteLine($"PixelsPerHour: {vm.PixelsPerHour}");
-                Console.WriteLine($"TotalHeight: {vm.TotalHeight}");
-                foreach (var h in vm.HourLines.Take(5))
-                {
-                    Console.WriteLine($"  Hour {h.Hour}: Y={h.YPosition}, Label={h.Label}");
-                }
-            }
-            else
-            {
-                Console.WriteLine($"DataContext is: {DataContext?.GetType().Name ?? "null"}");
-            }
-            
             // Reset scroll flag when DataContext changes
             _hasScrolledToTime = false;
         };
-        
-        Console.WriteLine("SchedulerView constructor - DataContext is:");
-        Console.WriteLine(DataContext?.GetType().Name ?? "null");
         
         // Set up timer to update current time indicator
         _timer = new DispatcherTimer

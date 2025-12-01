@@ -135,9 +135,9 @@ public partial class CalendarViewModel : ObservableObject
         var startOfWeek = SelectedDate.AddDays(-(int)SelectedDate.DayOfWeek);
         var endOfWeek = startOfWeek.AddDays(7);
 
-        var events = await _db.Events
-            .Where(e => e.StartTime < endOfWeek && e.EndTime > startOfWeek)
-            .ToListAsync();
+        var events = await _db.Events.ToListAsync();
+            // .Where(e => e.StartTime < endOfWeek && e.EndTime > startOfWeek)
+            // .ToListAsync();
 
         var calendarLookup = await _db.Calendars.ToDictionaryAsync(c => c.Id);
 
