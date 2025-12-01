@@ -106,9 +106,9 @@ public partial class CalendarViewModel : ObservableObject
         // Always show 6 weeks (42 days) for consistent grid
         var endDate = startDate.AddDays(42);
 
-        var events = await _db.Events
-             .Where(e => e.StartTime < endDate && e.EndTime > startDate)
-             .ToListAsync();
+        var events = await _db.Events.ToListAsync();
+             // .Where(e => e.StartTime < endDate && e.EndTime > startDate)
+             // .ToListAsync();
 
         var calendarLookup = await _db.Calendars.ToDictionaryAsync(c => c.Id);
 
@@ -163,9 +163,9 @@ public partial class CalendarViewModel : ObservableObject
         var start = SelectedDate.Date;
         var end = start.AddDays(1);
 
-        var events = await _db.Events
-            .Where(e => e.StartTime < end && e.EndTime > start)
-            .ToListAsync();
+        var events = await _db.Events.ToListAsync();
+            // .Where(e => e.StartTime < end && e.EndTime > start)
+            // .ToListAsync();
 
         var calendarLookup = await _db.Calendars.ToDictionaryAsync(c => c.Id);
 
