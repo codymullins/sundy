@@ -40,19 +40,15 @@ public partial class EventEditView : UserControl
     
     private async void OnSchedulerOpenRequested(object? sender, EventArgs e)
     {
-        if (DataContext is not EventEditViewModel viewModel) return;
-        // DEBUG
-        Console.WriteLine($"Scheduler is null: {viewModel?.Scheduler == null}");
-        Console.WriteLine($"HourLines count: {viewModel?.Scheduler.HourLines.Count}");
-        Console.WriteLine($"PixelsPerHour: {viewModel?.Scheduler.PixelsPerHour}");
-        Console.WriteLine($"TotalHeight: {viewModel?.Scheduler.TotalHeight}");
+        if (DataContext is not EventEditViewModel viewModel)
+        {
+            return;
+        }
     
-        if (viewModel?.Scheduler.HourLines.Count > 0)
+        if (viewModel.Scheduler.HourLines.Count > 0)
         {
             var first = viewModel.Scheduler.HourLines[0];
             var last = viewModel.Scheduler.HourLines[^1];
-            Console.WriteLine($"First hour: {first.Hour}, Y={first.YPosition}, Label={first.Label}");
-            Console.WriteLine($"Last hour: {last.Hour}, Y={last.YPosition}, Label={last.Label}");
         }
 
         var schedulerWindow = new SchedulerWindow(viewModel.Scheduler);
