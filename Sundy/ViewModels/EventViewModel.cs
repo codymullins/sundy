@@ -1,5 +1,6 @@
 using System;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Sundy.Core;
 
 namespace Sundy.ViewModels;
@@ -81,4 +82,12 @@ public partial class EventViewModel : ObservableObject
             CanvasWidth = double.NaN; // Let it stretch
         }
     }
+
+    [RelayCommand]
+    private void RequestEdit()
+    {
+        EditRequested?.Invoke(this, Event);
+    }
+
+    public event EventHandler<CalendarEvent>? EditRequested;
 }

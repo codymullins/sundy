@@ -78,7 +78,8 @@
                                                         CornerRadius="3"
                                                         Padding="4,2"
                                                         Margin="0,1"
-                                                        Cursor="Hand">
+                                                        Cursor="Hand"
+                                                        DoubleTapped="OnEventDoubleTapped">
                                                     <Border.Styles>
                                                         <Style Selector="Border:pointerover">
                                                             <Setter Property="Opacity" Value="0.8"/>
@@ -182,7 +183,9 @@
                                             Canvas.Left="{Binding CanvasLeft}"
                                             Canvas.Top="{Binding CanvasTop}"
                                             Width="{Binding CanvasWidth}"
-                                            Height="{Binding CanvasHeight}">
+                                            Height="{Binding CanvasHeight}"
+                                            Cursor="Hand"
+                                            DoubleTapped="OnEventDoubleTapped">
                                         <StackPanel>
                                             <TextBlock Text="{Binding Title}"
                                                        Foreground="White"
@@ -251,7 +254,9 @@
                                             Padding="8"
                                             Margin="4,0"
                                             Canvas.Top="{Binding CanvasTop}"
-                                            Height="{Binding CanvasHeight}">
+                                            Height="{Binding CanvasHeight}"
+                                            Cursor="Hand"
+                                            DoubleTapped="OnEventDoubleTapped">
                                         <StackPanel>
                                             <TextBlock Text="{Binding Title}"
                                                        Foreground="White"

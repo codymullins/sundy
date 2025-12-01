@@ -1,4 +1,4 @@
-﻿﻿using System;
+﻿﻿﻿using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -30,6 +30,7 @@ public partial class MainViewModel : ViewModelBase
                 OnPropertyChanged(nameof(CurrentPeriodDisplay));
             }
         };
+        CalendarViewModel.EventEditRequested += async (_, evt) => await EditEvent(evt);
     }
 
     [ObservableProperty]
@@ -187,6 +188,26 @@ public partial class MainViewModel : ViewModelBase
         await editVm.InitializeAsync(
             existingEvent: null,
             defaultCalendarId: CalendarViewModel.SelectedCalendar?.Id);
+        
+        EventEditViewModel = editVm;
+        IsEventDialogOpen = true;
+    }
+
+    private async Task EditEvent(CalendarEvent evt)
+    {
+        var editVm = new EventEditViewModel(
+            _db,
+            _blockingEngine,
+            onSaved: OnEventSaved,
+            onCancelled: () =>
+            {
+                IsEventDialogOpen = false;
+                EventEditViewModel = null;
+            });
+        
+        await editVm.InitializeAsync(
+            existingEvent: evt,
+            defaultCalendarId: evt.CalendarId);
         
         EventEditViewModel = editVm;
         IsEventDialogOpen = true;

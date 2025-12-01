@@ -23,6 +23,8 @@ public partial class CalendarViewModel : ObservableObject
         InitializeTimeSlots();
     }
 
+    public event EventHandler<CalendarEvent>? EventEditRequested;
+
     [ObservableProperty]
     private ObservableCollection<Calendar> _calendars = new();
 
@@ -117,7 +119,12 @@ public partial class CalendarViewModel : ObservableObject
         {
             var dayEvents = events
                 .Where(e => e.StartTime.Date <= date && e.EndTime.Date >= date)
-                .Select(e => new EventViewModel(e, calendarLookup.GetValueOrDefault(e.CalendarId)))
+                .Select(e =>
+                {
+                    var eventVm = new EventViewModel(e, calendarLookup.GetValueOrDefault(e.CalendarId));
+                    eventVm.EditRequested += OnEventEditRequested;
+                    return eventVm;
+                })
                 .ToList();
 
             var isCurrentMonth = date.Month == SelectedDate.Month;
@@ -152,7 +159,12 @@ public partial class CalendarViewModel : ObservableObject
 
         // Build positioned events
         var visibleEvents = events
-            .Select(e => new EventViewModel(e, calendarLookup.GetValueOrDefault(e.CalendarId), startOfWeek, ViewMode))
+            .Select(e =>
+            {
+                var eventVm = new EventViewModel(e, calendarLookup.GetValueOrDefault(e.CalendarId), startOfWeek, ViewMode);
+                eventVm.EditRequested += OnEventEditRequested;
+                return eventVm;
+            })
             .ToList();
 
         VisibleEvents = new ObservableCollection<EventViewModel>(visibleEvents);
@@ -170,7 +182,12 @@ public partial class CalendarViewModel : ObservableObject
         var calendarLookup = await _db.Calendars.ToDictionaryAsync(c => c.Id);
 
         var visibleEvents = events
-            .Select(e => new EventViewModel(e, calendarLookup.GetValueOrDefault(e.CalendarId), start, ViewMode))
+            .Select(e =>
+            {
+                var eventVm = new EventViewModel(e, calendarLookup.GetValueOrDefault(e.CalendarId), start, ViewMode);
+                eventVm.EditRequested += OnEventEditRequested;
+                return eventVm;
+            })
             .ToList();
 
         VisibleEvents = new ObservableCollection<EventViewModel>(visibleEvents);
@@ -236,5 +253,10 @@ public partial class CalendarViewModel : ObservableObject
             evt.Id);
 
         await RefreshViewAsync();
+    }
+
+    private void OnEventEditRequested(object? sender, CalendarEvent evt)
+    {
+        EventEditRequested?.Invoke(this, evt);
     }
 }

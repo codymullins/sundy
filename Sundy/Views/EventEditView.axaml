@@ -95,21 +95,6 @@
             <!-- Form Content -->
             <ScrollViewer Grid.Row="1" MaxHeight="500" Padding="1">
                 <StackPanel Spacing="16" Margin="2,0,2,8">
-                    <!-- Blocking Event Warning -->
-                    <Border IsVisible="{Binding IsEditMode}"
-                            Background="{DynamicResource WarningBackground}"
-                            BorderBrush="{DynamicResource WarningBorder}"
-                            BorderThickness="1"
-                            CornerRadius="4"
-                            Padding="12">
-                        <TextBlock Text="{Binding BlockingSourceText}"
-                                   TextWrapping="Wrap"
-                                   FontSize="12"
-                                   Foreground="{DynamicResource WarningBorder}"
-                                   IsVisible="{Binding IsBlockingEvent}" />
-                    </Border>
-
-                    <!-- Title -->
                     <StackPanel Spacing="6">
                         <TextBlock Text="Title *"
                                    FontWeight="SemiBold"
@@ -120,7 +105,6 @@
                                  IsEnabled="{Binding !IsBlockingEvent}" />
                     </StackPanel>
 
-                    <!-- Date and Time -->
                     <StackPanel Spacing="12">
                         <TextBlock Text="Date &amp; Time *"
                                    FontWeight="SemiBold"
