@@ -36,11 +36,6 @@ public partial class MainViewModel : ViewModelBase
         };
     }
 
-    // For design-time support
-    public MainViewModel() : this(null!, null!, null!)
-    {
-    }
-
     [ObservableProperty]
     private CalendarViewModel _calendarViewModel = null!;
 
