@@ -7,79 +7,25 @@ using Sundy.Core;
 
 namespace Sundy.ViewModels;
 
-public partial class CalendarItemViewModel(
-    Calendar calendar,
-    SundyDbContext db,
-    Func<CalendarItemViewModel, Task>? onDeleteRequested = null)
-    : ObservableObject
+public partial class CalendarItemViewModel : ObservableObject
 {
-    private CancellationTokenSource? _saveCts;
+    private readonly Func<CalendarItemViewModel, CancellationToken, Task> onDeleteRequested;
 
     public string Id => calendar.Id;
     public string Name => calendar.Name;
     public string Color => calendar.Color;
-    
-    public bool EnableBlocking
-    {
-        get => calendar.EnableBlocking;
-        set
-        {
-            if (calendar.EnableBlocking != value)
-            {
-                calendar.EnableBlocking = value;
-                OnPropertyChanged();
-                DebouncedSave();
-            }
-        }
-    }
-    
-    public bool ReceiveBlocks
-    {
-        get => calendar.ReceiveBlocks;
-        set
-        {
-            if (calendar.ReceiveBlocks != value)
-            {
-                calendar.ReceiveBlocks = value;
-                OnPropertyChanged();
-                DebouncedSave();
-            }
-        }
-    }
 
-    private void DebouncedSave()
-    {
-        _saveCts?.Cancel();
-        _saveCts = new CancellationTokenSource();
-        var token = _saveCts.Token;
+    public IAsyncRelayCommand DeleteCommand { get; }
 
-        _ = Task.Run(async () =>
-        {
-            try
-            {
-                await Task.Delay(500, token);
-                if (!token.IsCancellationRequested)
-                {
-                    await db.SaveChangesAsync(token);
-                }
-            }
-            catch (OperationCanceledException)
-            {
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error saving calendar changes: {ex.Message}");
-            }
-        }, token);
-    }
+    private readonly Calendar calendar;
 
-    [RelayCommand]
-    private async Task Delete()
+    public CalendarItemViewModel(
+        Calendar calendar,
+        Func<CalendarItemViewModel, CancellationToken, Task> onDeleteRequested)
     {
-        if (onDeleteRequested != null)
-        {
-            await onDeleteRequested(this);
-        }
+        this.calendar = calendar;
+        this.onDeleteRequested = onDeleteRequested;
+
+        DeleteCommand = new AsyncRelayCommand(ct => this.onDeleteRequested(this, ct));
     }
 }
-

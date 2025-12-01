@@ -13,7 +13,7 @@ public partial class EventViewModel : ObservableObject
     {
         Event = evt;
         Calendar = calendar;
-        Title = evt.Title;
+        Title = evt.Title ?? "";
         Location = evt.Location ?? string.Empty;
         HasLocation = !string.IsNullOrEmpty(evt.Location);
         CalendarColor = calendar?.Color ?? "#4A90E2";

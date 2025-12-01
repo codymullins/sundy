@@ -213,29 +213,24 @@
                 </StackPanel>
             </ScrollViewer>
 
-            <!-- Action Buttons -->
             <Grid Grid.Row="2"
                   ColumnDefinitions="Auto,*,Auto,Auto"
                   ColumnSpacing="10"
                   Margin="0,24,0,0">
-                <!-- Delete Button (only in edit mode) -->
                 <Button Grid.Column="0"
                         Content="Delete"
                         Command="{Binding DeleteCommand}"
                         Classes="danger"
                         IsVisible="{Binding IsEditMode}" />
 
-                <!-- Spacer -->
                 <Panel Grid.Column="1" />
 
-                <!-- Cancel Button -->
                 <Button Grid.Column="2"
                         Content="Cancel"
                         Command="{Binding CancelCommand}"
                         Classes="modern"
                         Width="100" />
 
-                <!-- Save Button -->
                 <Button Grid.Column="3"
                         Content="{Binding SaveButtonText}"
                         Command="{Binding SaveCommand}"

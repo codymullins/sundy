@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using Sundy.Core;
 
 namespace Sundy.ViewModels;
@@ -14,16 +13,13 @@ public partial class MainViewModel : ViewModelBase
 {
     private readonly SundyDbContext _db;
     private readonly BlockingEngine _blockingEngine;
-    private readonly ILogger<MainViewModel> _logger;
 
     public MainViewModel(
         SundyDbContext db,
-        BlockingEngine blockingEngine,
-        ILogger<MainViewModel> logger)
+        BlockingEngine blockingEngine)
     {
         _db = db;
         _blockingEngine = blockingEngine;
-        _logger = logger;
 
         CalendarViewModel = new CalendarViewModel(blockingEngine, db);
         CalendarViewModel.PropertyChanged += (_, e) =>
@@ -54,7 +50,7 @@ public partial class MainViewModel : ViewModelBase
     [ObservableProperty]
     private CalendarSettingsViewModel? _calendarSettingsViewModel;
 
-    public bool HasNoCalendars => Calendars?.Count == 0;
+    public bool HasNoCalendars => Calendars.Count == 0;
 
     public int ViewModeIndex
     {
@@ -250,31 +246,20 @@ public partial class MainViewModel : ViewModelBase
 }
 
 // ViewModel for calendar items in the sidebar list
-public partial class CalendarListItemViewModel : ObservableObject
+public partial class CalendarListItemViewModel(Calendar calendar, Action? onVisibilityChanged = null) : ObservableObject
 {
-    private readonly Calendar _calendar;
-    private readonly Action? _onVisibilityChanged;
-    private bool _isVisible = true;
-
-    public CalendarListItemViewModel(Calendar calendar, Action? onVisibilityChanged = null)
-    {
-        _calendar = calendar;
-        _onVisibilityChanged = onVisibilityChanged;
-    }
-
-    public string Id => _calendar.Id;
-    public string Name => _calendar.Name;
-    public string Color => _calendar.Color;
+    public string Name => calendar.Name;
+    public string Color => calendar.Color;
 
     public bool IsVisible
     {
-        get => _isVisible;
+        get;
         set
         {
-            if (SetProperty(ref _isVisible, value))
+            if (SetProperty(ref field, value))
             {
-                _onVisibilityChanged?.Invoke();
+                onVisibilityChanged?.Invoke();
             }
         }
-    }
+    } = true;
 }

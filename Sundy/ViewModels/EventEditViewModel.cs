@@ -1,6 +1,7 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -21,8 +22,7 @@ public partial class EventEditViewModel(
     private bool _isEditMode;
 
     public event EventHandler? CalendarSelected;
-    [ObservableProperty]
-    private SchedulerViewModel _scheduler = new();
+    [ObservableProperty] private SchedulerViewModel _scheduler = new();
 
 // Sync the scheduler's TimeBlock with your event times
     partial void OnSchedulerChanged(SchedulerViewModel value)
@@ -37,47 +37,33 @@ public partial class EventEditViewModel(
         };
     }
 
-    [ObservableProperty]
-    private string _title = string.Empty;
+    [ObservableProperty] private string _title = string.Empty;
 
-    [ObservableProperty]
-    private ObservableCollection<CalendarItemViewModel> _availableCalendars = new();
+    [ObservableProperty] private ObservableCollection<Calendar> _availableCalendars = [];
 
-    [ObservableProperty]
-    private CalendarItemViewModel? _selectedCalendar;
+    [ObservableProperty] private Calendar? _selectedCalendar;
 
-    [ObservableProperty]
-    private DateTimeOffset _startDate = DateTimeOffset.Now.Date;
+    [ObservableProperty] private DateTimeOffset _startDate = DateTimeOffset.Now.Date;
 
-    [ObservableProperty]
-    private TimeSpan _startTime = TimeSpan.FromHours(9);
+    [ObservableProperty] private TimeSpan _startTime = TimeSpan.FromHours(9);
 
-    [ObservableProperty]
-    private DateTimeOffset _endDate = DateTimeOffset.Now.Date;
+    [ObservableProperty] private DateTimeOffset _endDate = DateTimeOffset.Now.Date;
 
-    [ObservableProperty]
-    private TimeSpan _endTime = TimeSpan.FromHours(10);
+    [ObservableProperty] private TimeSpan _endTime = TimeSpan.FromHours(10);
 
-    [ObservableProperty]
-    private bool _isAllDay;
+    [ObservableProperty] private bool _isAllDay;
 
-    [ObservableProperty]
-    private string _location = string.Empty;
+    [ObservableProperty] private string _location = string.Empty;
 
-    [ObservableProperty]
-    private string _description = string.Empty;
+    [ObservableProperty] private string _description = string.Empty;
 
-    [ObservableProperty]
-    private bool _isBlockingEvent;
+    [ObservableProperty] private bool _isBlockingEvent;
 
-    [ObservableProperty]
-    private string _blockingSourceText = string.Empty;
+    [ObservableProperty] private string _blockingSourceText = string.Empty;
 
-    [ObservableProperty]
-    private string _dialogTitle = "New Event";
+    [ObservableProperty] private string _dialogTitle = "New Event";
 
-    [ObservableProperty]
-    private string _saveButtonText = "Create";
+    [ObservableProperty] private string _saveButtonText = "Create";
 
     public bool IsEditMode => _isEditMode;
 
@@ -85,8 +71,7 @@ public partial class EventEditViewModel(
     {
         // Load available calendars
         var calendars = await db.Calendars.ToListAsync();
-        AvailableCalendars = new ObservableCollection<CalendarItemViewModel>(
-            calendars.Select(c => new CalendarItemViewModel(c, db)));
+        AvailableCalendars = new ObservableCollection<Calendar>(calendars);
 
         if (existingEvent != null)
         {
@@ -96,14 +81,14 @@ public partial class EventEditViewModel(
             DialogTitle = "Edit Event";
             SaveButtonText = "Save";
 
-            Title = existingEvent.Title;
+            Title = existingEvent.Title ?? string.Empty;
             Location = existingEvent.Location ?? string.Empty;
             Description = existingEvent.Description ?? string.Empty;
             IsBlockingEvent = existingEvent.IsBlockingEvent;
 
-            StartDate = new DateTimeOffset(existingEvent.StartTime);
+            StartDate = existingEvent.StartTime;
             StartTime = existingEvent.StartTime.TimeOfDay;
-            EndDate = new DateTimeOffset(existingEvent.EndTime);
+            EndDate = existingEvent.EndTime;
             EndTime = existingEvent.EndTime.TimeOfDay;
 
             // Set selected calendar
@@ -117,7 +102,8 @@ public partial class EventEditViewModel(
                 if (sourceEvent != null)
                 {
                     var sourceCalendar = await db.Calendars.FindAsync(sourceEvent.CalendarId);
-                    BlockingSourceText = $"This is an automatically created blocking event from '{sourceEvent.Title}' on {sourceCalendar?.Name ?? "Unknown Calendar"}";
+                    BlockingSourceText =
+                        $"This is an automatically created blocking event from '{sourceEvent.Title}' on {sourceCalendar?.Name ?? "Unknown Calendar"}";
                 }
             }
         }
@@ -151,8 +137,8 @@ public partial class EventEditViewModel(
         OnPropertyChanged(nameof(IsEditMode));
     }
 
-    [RelayCommand]
-    private async Task Save()
+    [RelayCommand(IncludeCancelCommand = true)]
+    private async Task Save(CancellationToken ct)
     {
         if (SelectedCalendar == null)
         {
@@ -184,19 +170,6 @@ public partial class EventEditViewModel(
             _originalEvent.Location = string.IsNullOrWhiteSpace(Location) ? null : Location;
             _originalEvent.Description = string.IsNullOrWhiteSpace(Description) ? null : Description;
             _originalEvent.CalendarId = SelectedCalendar.Id;
-
-            if (_originalEvent.IsBlockingEvent)
-            {
-                // If this is a blocking event, just update it directly
-                await db.SaveChangesAsync();
-            }
-            else
-            {
-                // Update with blocking logic
-                await blockingEngine.UpdateEventWithBlockingAsync(
-                    SelectedCalendar.Id,
-                    _originalEvent);
-            }
         }
         else
         {
@@ -214,10 +187,10 @@ public partial class EventEditViewModel(
                 SourceEventId = null
             };
 
-            await blockingEngine.CreateEventWithBlockingAsync(
-                SelectedCalendar.Id,
-                newEvent);
+            db.Events.Add(newEvent);
         }
+
+        await db.SaveChangesAsync(ct);
 
         onSaved?.Invoke();
     }
@@ -229,20 +202,8 @@ public partial class EventEditViewModel(
 
         // TODO: Show confirmation dialog
 
-        if (_originalEvent.IsBlockingEvent)
-        {
-            // If this is a blocking event, just delete it
-            // Don't delete the source event
-            db.Events.Remove(_originalEvent);
-            await db.SaveChangesAsync();
-        }
-        else
-        {
-            // Delete with blocking logic (will delete blocking events too)
-            await blockingEngine.DeleteEventWithBlockingAsync(
-                _originalEvent.CalendarId,
-                _originalEvent.Id);
-        }
+        db.Events.Remove(_originalEvent);
+        await db.SaveChangesAsync();
 
         onSaved?.Invoke();
     }
@@ -254,18 +215,18 @@ public partial class EventEditViewModel(
     }
 
     [RelayCommand]
-    private void SelectCalendar(CalendarItemViewModel calendar)
+    private void SelectCalendar(Calendar calendar)
     {
         SelectedCalendar = calendar;
         CalendarSelected?.Invoke(this, EventArgs.Empty);
     }
-    
+
     [RelayCommand]
     private void OpenScheduler()
     {
         SchedulerOpenRequested?.Invoke(this, EventArgs.Empty);
     }
-    
+
     public event EventHandler? SchedulerOpenRequested;
 
     private static DateTime CombineDateAndTime(DateTimeOffset date, TimeSpan time)

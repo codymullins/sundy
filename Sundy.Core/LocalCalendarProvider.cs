@@ -2,53 +2,60 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Sundy.Core;
 
-public class LocalCalendarProvider : ICalendarProvider
+public class LocalCalendarProvider(SundyDbContext db) : ICalendarProvider
 {
-    private readonly SundyDbContext _db;
-    
-    public async Task<CalendarEvent> CreateEventAsync(string calendarId, CalendarEvent evt)
+    public async Task<CalendarEvent> CreateEventAsync(string calendarId, CalendarEvent evt, CancellationToken ct = default)
     {
         evt.Id = Guid.NewGuid().ToString();
         evt.CalendarId = calendarId;
-        _db.Events.Add(evt);
-        await _db.SaveChangesAsync();
+        db.Events.Add(evt);
+        await db.SaveChangesAsync(ct);
         return evt;
     }
-    
-    public async Task<CalendarEvent> UpdateEventAsync(string calendarId, CalendarEvent evt)
+
+    public async Task<CalendarEvent> UpdateEventAsync(string calendarId, CalendarEvent evt, CancellationToken ct = default)
     {
-        var existing = await _db.Events.FindAsync(evt.Id);
-        if (existing == null) throw new Exception("Event not found");
-        
+        var existing = await db.Events.Where(p => p.CalendarId == calendarId && p.Id == evt.Id).SingleOrDefaultAsync(ct);
+        if (existing == null)
+        {
+            throw new EventNotFoundException(evt.Id);
+        }
+
         existing.Title = evt.Title;
         existing.StartTime = evt.StartTime;
         existing.EndTime = evt.EndTime;
         existing.Description = evt.Description;
         existing.Location = evt.Location;
-        
-        await _db.SaveChangesAsync();
+
+        await db.SaveChangesAsync(ct);
         return existing;
     }
-    
-    public async Task DeleteEventAsync(string calendarId, string eventId)
+
+    public async Task DeleteEventAsync(string calendarId, string eventId, CancellationToken ct = default)
     {
-        var evt = await _db.Events.FindAsync(eventId);
+        var evt = await db.Events
+            .Where(p => p.CalendarId == calendarId && p.Id == eventId)
+            .SingleOrDefaultAsync(ct);
+        
         if (evt != null)
         {
-            _db.Events.Remove(evt);
-            await _db.SaveChangesAsync();
+            db.Events.Remove(evt);
+            await db.SaveChangesAsync(ct);
         }
     }
-    
+
+    // TODO: async enumerable for large datasets
     public async Task<List<CalendarEvent>> GetEventsAsync(
-        string calendarId, 
-        DateTime start, 
-        DateTime end)
+        string calendarId,
+        DateTimeOffset start,
+        DateTimeOffset end,
+        CancellationToken ct = default)
     {
-        return await _db.Events
-            .Where(e => e.CalendarId == calendarId 
-                        && e.StartTime < end 
-                        && e.EndTime > start)
-            .ToListAsync();
+        return await db.Events.ToListAsync(ct);
+            // TODO: Re-enable filtering
+            // .Where(e => e.CalendarId == calendarId
+            //             && e.StartTime < end
+            //             && e.EndTime > start)
+            // .ToListAsync(ct);
     }
 }

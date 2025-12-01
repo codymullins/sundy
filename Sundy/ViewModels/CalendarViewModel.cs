@@ -107,8 +107,8 @@ public partial class CalendarViewModel : ObservableObject
         var endDate = startDate.AddDays(42);
 
         var events = await _db.Events
-            .Where(e => e.StartTime < endDate && e.EndTime > startDate)
-            .ToListAsync();
+             .Where(e => e.StartTime < endDate && e.EndTime > startDate)
+             .ToListAsync();
 
         var calendarLookup = await _db.Calendars.ToDictionaryAsync(c => c.Id);
 
@@ -238,13 +238,3 @@ public partial class CalendarViewModel : ObservableObject
         await RefreshViewAsync();
     }
 }
-
-// ViewModel for a single day cell in month view
-
-// ViewModel for time slot labels
-
-// ViewModel for week day headers
-
-// ViewModel for calendar events with positioning
-
-// Wrapper ViewModel for individual calendar items

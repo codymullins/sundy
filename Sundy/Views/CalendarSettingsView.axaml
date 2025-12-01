@@ -4,21 +4,21 @@
              x:Class="Sundy.Views.CalendarSettingsView"
              x:DataType="vm:CalendarSettingsViewModel"
              Width="700">
-    
+
     <Grid>
-        <Border Background="{DynamicResource BackgroundPrimary}" 
-                CornerRadius="8" 
+        <Border Background="{DynamicResource BackgroundPrimary}"
+                CornerRadius="8"
                 Padding="24"
                 BoxShadow="0 4 16 #30000000">
-            <Grid RowDefinitions="Auto,*,Auto,Auto">
+            <Grid RowDefinitions="Auto,*,Auto,Auto,Auto">
                 <!-- Header -->
-                <TextBlock Grid.Row="0" 
+                <TextBlock Grid.Row="0"
                            Text="Calendar Settings"
                            FontSize="24"
                            FontWeight="SemiBold"
                            Foreground="{DynamicResource ForegroundPrimary}"
-                           Margin="0,0,0,24"/>
-                
+                           Margin="0,0,0,24" />
+
                 <!-- Calendar List -->
                 <ScrollViewer Grid.Row="1" MaxHeight="400">
                     <StackPanel Spacing="12">
@@ -26,14 +26,14 @@
                                    FontWeight="SemiBold"
                                    FontSize="16"
                                    Foreground="{DynamicResource ForegroundPrimary}"
-                                   Margin="0,0,0,8"/>
-                        
+                                   Margin="0,0,0,8" />
+
                         <!-- Empty state -->
                         <TextBlock Text="No calendars yet. Create one below."
                                    Foreground="{DynamicResource ForegroundDisabled}"
                                    FontStyle="Italic"
-                                   IsVisible="{Binding !Calendars.Count}"/>
-                        
+                                   IsVisible="{Binding !Calendars.Count}" />
+
                         <!-- Calendar items -->
                         <ItemsControl ItemsSource="{Binding Calendars}">
                             <ItemsControl.ItemTemplate>
@@ -51,33 +51,22 @@
                                                     Background="{Binding Color}"
                                                     CornerRadius="4"
                                                     VerticalAlignment="Center"
-                                                    Margin="0,0,12,0"/>
-                                            
+                                                    Margin="0,0,12,0" />
+
                                             <TextBlock Grid.Row="0" Grid.Column="1"
                                                        Text="{Binding Name}"
                                                        FontSize="16"
                                                        FontWeight="SemiBold"
                                                        Foreground="{DynamicResource ForegroundPrimary}"
-                                                       VerticalAlignment="Center"/>
-                                            
+                                                       VerticalAlignment="Center" />
+
                                             <!-- Delete Button -->
                                             <Button Grid.Row="0" Grid.Column="2"
                                                     Content="Delete"
                                                     Command="{Binding DeleteCommand}"
+                                                    CommandParameter="{Binding}"
                                                     Classes="danger"
-                                                    VerticalAlignment="Center"/>
-                                            
-                                            <!-- Calendar Settings -->
-                                            <StackPanel Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2"
-                                                        Margin="0,12,0,0"
-                                                        Spacing="8">
-                                                <CheckBox Content="Enable blocking (block time in other calendars)"
-                                                          IsChecked="{Binding EnableBlocking}"
-                                                          FontSize="13"/>
-                                                <CheckBox Content="Receive blocks (allow other calendars to block time here)"
-                                                          IsChecked="{Binding ReceiveBlocks}"
-                                                          FontSize="13"/>
-                                            </StackPanel>
+                                                    VerticalAlignment="Center" />
                                         </Grid>
                                     </Border>
                                 </DataTemplate>
@@ -85,7 +74,7 @@
                         </ItemsControl>
                     </StackPanel>
                 </ScrollViewer>
-                
+
                 <!-- New Calendar Section -->
                 <Border Grid.Row="2"
                         BorderBrush="{DynamicResource BorderBrush}"
@@ -96,34 +85,60 @@
                         <TextBlock Text="Create New Calendar"
                                    FontWeight="SemiBold"
                                    FontSize="16"
-                                   Foreground="{DynamicResource ForegroundPrimary}"/>
-                        
+                                   Foreground="{DynamicResource ForegroundPrimary}" />
+
                         <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
                             <TextBox Grid.Column="0"
                                      Text="{Binding NewCalendarName}"
                                      Watermark="Calendar name"
-                                     Height="36"/>
+                                     Height="36" />
                             <Button Grid.Column="1"
                                     Content="Create"
                                     Command="{Binding CreateCalendarCommand}"
                                     Classes="accent"
                                     Height="36"
-                                    Width="100"/>
+                                    Width="100" />
                         </Grid>
                     </StackPanel>
                 </Border>
-                
+
+                <!-- Database Management Section -->
+                <Border Grid.Row="3"
+                        BorderBrush="{DynamicResource BorderBrush}"
+                        BorderThickness="0,1,0,0"
+                        Padding="0,20,0,0"
+                        Margin="0,20,0,0">
+                    <StackPanel Spacing="12">
+                        <TextBlock Text="Database Management"
+                                   FontWeight="SemiBold"
+                                   FontSize="16"
+                                   Foreground="{DynamicResource ForegroundPrimary}" />
+
+                        <TextBlock TextWrapping="Wrap"
+                                   Foreground="{DynamicResource ForegroundSecondary}"
+                                   FontSize="13"
+                                   Text="Warning: This will permanently delete all local data. This action cannot be undone." />
+
+                        <Button Content="Reset Database"
+                                Command="{Binding ResetDatabaseCommand}"
+                                Classes="danger"
+                                HorizontalAlignment="Left"
+                                Width="150"
+                                IsEnabled="{Binding !IsResettingDatabase}" />
+                    </StackPanel>
+                </Border>
+
                 <!-- Close Button -->
-                <Button Grid.Row="3"
+                <Button Grid.Row="4"
                         Content="Close"
                         Command="{Binding CloseCommand}"
                         Classes="modern"
                         HorizontalAlignment="Right"
                         Width="100"
-                        Margin="0,20,0,0"/>
+                        Margin="0,20,0,0" />
             </Grid>
         </Border>
-        
+
         <!-- Delete Confirmation Dialog Overlay -->
         <Border IsVisible="{Binding IsDeleteConfirmationOpen}"
                 Background="#80000000"
@@ -140,32 +155,86 @@
                     <TextBlock Text="Delete Calendar?"
                                FontSize="20"
                                FontWeight="SemiBold"
-                               Foreground="{DynamicResource ForegroundPrimary}"/>
-                    
+                               Foreground="{DynamicResource ForegroundPrimary}" />
+
                     <TextBlock TextWrapping="Wrap"
                                Foreground="{DynamicResource ForegroundPrimary}">
-                        <Run Text="Are you sure you want to delete "/>
-                        <Run Text="{Binding CalendarToDelete.Name, FallbackValue='this calendar'}" FontWeight="SemiBold"/>
-                        <Run Text="? This will permanently delete all events in this calendar and cannot be undone."/>
+                        <Run Text="Are you sure you want to delete " />
+                        <Run Text="{Binding CalendarToDelete.Name, FallbackValue='this calendar'}"
+                             FontWeight="SemiBold" />
+                        <Run Text="? This will permanently delete all events in this calendar and cannot be undone." />
                     </TextBlock>
-                    
+
                     <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
                         <Button Grid.Column="0"
                                 Content="Cancel"
                                 Command="{Binding CancelDeleteCommand}"
                                 Classes="modern"
                                 IsEnabled="{Binding !IsDeleting}"
-                                HorizontalAlignment="Stretch"/>
+                                HorizontalAlignment="Stretch" />
                         <Button Grid.Column="1"
                                 Content="Delete"
                                 Command="{Binding ConfirmDeleteCommand}"
                                 Classes="danger"
                                 IsEnabled="{Binding !IsDeleting}"
-                                HorizontalAlignment="Stretch"/>
+                                HorizontalAlignment="Stretch" />
+                    </Grid>
+                </StackPanel>
+            </Border>
+        </Border>
+
+        <!-- Reset Database Confirmation Dialog Overlay -->
+        <Border IsVisible="{Binding IsResetConfirmationOpen}"
+                Background="#80000000"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch">
+            <Border Background="{DynamicResource BackgroundPrimary}"
+                    CornerRadius="8"
+                    Padding="24"
+                    MaxWidth="450"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    BoxShadow="0 4 16 #40000000">
+                <StackPanel Spacing="16">
+                    <TextBlock Text="Reset Database?"
+                               FontSize="20"
+                               FontWeight="SemiBold"
+                               Foreground="{DynamicResource ForegroundPrimary}" />
+
+                    <TextBlock TextWrapping="Wrap"
+                               Foreground="{DynamicResource ForegroundPrimary}">
+                        <Run
+                            Text="Are you sure you want to completely reset the database? This will permanently delete:" />
+                    </TextBlock>
+
+                    <StackPanel Spacing="4" Margin="16,0,0,0">
+                        <TextBlock Text="• All calendars" Foreground="{DynamicResource ForegroundPrimary}" />
+                        <TextBlock Text="• All events" Foreground="{DynamicResource ForegroundPrimary}" />
+                        <TextBlock Text="• All blocking relationships" Foreground="{DynamicResource ForegroundPrimary}" />
+                        <TextBlock Text="• All other data" Foreground="{DynamicResource ForegroundPrimary}" />
+                    </StackPanel>
+
+                    <TextBlock TextWrapping="Wrap"
+                               Foreground="#FFD32F2F"
+                               FontWeight="SemiBold"
+                               Text="This action cannot be undone!" />
+
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                        <Button Grid.Column="0"
+                                Content="Cancel"
+                                Command="{Binding CancelResetCommand}"
+                                Classes="modern"
+                                IsEnabled="{Binding !IsResettingDatabase}"
+                                HorizontalAlignment="Stretch" />
+                        <Button Grid.Column="1"
+                                Content="Reset Database"
+                                Command="{Binding ConfirmResetCommand}"
+                                Classes="danger"
+                                IsEnabled="{Binding !IsResettingDatabase}"
+                                HorizontalAlignment="Stretch" />
                     </Grid>
                 </StackPanel>
             </Border>
         </Border>
     </Grid>
 </UserControl>
-

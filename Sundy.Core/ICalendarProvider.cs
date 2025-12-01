@@ -2,8 +2,8 @@ namespace Sundy.Core;
 
 public interface ICalendarProvider
 {
-    Task<CalendarEvent> CreateEventAsync(string calendarId, CalendarEvent evt);
-    Task<CalendarEvent> UpdateEventAsync(string calendarId, CalendarEvent evt);
-    Task DeleteEventAsync(string calendarId, string eventId);
-    Task<List<CalendarEvent>> GetEventsAsync(string calendarId, DateTime start, DateTime end);
+    Task<CalendarEvent> CreateEventAsync(string calendarId, CalendarEvent evt, CancellationToken ct = default);
+    Task<CalendarEvent> UpdateEventAsync(string calendarId, CalendarEvent evt, CancellationToken ct = default);
+    Task DeleteEventAsync(string calendarId, string eventId, CancellationToken ct = default);
+    Task<List<CalendarEvent>> GetEventsAsync(string calendarId, DateTimeOffset start, DateTimeOffset end, CancellationToken ct = default);
 }
