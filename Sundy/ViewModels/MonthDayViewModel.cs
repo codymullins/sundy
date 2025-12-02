@@ -7,13 +7,16 @@ namespace Sundy.ViewModels;
 
 public partial class MonthDayViewModel : ObservableObject
 {
-    public MonthDayViewModel(DateTime date, bool isCurrentMonth, bool isToday, List<EventViewModel> events)
+    private readonly Action<MonthDayViewModel, EventViewModel>? _onEventSelected;
+
+    public MonthDayViewModel(DateTime date, bool isCurrentMonth, bool isToday, List<EventViewModel> events, Action<MonthDayViewModel, EventViewModel>? onEventSelected = null)
     {
         Date = date;
         Day = date.Day.ToString();
         IsCurrentMonth = isCurrentMonth;
         IsToday = isToday;
         Events = new ObservableCollection<EventViewModel>(events);
+        _onEventSelected = onEventSelected;
     }
 
     public DateTime Date { get; }
@@ -21,6 +24,17 @@ public partial class MonthDayViewModel : ObservableObject
     public bool IsCurrentMonth { get; }
     public bool IsToday { get; }
     public ObservableCollection<EventViewModel> Events { get; }
+
+    [ObservableProperty]
+    private EventViewModel? _selectedEvent;
+
+    partial void OnSelectedEventChanged(EventViewModel? value)
+    {
+        if (value != null && _onEventSelected != null)
+        {
+            _onEventSelected(this, value);
+        }
+    }
 
     // Return null to use the default background from theme resources
     // Today highlighting will be done in XAML using DynamicResource

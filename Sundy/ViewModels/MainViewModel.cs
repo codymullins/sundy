@@ -1,27 +1,21 @@
-﻿﻿﻿using System;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Microsoft.EntityFrameworkCore;
 using Sundy.Core;
 
 namespace Sundy.ViewModels;
 
 public partial class MainViewModel : ViewModelBase
 {
-    private readonly SundyDbContext _db;
-    private readonly BlockingEngine _blockingEngine;
+    private readonly IEventRepository eventRepository;
 
     public MainViewModel(
-        SundyDbContext db,
-        BlockingEngine blockingEngine)
+        ICalendarProvider calendarProvider,
+        IEventRepository eventRepository)
     {
-        _db = db;
-        _blockingEngine = blockingEngine;
+        this.eventRepository = eventRepository;
 
-        CalendarViewModel = new CalendarViewModel(blockingEngine, db);
+        CalendarViewModel = new CalendarViewModel(calendarProvider, eventRepository);
         CalendarViewModel.PropertyChanged += (_, e) =>
         {
             if (e.PropertyName is nameof(CalendarViewModel.SelectedDate) 
@@ -117,14 +111,14 @@ public partial class MainViewModel : ViewModelBase
 
     public async Task InitializeAsync()
     {
-        await CalendarViewModel.LoadCalendarsAsync();
-        await LoadCalendarListAsync();
-        await CalendarViewModel.RefreshViewAsync();
+        await CalendarViewModel.LoadCalendarsAsync().ConfigureAwait(false);
+        await LoadCalendarListAsync().ConfigureAwait(false);
+        await CalendarViewModel.RefreshViewAsync().ConfigureAwait(false);
     }
 
     private async Task LoadCalendarListAsync()
     {
-        var calendars = await _db.Calendars.ToListAsync();
+        var calendars = await eventRepository.GetAllCalendarsAsync().ConfigureAwait(false);
         Calendars = new ObservableCollection<CalendarListItemViewModel>(
             calendars.Select(c => new CalendarListItemViewModel(c, OnCalendarVisibilityChanged)));
         OnPropertyChanged(nameof(HasNoCalendars));
@@ -132,7 +126,7 @@ public partial class MainViewModel : ViewModelBase
 
     private async void OnCalendarVisibilityChanged()
     {
-        await CalendarViewModel.RefreshViewAsync();
+        await CalendarViewModel.RefreshViewAsync().ConfigureAwait(false);
     }
 
     [RelayCommand]
@@ -157,17 +151,17 @@ public partial class MainViewModel : ViewModelBase
     private async Task OpenSettings()
     {
         var settingsVm = new CalendarSettingsViewModel(
-            _db,
+            eventRepository,
             onClosed: async () =>
             {
                 IsSettingsDialogOpen = false;
                 CalendarSettingsViewModel = null;
-                await LoadCalendarListAsync();
-                await CalendarViewModel.LoadCalendarsAsync();
-                await CalendarViewModel.RefreshViewAsync();
+                await LoadCalendarListAsync().ConfigureAwait(false);
+                await CalendarViewModel.LoadCalendarsAsync().ConfigureAwait(false);
+                await CalendarViewModel.RefreshViewAsync().ConfigureAwait(false);
             });
-        
-        await settingsVm.LoadCalendarsAsync();
+
+        await settingsVm.LoadCalendarsAsync().ConfigureAwait(false);
         CalendarSettingsViewModel = settingsVm;
         IsSettingsDialogOpen = true;
     }
@@ -176,19 +170,18 @@ public partial class MainViewModel : ViewModelBase
     private async Task CreateEvent()
     {
         var editVm = new EventEditViewModel(
-            _db,
-            _blockingEngine,
+            eventRepository,
             onSaved: OnEventSaved,
             onCancelled: () =>
             {
                 IsEventDialogOpen = false;
                 EventEditViewModel = null;
             });
-        
+
         await editVm.InitializeAsync(
             existingEvent: null,
-            defaultCalendarId: CalendarViewModel.SelectedCalendar?.Id);
-        
+            defaultCalendarId: CalendarViewModel.SelectedCalendar?.Id).ConfigureAwait(false);
+
         EventEditViewModel = editVm;
         IsEventDialogOpen = true;
     }
@@ -196,19 +189,18 @@ public partial class MainViewModel : ViewModelBase
     private async Task EditEvent(CalendarEvent evt)
     {
         var editVm = new EventEditViewModel(
-            _db,
-            _blockingEngine,
+            eventRepository,
             onSaved: OnEventSaved,
             onCancelled: () =>
             {
                 IsEventDialogOpen = false;
                 EventEditViewModel = null;
             });
-        
+
         await editVm.InitializeAsync(
             existingEvent: evt,
-            defaultCalendarId: evt.CalendarId);
-        
+            defaultCalendarId: evt.CalendarId).ConfigureAwait(false);
+
         EventEditViewModel = editVm;
         IsEventDialogOpen = true;
     }
@@ -217,7 +209,7 @@ public partial class MainViewModel : ViewModelBase
     {
         IsEventDialogOpen = false;
         EventEditViewModel = null;
-        await CalendarViewModel.RefreshViewAsync();
+        await CalendarViewModel.RefreshViewAsync().ConfigureAwait(false);
     }
 
     [RelayCommand]
@@ -234,9 +226,9 @@ public partial class MainViewModel : ViewModelBase
         {
             IsSettingsDialogOpen = false;
             CalendarSettingsViewModel = null;
-            await LoadCalendarListAsync();
-            await CalendarViewModel.LoadCalendarsAsync();
-            await CalendarViewModel.RefreshViewAsync();
+            await LoadCalendarListAsync().ConfigureAwait(false);
+            await CalendarViewModel.LoadCalendarsAsync().ConfigureAwait(false);
+            await CalendarViewModel.RefreshViewAsync().ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -256,13 +248,11 @@ public partial class MainViewModel : ViewModelBase
             EnableBlocking = true,
             ReceiveBlocks = true
         };
-        
-        _db.Calendars.Add(calendar);
-        await _db.SaveChangesAsync();
-        
-        await LoadCalendarListAsync();
-        await CalendarViewModel.LoadCalendarsAsync();
-        await CalendarViewModel.RefreshViewAsync();
+        await eventRepository.CreateCalendarAsync(calendar).ConfigureAwait(false);
+
+        await LoadCalendarListAsync().ConfigureAwait(false);
+        await CalendarViewModel.LoadCalendarsAsync().ConfigureAwait(false);
+        await CalendarViewModel.RefreshViewAsync().ConfigureAwait(false);
     }
 }
 

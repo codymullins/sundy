@@ -1,13 +1,8 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:Sundy.ViewModels"
-             xmlns:designData="clr-namespace:Sundy.ViewModels.DesignData"
              x:Class="Sundy.Views.CalendarView"
              x:DataType="vm:CalendarViewModel">
-    
-    <Design.DataContext>
-        <designData:DesignCalendarViewModel/>
-    </Design.DataContext>
     
     <Grid Background="{DynamicResource BackgroundPrimary}">
         <!-- Month View -->
@@ -70,29 +65,50 @@
                                         </TextBlock.Styles>
                                     </TextBlock>
                                     
-                                    <ItemsControl Grid.Row="1" 
-                                                  ItemsSource="{Binding Events}">
-                                        <ItemsControl.ItemTemplate>
+                                    <ListBox Grid.Row="0" ItemsSource="{Binding Events}"
+                                             SelectedItem="{Binding SelectedEvent}"
+                                             Background="Transparent"
+                                             SelectionMode="Single">
+                                        <ListBox.ItemContainerTheme>
+                                            <ControlTheme TargetType="ListBoxItem">
+                                                <Setter Property="Padding" Value="0"/>
+                                                <Setter Property="Margin" Value="0,1"/>
+                                                <Setter Property="Template">
+                                                    <ControlTemplate>
+                                                        <Border x:Name="SelectionBorder"
+                                                                CornerRadius="4"
+                                                                BorderThickness="2"
+                                                                BorderBrush="Transparent"
+                                                                Padding="0">
+                                                            <ContentPresenter Content="{TemplateBinding Content}"
+                                                                              ContentTemplate="{TemplateBinding ContentTemplate}"/>
+                                                        </Border>
+                                                    </ControlTemplate>
+                                                </Setter>
+            
+                                                <Style Selector="^:selected /template/ Border#SelectionBorder">
+                                                    <Setter Property="BorderBrush" Value="#FFD700"/>
+                                                </Style>
+                                                <Style Selector="^:focus /template/ Border#SelectionBorder">
+                                                    <Setter Property="BorderBrush" Value="#FFD700"/>
+                                                </Style>
+                                            </ControlTheme>
+                                        </ListBox.ItemContainerTheme>
+    
+                                        <ListBox.ItemTemplate>
                                             <DataTemplate>
                                                 <Border Background="{Binding CalendarColor}"
                                                         CornerRadius="3"
                                                         Padding="4,2"
-                                                        Margin="0,1"
-                                                        Cursor="Hand"
                                                         DoubleTapped="OnEventDoubleTapped">
-                                                    <Border.Styles>
-                                                        <Style Selector="Border:pointerover">
-                                                            <Setter Property="Opacity" Value="0.8"/>
-                                                        </Style>
-                                                    </Border.Styles>
                                                     <TextBlock Text="{Binding Title}"
                                                                FontSize="11"
                                                                Foreground="White"
                                                                TextTrimming="CharacterEllipsis"/>
                                                 </Border>
                                             </DataTemplate>
-                                        </ItemsControl.ItemTemplate>
-                                    </ItemsControl>
+                                        </ListBox.ItemTemplate>
+                                    </ListBox>
                                 </Grid>
                             </Border>
                         </DataTemplate>
@@ -185,7 +201,20 @@
                                             Width="{Binding CanvasWidth}"
                                             Height="{Binding CanvasHeight}"
                                             Cursor="Hand"
-                                            DoubleTapped="OnEventDoubleTapped">
+                                            Tapped="OnEventTapped"
+                                            DoubleTapped="OnEventDoubleTapped"
+                                            BorderBrush="#FFD700"
+                                            BorderThickness="0"
+                                            Classes.selected="{Binding IsSelected}">
+                                        <Border.Styles>
+                                            <Style Selector="Border:pointerover">
+                                                <Setter Property="Opacity" Value="0.8"/>
+                                            </Style>
+                                            <Style Selector="Border.selected">
+                                                <Setter Property="BorderThickness" Value="3"/>
+                                                <Setter Property="BoxShadow" Value="0 0 8 2 #FFD700"/>
+                                            </Style>
+                                        </Border.Styles>
                                         <StackPanel>
                                             <TextBlock Text="{Binding Title}"
                                                        Foreground="White"
@@ -256,7 +285,20 @@
                                             Canvas.Top="{Binding CanvasTop}"
                                             Height="{Binding CanvasHeight}"
                                             Cursor="Hand"
-                                            DoubleTapped="OnEventDoubleTapped">
+                                            Tapped="OnEventTapped"
+                                            DoubleTapped="OnEventDoubleTapped"
+                                            BorderBrush="#FFD700"
+                                            BorderThickness="0"
+                                            Classes.selected="{Binding IsSelected}">
+                                        <Border.Styles>
+                                            <Style Selector="Border:pointerover">
+                                                <Setter Property="Opacity" Value="0.8"/>
+                                            </Style>
+                                            <Style Selector="Border.selected">
+                                                <Setter Property="BorderThickness" Value="3"/>
+                                                <Setter Property="BoxShadow" Value="0 0 8 2 #FFD700"/>
+                                            </Style>
+                                        </Border.Styles>
                                         <StackPanel>
                                             <TextBlock Text="{Binding Title}"
                                                        Foreground="White"

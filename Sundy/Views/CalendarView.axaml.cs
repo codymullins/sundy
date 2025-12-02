@@ -11,6 +11,15 @@ public partial class CalendarView : UserControl
         InitializeComponent();
     }
 
+    private void OnEventTapped(object? sender, TappedEventArgs e)
+    {
+        if (sender is Border { DataContext: EventViewModel eventVm })
+        {
+            eventVm.SelectCommand.Execute(null);
+            e.Handled = true;
+        }
+    }
+
     private void OnEventDoubleTapped(object? sender, TappedEventArgs e)
     {
         if (sender is Border { DataContext: EventViewModel eventVm })

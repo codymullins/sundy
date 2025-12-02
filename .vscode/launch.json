@@ -1,0 +1,43 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Sundy Desktop",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/Sundy.Desktop/bin/Debug/net9.0/Sundy.Desktop.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/Sundy.Desktop",
+            "console": "internalConsole",
+            "stopAtEntry": false
+        },
+        {
+            "name": "Sundy Browser",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "dotnet",
+            "args": [
+                "run",
+                "--project",
+                "${workspaceFolder}/Sundy.Browser/Sundy.Browser.csproj",
+                "--no-build"
+            ],
+            "cwd": "${workspaceFolder}/Sundy.Browser",
+            "console": "internalConsole",
+            "stopAtEntry": false,
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            },
+            "serverReadyAction": {
+                "action": "openExternally",
+                "pattern": "App url: (https?://[^\\s]+)",
+                "uriFormat": "%s"
+            }
+        }
+    ]
+}

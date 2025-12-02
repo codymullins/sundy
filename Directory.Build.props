@@ -1,5 +1,8 @@
 <Project>
   <PropertyGroup>
-    <AvaloniaVersion>11.3.5</AvaloniaVersion>
+    <AvaloniaVersion>11.3.9</AvaloniaVersion>
+    <LangVersion>preview</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 </Project>

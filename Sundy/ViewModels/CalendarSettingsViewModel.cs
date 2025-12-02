@@ -1,16 +1,12 @@
-using System;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Microsoft.EntityFrameworkCore;
+using Serilog;
 using Sundy.Core;
 
 namespace Sundy.ViewModels;
 
-public partial class CalendarSettingsViewModel(SundyDbContext db, Func<Task>? onClosed = null) : ObservableObject
+public partial class CalendarSettingsViewModel(IEventRepository eventRepository, Func<Task>? onClosed = null) : ObservableObject
 {
     [ObservableProperty] private ObservableCollection<CalendarItemViewModel> _calendars = [];
 
@@ -42,8 +38,7 @@ public partial class CalendarSettingsViewModel(SundyDbContext db, Func<Task>? on
             ReceiveBlocks = true
         };
 
-        db.Calendars.Add(calendar);
-        await db.SaveChangesAsync();
+        await eventRepository.CreateCalendarAsync(calendar).ConfigureAwait(false);
 
         Calendars.Add(new CalendarItemViewModel(calendar, RequestDeleteCalendar));
         NewCalendarName = string.Empty;
@@ -67,55 +62,7 @@ public partial class CalendarSettingsViewModel(SundyDbContext db, Func<Task>? on
         {
             var calendarId = CalendarToDelete.Id;
 
-            // Get all event IDs for this calendar first
-            var eventIds = await db.Events
-                .Where(e => e.CalendarId == calendarId)
-                .Select(e => e.Id)
-                .ToListAsync();
-
-            // Delete all blocking relationships involving this calendar or its events
-            var blockingRelationships = await db.BlockingRelationships
-                .Where(br => br.SourceCalendarId == calendarId ||
-                             eventIds.Contains(br.SourceEventId))
-                .ToListAsync();
-
-            if (blockingRelationships.Any())
-            {
-                db.BlockingRelationships.RemoveRange(blockingRelationships);
-            }
-
-            // Delete all blocked events targeting this calendar or its events
-            var blockedEvents = await db.BlockedEvents
-                .Where(be => be.TargetCalendarId == calendarId ||
-                             eventIds.Contains(be.TargetEventId))
-                .ToListAsync();
-
-            if (blockedEvents.Any())
-            {
-                db.BlockedEvents.RemoveRange(blockedEvents);
-            }
-
-            // Delete all events in this calendar
-            var events = await db.Events
-                .Where(e => e.CalendarId == calendarId)
-                .ToListAsync();
-
-            if (events.Any())
-            {
-                db.Events.RemoveRange(events);
-            }
-
-            // Find and delete the calendar itself
-            var calendar = await db.Calendars
-                .FirstOrDefaultAsync(c => c.Id == calendarId);
-
-            if (calendar != null)
-            {
-                db.Calendars.Remove(calendar);
-            }
-
-            // Save all changes to the database
-            await db.SaveChangesAsync();
+            await eventRepository.DeleteCalendarAsync(calendarId).ConfigureAwait(false);
 
             // Remove from UI collection
             Calendars.Remove(CalendarToDelete);
@@ -125,13 +72,7 @@ public partial class CalendarSettingsViewModel(SundyDbContext db, Func<Task>? on
         }
         catch (Exception ex)
         {
-            // Log the error
-            System.Diagnostics.Debug.WriteLine($"Error deleting calendar: {ex.Message}");
-            System.Diagnostics.Debug.WriteLine($"Stack trace: {ex.StackTrace}");
-            if (ex.InnerException != null)
-            {
-                System.Diagnostics.Debug.WriteLine($"Inner exception: {ex.InnerException.Message}");
-            }
+            Log.Error(ex, "Error deleting calendar {CalendarId}", CalendarToDelete?.Id);
         }
         finally
         {
@@ -172,20 +113,14 @@ public partial class CalendarSettingsViewModel(SundyDbContext db, Func<Task>? on
         IsResettingDatabase = true;
         try
         {
-            await db.Database.EnsureDeletedAsync();
-            await db.Database.EnsureCreatedAsync();
+            await eventRepository.ResetDatabaseAsync();
             Calendars.Clear();
 
             IsResetConfirmationOpen = false;
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"Error resetting database: {ex.Message}");
-            System.Diagnostics.Debug.WriteLine($"Stack trace: {ex.StackTrace}");
-            if (ex.InnerException != null)
-            {
-                System.Diagnostics.Debug.WriteLine($"Inner exception: {ex.InnerException.Message}");
-            }
+            Log.Error(ex, "Error resetting database");
         }
         finally
         {
@@ -201,7 +136,7 @@ public partial class CalendarSettingsViewModel(SundyDbContext db, Func<Task>? on
 
     public async Task LoadCalendarsAsync()
     {
-        var cals = await db.Calendars.ToListAsync();
+        var cals = await eventRepository.GetAllCalendarsAsync();
         Calendars = new ObservableCollection<CalendarItemViewModel>(cals.Select(p =>
             new CalendarItemViewModel(p, RequestDeleteCalendar)));
     }

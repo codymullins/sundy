@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Microsoft.EntityFrameworkCore;
 using Sundy.Core;
 
 namespace Sundy.ViewModels;
@@ -13,41 +13,49 @@ namespace Sundy.ViewModels;
 // Main calendar view
 public partial class CalendarViewModel : ObservableObject
 {
-    private readonly BlockingEngine _blockingEngine;
-    private readonly SundyDbContext _db;
+    private readonly ICalendarProvider provider;
+    private readonly IEventRepository _eventRepository;
+    private readonly object _refreshLock = new();
+    private readonly SemaphoreSlim _refreshGate = new(1, 1);
+    private bool _refreshQueued;
+    private Task _refreshProcessing = Task.CompletedTask;
 
-    public CalendarViewModel(BlockingEngine blockingEngine, SundyDbContext db)
+    public CalendarViewModel(ICalendarProvider provider, IEventRepository eventRepository)
     {
-        _blockingEngine = blockingEngine;
-        _db = db;
+        _eventRepository = eventRepository;
+        this.provider = provider;
         InitializeTimeSlots();
     }
 
     public event EventHandler<CalendarEvent>? EventEditRequested;
 
-    [ObservableProperty]
-    private ObservableCollection<Calendar> _calendars = new();
+    [ObservableProperty] private ObservableCollection<Calendar> _calendars = new();
 
-    [ObservableProperty]
-    private ObservableCollection<EventViewModel> _visibleEvents = new();
+    [ObservableProperty] private ObservableCollection<EventViewModel> _visibleEvents = new();
 
-    [ObservableProperty]
-    private DateTime _selectedDate = DateTime.Today;
+    [ObservableProperty] private DateTime _selectedDate = DateTime.Today;
 
-    [ObservableProperty]
-    private Calendar? _selectedCalendar;
+    [ObservableProperty] private Calendar? _selectedCalendar;
 
-    [ObservableProperty]
-    private CalendarViewMode _viewMode = CalendarViewMode.Month;
+    [ObservableProperty] private CalendarViewMode _viewMode = CalendarViewMode.Month;
 
-    [ObservableProperty]
-    private ObservableCollection<MonthDayViewModel> _monthDays = new();
+    [ObservableProperty] private ObservableCollection<MonthDayViewModel> _monthDays = new();
 
-    [ObservableProperty]
-    private ObservableCollection<TimeSlotViewModel> _timeSlots = new();
+    [ObservableProperty] private ObservableCollection<TimeSlotViewModel> _timeSlots = new();
 
-    [ObservableProperty]
-    private ObservableCollection<WeekDayViewModel> _weekDays = new();
+    [ObservableProperty] private ObservableCollection<WeekDayViewModel> _weekDays = new();
+
+    [ObservableProperty] private EventViewModel? _selectedEvent;
+
+    partial void OnSelectedEventChanged(EventViewModel? value)
+    {
+        if (value != null)
+        {
+            SelectionChanged?.Invoke(this, value);
+        }
+    }
+
+    public event EventHandler<EventViewModel>? SelectionChanged;
 
     // View mode helpers
     public bool IsMonthView => ViewMode == CalendarViewMode.Month;
@@ -78,41 +86,79 @@ public partial class CalendarViewModel : ObservableObject
 
     public async Task LoadCalendarsAsync()
     {
-        var cals = await _db.Calendars.ToListAsync();
+        var cals = await _eventRepository.GetAllCalendarsAsync().ConfigureAwait(false);
         Calendars = new ObservableCollection<Calendar>(cals);
     }
 
-    public async Task RefreshViewAsync()
+    public Task RefreshViewAsync()
     {
-        switch (ViewMode)
+        lock (_refreshLock)
         {
-            case CalendarViewMode.Month:
-                await LoadMonthViewAsync();
-                break;
-            case CalendarViewMode.Week:
-                await LoadWeekViewAsync();
-                break;
-            case CalendarViewMode.Day:
-                await LoadDayViewAsync();
-                break;
+            _refreshQueued = true;
+
+            if (_refreshProcessing.IsCompleted)
+            {
+                _refreshProcessing = ProcessRefreshQueueAsync();
+            }
+
+            return _refreshProcessing;
         }
     }
+
+    private async Task ProcessRefreshQueueAsync()
+    {
+        while (true)
+        {
+            lock (_refreshLock)
+            {
+                if (!_refreshQueued)
+                {
+                    _refreshProcessing = Task.CompletedTask;
+                    return;
+                }
+
+                _refreshQueued = false;
+            }
+
+            await _refreshGate.WaitAsync().ConfigureAwait(false);
+            try
+            {
+                await RefreshViewCoreAsync().ConfigureAwait(false);
+            }
+            finally
+            {
+                _refreshGate.Release();
+            }
+        }
+    }
+
+    private Task RefreshViewCoreAsync() =>
+        ViewMode switch
+        {
+            CalendarViewMode.Month => LoadMonthViewAsync(),
+            CalendarViewMode.Week => LoadWeekViewAsync(),
+            CalendarViewMode.Day => LoadDayViewAsync(),
+            _ => Task.CompletedTask
+        };
 
     private async Task LoadMonthViewAsync()
     {
         var firstOfMonth = new DateTime(SelectedDate.Year, SelectedDate.Month, 1);
-        var lastOfMonth = firstOfMonth.AddMonths(1).AddDays(-1);
 
         // Find the first Sunday on or before the first of the month
         var startDate = firstOfMonth.AddDays(-(int)firstOfMonth.DayOfWeek);
         // Always show 6 weeks (42 days) for consistent grid
         var endDate = startDate.AddDays(42);
 
-        var events = await _db.Events.ToListAsync();
-             // .Where(e => e.StartTime < endDate && e.EndTime > startDate)
-             // .ToListAsync();
+        var startRange = new DateTimeOffset(startDate, DateTimeOffset.Now.Offset);
+        var endRange = new DateTimeOffset(endDate, DateTimeOffset.Now.Offset);
 
-        var calendarLookup = await _db.Calendars.ToDictionaryAsync(c => c.Id);
+        var events = await _eventRepository.GetEventsInRangeAsync(
+            startRange,
+            endRange,
+            SelectedCalendar?.Id).ConfigureAwait(false);
+
+        var calendarLookup = await _eventRepository.GetCalendarLookupAsync().ConfigureAwait(false);
 
         var days = new ObservableCollection<MonthDayViewModel>();
         for (var date = startDate; date < endDate; date = date.AddDays(1))
@@ -130,10 +176,31 @@ public partial class CalendarViewModel : ObservableObject
             var isCurrentMonth = date.Month == SelectedDate.Month;
             var isToday = date.Date == DateTime.Today;
 
-            days.Add(new MonthDayViewModel(date, isCurrentMonth, isToday, dayEvents));
+            days.Add(new MonthDayViewModel(date, isCurrentMonth, isToday, dayEvents, OnMonthDayEventSelected));
         }
 
         MonthDays = days;
+    }
+
+    private void OnMonthDayEventSelected(MonthDayViewModel sourceDay, EventViewModel selectedEvent)
+    {
+        // Deselect events in all other days
+        foreach (var day in MonthDays)
+        {
+            if (day != sourceDay && day.SelectedEvent != null)
+            {
+                day.SelectedEvent = null;
+            }
+        }
+
+        // Update the EventViewModel's IsSelected state
+        if (SelectedEvent != null && SelectedEvent != selectedEvent)
+        {
+            SelectedEvent.IsSelected = false;
+        }
+
+        selectedEvent.IsSelected = true;
+        SelectedEvent = selectedEvent;
     }
 
     private async Task LoadWeekViewAsync()
@@ -142,11 +209,15 @@ public partial class CalendarViewModel : ObservableObject
         var startOfWeek = SelectedDate.AddDays(-(int)SelectedDate.DayOfWeek);
         var endOfWeek = startOfWeek.AddDays(7);
 
-        var events = await _db.Events.ToListAsync();
-            // .Where(e => e.StartTime < endOfWeek && e.EndTime > startOfWeek)
-            // .ToListAsync();
+        var startRange = new DateTimeOffset(startOfWeek, DateTimeOffset.Now.Offset);
+        var endRange = new DateTimeOffset(endOfWeek, DateTimeOffset.Now.Offset);
 
-        var calendarLookup = await _db.Calendars.ToDictionaryAsync(c => c.Id);
+        var events = await _eventRepository.GetEventsInRangeAsync(
+            startRange,
+            endRange,
+            SelectedCalendar?.Id).ConfigureAwait(false);
+
+        var calendarLookup = await _eventRepository.GetCalendarLookupAsync().ConfigureAwait(false);
 
         // Build week day headers
         var weekDays = new ObservableCollection<WeekDayViewModel>();
@@ -155,14 +226,17 @@ public partial class CalendarViewModel : ObservableObject
             var date = startOfWeek.AddDays(i);
             weekDays.Add(new WeekDayViewModel(date, date.Date == DateTime.Today));
         }
+
         WeekDays = weekDays;
 
         // Build positioned events
         var visibleEvents = events
             .Select(e =>
             {
-                var eventVm = new EventViewModel(e, calendarLookup.GetValueOrDefault(e.CalendarId), startOfWeek, ViewMode);
+                var eventVm = new EventViewModel(e, calendarLookup.GetValueOrDefault(e.CalendarId), startOfWeek,
+                    ViewMode);
                 eventVm.EditRequested += OnEventEditRequested;
+                eventVm.Selected += OnEventSelected;
                 return eventVm;
             })
             .ToList();
@@ -175,17 +249,22 @@ public partial class CalendarViewModel : ObservableObject
         var start = SelectedDate.Date;
         var end = start.AddDays(1);
 
-        var events = await _db.Events.ToListAsync();
-            // .Where(e => e.StartTime < end && e.EndTime > start)
-            // .ToListAsync();
+        var startRange = new DateTimeOffset(start, DateTimeOffset.Now.Offset);
+        var endRange = new DateTimeOffset(end, DateTimeOffset.Now.Offset);
 
-        var calendarLookup = await _db.Calendars.ToDictionaryAsync(c => c.Id);
+        var events = await _eventRepository.GetEventsInRangeAsync(
+            startRange,
+            endRange,
+            SelectedCalendar?.Id).ConfigureAwait(false);
+
+        var calendarLookup = await _eventRepository.GetCalendarLookupAsync().ConfigureAwait(false);
 
         var visibleEvents = events
             .Select(e =>
             {
                 var eventVm = new EventViewModel(e, calendarLookup.GetValueOrDefault(e.CalendarId), start, ViewMode);
                 eventVm.EditRequested += OnEventEditRequested;
+                eventVm.Selected += OnEventSelected;
                 return eventVm;
             })
             .ToList();
@@ -228,35 +307,46 @@ public partial class CalendarViewModel : ObservableObject
     {
         if (SelectedCalendar == null) return;
 
-        await _blockingEngine.CreateEventWithBlockingAsync(
-            SelectedCalendar.Id,
-            newEvent);
+        await provider.CreateEventAsync(SelectedCalendar.Id, newEvent, CancellationToken.None).ConfigureAwait(false);
 
-        await RefreshViewAsync();
+        _ = RefreshViewAsync().ConfigureAwait(false);;
     }
 
     [RelayCommand]
     private async Task UpdateEvent(CalendarEvent updatedEvent)
     {
-        await _blockingEngine.UpdateEventWithBlockingAsync(
-            updatedEvent.CalendarId,
-            updatedEvent);
-
-        await RefreshViewAsync();
+        await provider.UpdateEventAsync(SelectedCalendar.Id, updatedEvent, CancellationToken.None)
+            .ConfigureAwait(false);
+        _ = RefreshViewAsync().ConfigureAwait(false);;
     }
 
     [RelayCommand]
     private async Task DeleteEvent(CalendarEvent evt)
     {
-        await _blockingEngine.DeleteEventWithBlockingAsync(
-            evt.CalendarId,
-            evt.Id);
+        ArgumentException.ThrowIfNullOrWhiteSpace(evt.Id);
+        await provider.DeleteEventAsync(SelectedCalendar.Id, evt.Id, CancellationToken.None).ConfigureAwait(false);
 
-        await RefreshViewAsync();
+        _ = RefreshViewAsync().ConfigureAwait(false);
     }
 
     private void OnEventEditRequested(object? sender, CalendarEvent evt)
     {
         EventEditRequested?.Invoke(this, evt);
+    }
+
+    private void OnEventSelected(object? sender, EventArgs e)
+    {
+        if (sender is EventViewModel eventVm)
+        {
+            // Deselect previous selection
+            if (SelectedEvent != null && SelectedEvent != eventVm)
+            {
+                SelectedEvent.IsSelected = false;
+            }
+
+            // Select the new event
+            eventVm.IsSelected = true;
+            SelectedEvent = eventVm;
+        }
     }
 }

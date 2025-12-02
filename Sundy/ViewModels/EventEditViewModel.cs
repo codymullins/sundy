@@ -1,19 +1,13 @@
-using System;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Microsoft.EntityFrameworkCore;
 using Sundy.Core;
 using Sundy.ViewModels.Scheduler;
 
 namespace Sundy.ViewModels;
 
 public partial class EventEditViewModel(
-    SundyDbContext db,
-    BlockingEngine blockingEngine,
+    IEventRepository repository,
     Action? onSaved = null,
     Action? onCancelled = null)
     : ObservableObject
@@ -57,7 +51,7 @@ public partial class EventEditViewModel(
     public async Task InitializeAsync(CalendarEvent? existingEvent = null, string? defaultCalendarId = null)
     {
         // Load available calendars
-        var calendars = await db.Calendars.ToListAsync();
+        var calendars = await repository.GetAllCalendarsAsync().ConfigureAwait(false);
         AvailableCalendars = new ObservableCollection<Calendar>(calendars);
 
         if (existingEvent != null)
@@ -81,18 +75,6 @@ public partial class EventEditViewModel(
             // Set selected calendar
             SelectedCalendar = AvailableCalendars
                 .FirstOrDefault(c => c.Id == existingEvent.CalendarId);
-
-            // If this is a blocking event, show source info
-            if (existingEvent.IsBlockingEvent && !string.IsNullOrEmpty(existingEvent.SourceEventId))
-            {
-                var sourceEvent = await db.Events.FindAsync(existingEvent.SourceEventId);
-                if (sourceEvent != null)
-                {
-                    var sourceCalendar = await db.Calendars.FindAsync(sourceEvent.CalendarId);
-                    BlockingSourceText =
-                        $"This is an automatically created blocking event from '{sourceEvent.Title}' on {sourceCalendar?.Name ?? "Unknown Calendar"}";
-                }
-            }
         }
         else
         {
@@ -157,6 +139,8 @@ public partial class EventEditViewModel(
             _originalEvent.Location = string.IsNullOrWhiteSpace(Location) ? null : Location;
             _originalEvent.Description = string.IsNullOrWhiteSpace(Description) ? null : Description;
             _originalEvent.CalendarId = SelectedCalendar.Id;
+            await repository.UpdateEventAsync(_originalEvent, ct).ConfigureAwait(false);
+
         }
         else
         {
@@ -174,10 +158,8 @@ public partial class EventEditViewModel(
                 SourceEventId = null
             };
 
-            db.Events.Add(newEvent);
+            await repository.CreateEventAsync(newEvent, ct).ConfigureAwait(false);
         }
-
-        await db.SaveChangesAsync(ct);
 
         onSaved?.Invoke();
     }
@@ -185,12 +167,11 @@ public partial class EventEditViewModel(
     [RelayCommand]
     private async Task Delete()
     {
-        if (_originalEvent == null) return;
+        if (_originalEvent?.Id == null) return;
 
         // TODO: Show confirmation dialog
 
-        db.Events.Remove(_originalEvent);
-        await db.SaveChangesAsync();
+        await repository.DeleteEventAsync(_originalEvent.Id).ConfigureAwait(false);
 
         onSaved?.Invoke();
     }
@@ -209,14 +190,17 @@ public partial class EventEditViewModel(
     }
 
     [RelayCommand]
-    private void OpenScheduler()
+    private async Task OpenScheduler()
     {
         // Initialize scheduler with current event date/time
         Scheduler.SelectedDate = DateOnly.FromDateTime(StartDate.DateTime);
         Scheduler.TimeBlock.StartTime = TimeOnly.FromTimeSpan(StartTime);
         Scheduler.TimeBlock.EndTime = TimeOnly.FromTimeSpan(EndTime);
-        
-        SchedulerOpenRequested?.Invoke(this, EventArgs.Empty);
+
+        if (OnSchedulerOpenRequested != null)
+        {
+            await OnSchedulerOpenRequested(this);
+        }
     }
 
     public void ApplySchedulerSelection()
@@ -240,7 +224,7 @@ public partial class EventEditViewModel(
         EndTime = Scheduler.TimeBlock.EndTime.ToTimeSpan();
     }
 
-    public event EventHandler? SchedulerOpenRequested;
+    public Func<EventEditViewModel, Task>? OnSchedulerOpenRequested { get; set; }
 
     private static DateTime CombineDateAndTime(DateTimeOffset date, TimeSpan time)
     {

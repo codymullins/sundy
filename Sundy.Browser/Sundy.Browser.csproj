@@ -4,10 +4,14 @@
         <OutputType>Exe</OutputType>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <Nullable>enable</Nullable>
+        <WasmEnableSIMD>true</WasmEnableSIMD>
+        <RunAOTCompilation>true</RunAOTCompilation>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="Avalonia.Browser" Version="$(AvaloniaVersion)"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.0"/>
+        <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="3.0.2" />
     </ItemGroup>
 
     <ItemGroup>

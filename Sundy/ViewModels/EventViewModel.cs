@@ -39,6 +39,9 @@ public partial class EventViewModel : ObservableObject
     public string CalendarColor { get; }
     public string TimeRange { get; }
 
+    [ObservableProperty]
+    private bool _isSelected;
+
     // Canvas positioning for week/day views
     public double CanvasLeft { get; private set; }
     public double CanvasTop { get; private set; }
@@ -84,10 +87,17 @@ public partial class EventViewModel : ObservableObject
     }
 
     [RelayCommand]
+    private void Select()
+    {
+        Selected?.Invoke(this, EventArgs.Empty);
+    }
+
+    [RelayCommand]
     private void RequestEdit()
     {
         EditRequested?.Invoke(this, Event);
     }
 
+    public event EventHandler? Selected;
     public event EventHandler<CalendarEvent>? EditRequested;
 }

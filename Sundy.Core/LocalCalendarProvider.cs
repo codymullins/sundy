@@ -1,21 +1,19 @@
-using Microsoft.EntityFrameworkCore;
 
 namespace Sundy.Core;
 
-public class LocalCalendarProvider(SundyDbContext db) : ICalendarProvider
+public class LocalCalendarProvider(IEventRepository eventRepository) : ICalendarProvider
 {
     public async Task<CalendarEvent> CreateEventAsync(string calendarId, CalendarEvent evt, CancellationToken ct = default)
     {
         evt.Id = Guid.NewGuid().ToString();
         evt.CalendarId = calendarId;
-        db.Events.Add(evt);
-        await db.SaveChangesAsync(ct);
+        await eventRepository.CreateEventAsync(evt, ct).ConfigureAwait(false);
         return evt;
     }
 
     public async Task<CalendarEvent> UpdateEventAsync(string calendarId, CalendarEvent evt, CancellationToken ct = default)
     {
-        var existing = await db.Events.Where(p => p.CalendarId == calendarId && p.Id == evt.Id).SingleOrDefaultAsync(ct);
+        var existing = await eventRepository.GetEventByIdAsync(evt.Id, ct).ConfigureAwait(false);
         if (existing == null)
         {
             throw new EventNotFoundException(evt.Id);
@@ -26,22 +24,15 @@ public class LocalCalendarProvider(SundyDbContext db) : ICalendarProvider
         existing.EndTime = evt.EndTime;
         existing.Description = evt.Description;
         existing.Location = evt.Location;
+        
+        await eventRepository.UpdateEventAsync(existing, ct).ConfigureAwait(false);
 
-        await db.SaveChangesAsync(ct);
         return existing;
     }
 
     public async Task DeleteEventAsync(string calendarId, string eventId, CancellationToken ct = default)
     {
-        var evt = await db.Events
-            .Where(p => p.CalendarId == calendarId && p.Id == eventId)
-            .SingleOrDefaultAsync(ct);
-        
-        if (evt != null)
-        {
-            db.Events.Remove(evt);
-            await db.SaveChangesAsync(ct);
-        }
+        await eventRepository.DeleteEventAsync(eventId, ct).ConfigureAwait(false);
     }
 
     // TODO: async enumerable for large datasets
@@ -51,11 +42,6 @@ public class LocalCalendarProvider(SundyDbContext db) : ICalendarProvider
         DateTimeOffset end,
         CancellationToken ct = default)
     {
-        return await db.Events.ToListAsync(ct);
-            // TODO: Re-enable filtering
-            // .Where(e => e.CalendarId == calendarId
-            //             && e.StartTime < end
-            //             && e.EndTime > start)
-            // .ToListAsync(ct);
+        return await eventRepository.GetEventsInRangeAsync(start, end, calendarId, ct).ConfigureAwait(false);
     }
 }
