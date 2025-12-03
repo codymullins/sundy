@@ -3,57 +3,71 @@
              xmlns:vm="using:Sundy.ViewModels"
              x:Class="Sundy.Views.CalendarView"
              x:DataType="vm:CalendarViewModel">
-    
+
     <Grid Background="{DynamicResource BackgroundPrimary}">
         <!-- Month View -->
         <Panel IsVisible="{Binding IsMonthView}">
             <Grid RowDefinitions="Auto,*">
                 <!-- Day Headers -->
                 <Grid Grid.Row="0" ColumnDefinitions="*,*,*,*,*,*,*" Height="40">
-                    <Border Grid.Column="0" Background="{DynamicResource BackgroundHover}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,1">
-                        <TextBlock Text="Sunday" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="SemiBold" Foreground="{DynamicResource ForegroundPrimary}"/>
+                    <Border Grid.Column="0" Background="{DynamicResource BackgroundHover}"
+                            BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,1">
+                        <TextBlock Text="Sunday" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                   FontWeight="SemiBold" Foreground="{DynamicResource ForegroundPrimary}" />
                     </Border>
-                    <Border Grid.Column="1" Background="{DynamicResource BackgroundHover}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,1">
-                        <TextBlock Text="Monday" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="SemiBold" Foreground="{DynamicResource ForegroundPrimary}"/>
+                    <Border Grid.Column="1" Background="{DynamicResource BackgroundHover}"
+                            BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,1">
+                        <TextBlock Text="Monday" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                   FontWeight="SemiBold" Foreground="{DynamicResource ForegroundPrimary}" />
                     </Border>
-                    <Border Grid.Column="2" Background="{DynamicResource BackgroundHover}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,1">
-                        <TextBlock Text="Tuesday" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="SemiBold" Foreground="{DynamicResource ForegroundPrimary}"/>
+                    <Border Grid.Column="2" Background="{DynamicResource BackgroundHover}"
+                            BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,1">
+                        <TextBlock Text="Tuesday" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                   FontWeight="SemiBold" Foreground="{DynamicResource ForegroundPrimary}" />
                     </Border>
-                    <Border Grid.Column="3" Background="{DynamicResource BackgroundHover}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,1">
-                        <TextBlock Text="Wednesday" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="SemiBold" Foreground="{DynamicResource ForegroundPrimary}"/>
+                    <Border Grid.Column="3" Background="{DynamicResource BackgroundHover}"
+                            BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,1">
+                        <TextBlock Text="Wednesday" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                   FontWeight="SemiBold" Foreground="{DynamicResource ForegroundPrimary}" />
                     </Border>
-                    <Border Grid.Column="4" Background="{DynamicResource BackgroundHover}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,1">
-                        <TextBlock Text="Thursday" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="SemiBold" Foreground="{DynamicResource ForegroundPrimary}"/>
+                    <Border Grid.Column="4" Background="{DynamicResource BackgroundHover}"
+                            BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,1">
+                        <TextBlock Text="Thursday" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                   FontWeight="SemiBold" Foreground="{DynamicResource ForegroundPrimary}" />
                     </Border>
-                    <Border Grid.Column="5" Background="{DynamicResource BackgroundHover}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,1">
-                        <TextBlock Text="Friday" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="SemiBold" Foreground="{DynamicResource ForegroundPrimary}"/>
+                    <Border Grid.Column="5" Background="{DynamicResource BackgroundHover}"
+                            BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,1">
+                        <TextBlock Text="Friday" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                   FontWeight="SemiBold" Foreground="{DynamicResource ForegroundPrimary}" />
                     </Border>
-                    <Border Grid.Column="6" Background="{DynamicResource BackgroundHover}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1">
-                        <TextBlock Text="Saturday" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="SemiBold" Foreground="{DynamicResource ForegroundPrimary}"/>
+                    <Border Grid.Column="6" Background="{DynamicResource BackgroundHover}"
+                            BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1">
+                        <TextBlock Text="Saturday" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                   FontWeight="SemiBold" Foreground="{DynamicResource ForegroundPrimary}" />
                     </Border>
                 </Grid>
-                
+
                 <!-- Month Grid -->
                 <ItemsControl Grid.Row="1" ItemsSource="{Binding MonthDays}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
-                            <UniformGrid Rows="6" Columns="7"/>
+                            <UniformGrid Rows="6" Columns="7" />
                         </ItemsPanelTemplate>
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Border BorderBrush="{DynamicResource BorderBrush}" 
+                            <Border BorderBrush="{DynamicResource BorderBrush}"
                                     BorderThickness="0,0,1,1"
                                     Padding="5"
                                     DoubleTapped="OnDayDoubleTapped">
                                 <Border.Styles>
                                     <!-- Default background for current month days -->
                                     <Style Selector="Border">
-                                        <Setter Property="Background" Value="{DynamicResource BackgroundPrimary}"/>
+                                        <Setter Property="Background" Value="{DynamicResource BackgroundPrimary}" />
                                     </Style>
                                 </Border.Styles>
                                 <Grid RowDefinitions="Auto,*">
-                                    <TextBlock Grid.Row="0" 
+                                    <TextBlock Grid.Row="0"
                                                Text="{Binding Day}"
                                                FontSize="12"
                                                HorizontalAlignment="Right"
@@ -61,19 +75,20 @@
                                         <TextBlock.Styles>
                                             <!-- Default text color for current month -->
                                             <Style Selector="TextBlock">
-                                                <Setter Property="Foreground" Value="{DynamicResource ForegroundPrimary}"/>
+                                                <Setter Property="Foreground"
+                                                        Value="{DynamicResource ForegroundPrimary}" />
                                             </Style>
                                         </TextBlock.Styles>
                                     </TextBlock>
-                                    
+
                                     <ListBox Grid.Row="0" ItemsSource="{Binding Events}"
                                              SelectedItem="{Binding SelectedEvent}"
                                              Background="Transparent"
                                              SelectionMode="Single">
                                         <ListBox.ItemContainerTheme>
                                             <ControlTheme TargetType="ListBoxItem">
-                                                <Setter Property="Padding" Value="0"/>
-                                                <Setter Property="Margin" Value="0,1"/>
+                                                <Setter Property="Padding" Value="0" />
+                                                <Setter Property="Margin" Value="0,1" />
                                                 <Setter Property="Template">
                                                     <ControlTemplate>
                                                         <Border x:Name="SelectionBorder"
@@ -82,20 +97,20 @@
                                                                 BorderBrush="Transparent"
                                                                 Padding="0">
                                                             <ContentPresenter Content="{TemplateBinding Content}"
-                                                                              ContentTemplate="{TemplateBinding ContentTemplate}"/>
+                                                                              ContentTemplate="{TemplateBinding ContentTemplate}" />
                                                         </Border>
                                                     </ControlTemplate>
                                                 </Setter>
-            
+
                                                 <Style Selector="^:selected /template/ Border#SelectionBorder">
-                                                    <Setter Property="BorderBrush" Value="#FFD700"/>
+                                                    <Setter Property="BorderBrush" Value="#FFD700" />
                                                 </Style>
                                                 <Style Selector="^:focus /template/ Border#SelectionBorder">
-                                                    <Setter Property="BorderBrush" Value="#FFD700"/>
+                                                    <Setter Property="BorderBrush" Value="#FFD700" />
                                                 </Style>
                                             </ControlTheme>
                                         </ListBox.ItemContainerTheme>
-    
+
                                         <ListBox.ItemTemplate>
                                             <DataTemplate>
                                                 <Border Background="{Binding CalendarColor}"
@@ -105,7 +120,7 @@
                                                     <TextBlock Text="{Binding Title}"
                                                                FontSize="11"
                                                                Foreground="White"
-                                                               TextTrimming="CharacterEllipsis"/>
+                                                               TextTrimming="CharacterEllipsis" />
                                                 </Border>
                                             </DataTemplate>
                                         </ListBox.ItemTemplate>
@@ -117,7 +132,7 @@
                 </ItemsControl>
             </Grid>
         </Panel>
-        
+
         <!-- Week View -->
         <Panel IsVisible="{Binding IsWeekView}">
             <ScrollViewer>
@@ -126,70 +141,70 @@
                     <ItemsControl Grid.Row="1" Grid.Column="0" ItemsSource="{Binding TimeSlots}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Border Height="60" 
+                                <Border Height="60"
                                         Background="{DynamicResource BackgroundPrimary}"
-                                        BorderBrush="{DynamicResource BorderBrush}" 
+                                        BorderBrush="{DynamicResource BorderBrush}"
                                         BorderThickness="0,0,1,1">
-                                    <TextBlock Text="{Binding TimeLabel}" 
+                                    <TextBlock Text="{Binding TimeLabel}"
                                                FontSize="11"
                                                Foreground="{DynamicResource ForegroundMuted}"
-                                               Margin="5,0"/>
+                                               Margin="5,0" />
                                 </Border>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
-                    
+
                     <!-- Day Headers -->
                     <ItemsControl Grid.Row="0" Grid.Column="1" ItemsSource="{Binding WeekDays}">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
-                                <UniformGrid Columns="7"/>
+                                <UniformGrid Columns="7" />
                             </ItemsPanelTemplate>
                         </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Border Background="{DynamicResource BackgroundHover}" 
-                                        BorderBrush="{DynamicResource BorderBrush}" 
+                                <Border Background="{DynamicResource BackgroundHover}"
+                                        BorderBrush="{DynamicResource BorderBrush}"
                                         BorderThickness="0,0,1,1"
                                         Padding="8">
                                     <StackPanel HorizontalAlignment="Center">
-                                        <TextBlock Text="{Binding DayName}" 
+                                        <TextBlock Text="{Binding DayName}"
                                                    FontSize="12"
                                                    FontWeight="SemiBold"
-                                                   Foreground="{DynamicResource ForegroundPrimary}"/>
-                                        <TextBlock Text="{Binding Date}" 
+                                                   Foreground="{DynamicResource ForegroundPrimary}" />
+                                        <TextBlock Text="{Binding Date}"
                                                    FontSize="20"
-                                                   Foreground="{DynamicResource ForegroundPrimary}"/>
+                                                   Foreground="{DynamicResource ForegroundPrimary}" />
                                     </StackPanel>
                                 </Border>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
-                    
+
                     <!-- Week Grid with Events -->
                     <Grid Grid.Row="1" Grid.Column="1">
                         <!-- Background time grid -->
                         <ItemsControl ItemsSource="{Binding TimeSlots}">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
-                                    <UniformGrid Columns="7"/>
+                                    <UniformGrid Columns="7" />
                                 </ItemsPanelTemplate>
                             </ItemsControl.ItemsPanel>
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <Border Height="60" 
+                                    <Border Height="60"
                                             Background="{DynamicResource BackgroundPrimary}"
-                                            BorderBrush="{DynamicResource BorderBrush}" 
-                                            BorderThickness="0,0,1,1"/>
+                                            BorderBrush="{DynamicResource BorderBrush}"
+                                            BorderThickness="0,0,1,1" />
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
-                        
+
                         <!-- Events overlay -->
                         <ItemsControl ItemsSource="{Binding VisibleEvents}">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
-                                    <Canvas/>
+                                    <Canvas />
                                 </ItemsPanelTemplate>
                             </ItemsControl.ItemsPanel>
                             <ItemsControl.ItemTemplate>
@@ -209,22 +224,22 @@
                                             Classes.selected="{Binding IsSelected}">
                                         <Border.Styles>
                                             <Style Selector="Border:pointerover">
-                                                <Setter Property="Opacity" Value="0.8"/>
+                                                <Setter Property="Opacity" Value="0.8" />
                                             </Style>
                                             <Style Selector="Border.selected">
-                                                <Setter Property="BorderThickness" Value="3"/>
-                                                <Setter Property="BoxShadow" Value="0 0 8 2 #FFD700"/>
+                                                <Setter Property="BorderThickness" Value="3" />
+                                                <Setter Property="BoxShadow" Value="0 0 8 2 #FFD700" />
                                             </Style>
                                         </Border.Styles>
                                         <StackPanel>
                                             <TextBlock Text="{Binding Title}"
                                                        Foreground="White"
                                                        FontWeight="SemiBold"
-                                                       TextTrimming="CharacterEllipsis"/>
+                                                       TextTrimming="CharacterEllipsis" />
                                             <TextBlock Text="{Binding TimeRange}"
                                                        Foreground="White"
                                                        FontSize="11"
-                                                       Opacity="0.9"/>
+                                                       Opacity="0.9" />
                                         </StackPanel>
                                     </Border>
                                 </DataTemplate>
@@ -234,7 +249,7 @@
                 </Grid>
             </ScrollViewer>
         </Panel>
-        
+
         <!-- Day View -->
         <Panel IsVisible="{Binding IsDayView}">
             <ScrollViewer>
@@ -243,38 +258,38 @@
                     <ItemsControl Grid.Column="0" ItemsSource="{Binding TimeSlots}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Border Height="60" 
+                                <Border Height="60"
                                         Background="{DynamicResource BackgroundPrimary}"
-                                        BorderBrush="{DynamicResource BorderBrush}" 
+                                        BorderBrush="{DynamicResource BorderBrush}"
                                         BorderThickness="0,0,1,1">
-                                    <TextBlock Text="{Binding TimeLabel}" 
+                                    <TextBlock Text="{Binding TimeLabel}"
                                                FontSize="11"
                                                Foreground="{DynamicResource ForegroundMuted}"
-                                               Margin="5,0"/>
+                                               Margin="5,0" />
                                 </Border>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
-                    
+
                     <!-- Day Column -->
                     <Grid Grid.Column="1">
                         <!-- Background time grid -->
                         <ItemsControl ItemsSource="{Binding TimeSlots}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <Border Height="60" 
+                                    <Border Height="60"
                                             Background="{DynamicResource BackgroundPrimary}"
-                                            BorderBrush="{DynamicResource BorderBrush}" 
-                                            BorderThickness="0,0,1,1"/>
+                                            BorderBrush="{DynamicResource BorderBrush}"
+                                            BorderThickness="0,0,1,1" />
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
-                        
+
                         <!-- Events overlay -->
                         <ItemsControl ItemsSource="{Binding VisibleEvents}">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
-                                    <Canvas/>
+                                    <Canvas />
                                 </ItemsPanelTemplate>
                             </ItemsControl.ItemsPanel>
                             <ItemsControl.ItemTemplate>
@@ -293,29 +308,29 @@
                                             Classes.selected="{Binding IsSelected}">
                                         <Border.Styles>
                                             <Style Selector="Border:pointerover">
-                                                <Setter Property="Opacity" Value="0.8"/>
+                                                <Setter Property="Opacity" Value="0.8" />
                                             </Style>
                                             <Style Selector="Border.selected">
-                                                <Setter Property="BorderThickness" Value="3"/>
-                                                <Setter Property="BoxShadow" Value="0 0 8 2 #FFD700"/>
+                                                <Setter Property="BorderThickness" Value="3" />
+                                                <Setter Property="BoxShadow" Value="0 0 8 2 #FFD700" />
                                             </Style>
                                         </Border.Styles>
                                         <StackPanel>
                                             <TextBlock Text="{Binding Title}"
                                                        Foreground="White"
                                                        FontWeight="SemiBold"
-                                                       FontSize="14"/>
+                                                       FontSize="14" />
                                             <TextBlock Text="{Binding TimeRange}"
                                                        Foreground="White"
                                                        FontSize="12"
                                                        Opacity="0.9"
-                                                       Margin="0,2,0,0"/>
+                                                       Margin="0,2,0,0" />
                                             <TextBlock Text="{Binding Location}"
                                                        Foreground="White"
                                                        FontSize="11"
                                                        Opacity="0.8"
                                                        Margin="0,4,0,0"
-                                                       IsVisible="{Binding HasLocation}"/>
+                                                       IsVisible="{Binding HasLocation}" />
                                         </StackPanel>
                                     </Border>
                                 </DataTemplate>

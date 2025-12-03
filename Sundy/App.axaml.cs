@@ -25,10 +25,7 @@ public partial class App : Application
         services.AddLogging(builder => { builder.AddSerilog(dispose: false); });
 
         // Add Mediator
-        services.AddMediator(options =>
-        {
-            options.ServiceLifetime = ServiceLifetime.Scoped;
-        });
+        services.AddMediator(options => { options.ServiceLifetime = ServiceLifetime.Scoped; });
 
         // Get the application data path
         string dbPath;
@@ -45,8 +42,14 @@ public partial class App : Application
             dbPath = Path.Combine(sundyDataPath, "sundy.db");
         }
 
-        services.AddSingleton<IEventRepository>(_ =>
-            new EventRepository($"Data Source={dbPath}"));
+        // todo: revisit this setup later
+        var connectionString = $"Data Source={dbPath}";
+        services.AddSingleton<EventStore>(_ =>
+            new EventStore(connectionString));
+        services.AddSingleton<DatabaseManager>(_ =>
+            new DatabaseManager(connectionString));
+        services.AddSingleton<CalendarStore>(_ =>
+            new CalendarStore(connectionString));
 
         // Register Services
         services.AddSingleton<ICalendarProvider, LocalCalendarProvider>();
@@ -61,8 +64,13 @@ public partial class App : Application
         var serviceProvider = services.BuildServiceProvider();
 
         // Initialize database schema
-        var eventRepository = serviceProvider.GetRequiredService<IEventRepository>();
-        eventRepository.InitializeDatabaseAsync().GetAwaiter().GetResult();
+        var metaStore = serviceProvider.GetRequiredService<DatabaseManager>();
+        if (!metaStore.DatabaseExistsAsync(CancellationToken.None).GetAwaiter().GetResult())
+        {
+            Log.Information("Database not found. Creating new database at {DbPath}", dbPath);
+            DatabaseManager.CreateDatabaseFileAsync(connectionString, CancellationToken.None).GetAwaiter().GetResult();
+        }
+        metaStore.InitializeDatabaseAsync().GetAwaiter().GetResult();
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {

@@ -3,12 +3,12 @@ using Sundy.Core.Commands;
 
 namespace Sundy.Core.Handlers;
 
-public class CreateCalendarCommandHandler(IEventRepository repository) : IRequestHandler<CreateCalendarCommand>
+public class CreateCalendarCommandHandler(CalendarStore store) : IRequestHandler<CreateCalendarCommand>
 {
 
     public async ValueTask<Unit> Handle(CreateCalendarCommand request, CancellationToken cancellationToken)
     {
-        await repository.CreateCalendarAsync(request.Calendar, cancellationToken);
+        await store.CreateCalendarAsync(request.Calendar, cancellationToken);
         return Unit.Value;
     }
 }

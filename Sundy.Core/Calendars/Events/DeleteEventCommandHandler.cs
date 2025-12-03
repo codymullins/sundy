@@ -3,7 +3,7 @@ using Sundy.Core.Commands;
 
 namespace Sundy.Core.Handlers;
 
-public class DeleteEventCommandHandler(IEventRepository repository) : IRequestHandler<DeleteEventCommand>
+public class DeleteEventCommandHandler(EventStore repository) : IRequestHandler<DeleteEventCommand>
 {
 
     public async ValueTask<Unit> Handle(DeleteEventCommand request, CancellationToken cancellationToken)

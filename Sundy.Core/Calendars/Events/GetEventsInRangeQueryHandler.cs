@@ -3,7 +3,7 @@ using Sundy.Core.Queries;
 
 namespace Sundy.Core.Handlers;
 
-public class GetEventsInRangeQueryHandler(IEventRepository repository)
+public class GetEventsInRangeQueryHandler(EventStore repository)
     : IRequestHandler<GetEventsInRangeQuery, List<CalendarEvent>>
 {
     public async ValueTask<List<CalendarEvent>> Handle(GetEventsInRangeQuery request, CancellationToken cancellationToken)

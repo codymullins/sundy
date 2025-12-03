@@ -3,7 +3,7 @@ using Sundy.Core.Commands;
 
 namespace Sundy.Core.Handlers;
 
-public class CreateEventCommandHandler(IEventRepository repository) : IRequestHandler<CreateEventCommand, CalendarEvent>
+public class CreateEventCommandHandler(EventStore repository) : IRequestHandler<CreateEventCommand, CalendarEvent>
 {
 
     public async ValueTask<CalendarEvent> Handle(CreateEventCommand request, CancellationToken cancellationToken)
