@@ -8,6 +8,7 @@
       <PackageReference Include="Mediator.Abstractions" Version="3.0.1" />
       <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.0" />
       <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.0" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.0" />
     </ItemGroup>
 
 </Project>

@@ -259,9 +259,28 @@ public partial class EventEditViewModel(
     {
         if (value)
         {
-            // Set to full day
+            // Set to full day (midnight to midnight next day)
             StartTime = TimeSpan.Zero;
-            EndTime = TimeSpan.FromHours(23).Add(TimeSpan.FromMinutes(59));
+            EndTime = TimeSpan.Zero; // Midnight
+            EndDate = StartDate.AddDays(1); // Next day
+
+            // Update scheduler display
+            Scheduler.TimeBlock.StartTime = TimeOnly.FromTimeSpan(StartTime);
+            Scheduler.TimeBlock.EndTime = new TimeOnly(23, 59); // Show as end of day in UI
+        }
+        else
+        {
+            // Reset to same day with 1 hour duration
+            EndDate = StartDate;
+            if (StartTime == TimeSpan.Zero && EndTime == TimeSpan.Zero)
+            {
+                StartTime = TimeSpan.FromHours(9);
+                EndTime = TimeSpan.FromHours(10);
+            }
+
+            // Update scheduler display
+            Scheduler.TimeBlock.StartTime = TimeOnly.FromTimeSpan(StartTime);
+            Scheduler.TimeBlock.EndTime = TimeOnly.FromTimeSpan(EndTime);
         }
     }
 
@@ -272,6 +291,9 @@ public partial class EventEditViewModel(
         {
             EndDate = value;
         }
+
+        // Update scheduler display
+        Scheduler.SelectedDate = DateOnly.FromDateTime(value.DateTime);
     }
 
     partial void OnStartTimeChanged(TimeSpan value)
@@ -281,5 +303,14 @@ public partial class EventEditViewModel(
         {
             EndTime = value.Add(TimeSpan.FromHours(1));
         }
+
+        // Update scheduler display
+        Scheduler.TimeBlock.StartTime = TimeOnly.FromTimeSpan(value);
+    }
+
+    partial void OnEndTimeChanged(TimeSpan value)
+    {
+        // Update scheduler display
+        Scheduler.TimeBlock.EndTime = TimeOnly.FromTimeSpan(value);
     }
 }

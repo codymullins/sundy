@@ -2,6 +2,7 @@ using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Sundy.Core;
@@ -42,14 +43,15 @@ public partial class App : Application
             dbPath = Path.Combine(sundyDataPath, "sundy.db");
         }
 
-        // todo: revisit this setup later
+        // Register DbContext
         var connectionString = $"Data Source={dbPath}";
-        services.AddSingleton<EventStore>(_ =>
-            new EventStore(connectionString));
-        services.AddSingleton<DatabaseManager>(_ =>
-            new DatabaseManager(connectionString));
-        services.AddSingleton<CalendarStore>(_ =>
-            new CalendarStore(connectionString));
+        services.AddDbContext<SundyDbContext>(options =>
+            options.UseSqlite(connectionString));
+
+        // Register stores and database manager
+        services.AddScoped<EventStore>();
+        services.AddScoped<DatabaseManager>();
+        services.AddScoped<CalendarStore>();
 
         // Register Services
         services.AddSingleton<ICalendarProvider, LocalCalendarProvider>();
@@ -64,13 +66,17 @@ public partial class App : Application
         var serviceProvider = services.BuildServiceProvider();
 
         // Initialize database schema
-        var metaStore = serviceProvider.GetRequiredService<DatabaseManager>();
-        if (!metaStore.DatabaseExistsAsync(CancellationToken.None).GetAwaiter().GetResult())
+        using (var scope = serviceProvider.CreateScope())
         {
-            Log.Information("Database not found. Creating new database at {DbPath}", dbPath);
-            DatabaseManager.CreateDatabaseFileAsync(connectionString, CancellationToken.None).GetAwaiter().GetResult();
+            var dbContext = scope.ServiceProvider.GetRequiredService<SundyDbContext>();
+            var metaStore = scope.ServiceProvider.GetRequiredService<DatabaseManager>();
+
+            if (!metaStore.DatabaseExistsAsync(CancellationToken.None).GetAwaiter().GetResult())
+            {
+                Log.Information("Database not found. Creating new database at {DbPath}", dbPath);
+            }
+            metaStore.InitializeDatabaseAsync().GetAwaiter().GetResult();
         }
-        metaStore.InitializeDatabaseAsync().GetAwaiter().GetResult();
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
