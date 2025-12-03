@@ -30,10 +30,10 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Sundy.Core\Sundy.Core.csproj" />
+      <Folder Include="Controls\" />
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Controls\" />
+      <ProjectReference Include="..\..\Sundy.Core\Sundy.Core.csproj" />
     </ItemGroup>
 </Project>
