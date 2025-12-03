@@ -1,6 +1,8 @@
 ﻿namespace Sundy.Core;
 
-// Calendar entity
+/// <summary>
+/// Represents a calendar in the system.
+/// </summary>
 public class Calendar
 {
     public required string Id { get; set; }

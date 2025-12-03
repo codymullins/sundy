@@ -24,6 +24,12 @@ public partial class App : Application
         // Add logging
         services.AddLogging(builder => { builder.AddSerilog(dispose: false); });
 
+        // Add Mediator
+        services.AddMediator(options =>
+        {
+            options.ServiceLifetime = ServiceLifetime.Scoped;
+        });
+
         // Get the application data path
         string dbPath;
         if (OperatingSystem.IsBrowser())

@@ -1,12 +1,15 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Mediator;
 using Serilog;
 using Sundy.Core;
+using Sundy.Core.Commands;
+using Sundy.Core.Queries;
 
 namespace Sundy.ViewModels;
 
-public partial class CalendarSettingsViewModel(IEventRepository eventRepository, Func<Task>? onClosed = null) : ObservableObject
+public partial class CalendarSettingsViewModel(IMediator mediator, Func<Task>? onClosed = null) : ObservableObject
 {
     [ObservableProperty] private ObservableCollection<CalendarItemViewModel> _calendars = [];
 
@@ -38,7 +41,7 @@ public partial class CalendarSettingsViewModel(IEventRepository eventRepository,
             ReceiveBlocks = true
         };
 
-        await eventRepository.CreateCalendarAsync(calendar).ConfigureAwait(false);
+        await mediator.Send(new CreateCalendarCommand(calendar)).ConfigureAwait(false);
 
         Calendars.Add(new CalendarItemViewModel(calendar, RequestDeleteCalendar));
         NewCalendarName = string.Empty;
@@ -62,7 +65,7 @@ public partial class CalendarSettingsViewModel(IEventRepository eventRepository,
         {
             var calendarId = CalendarToDelete.Id;
 
-            await eventRepository.DeleteCalendarAsync(calendarId).ConfigureAwait(false);
+            await mediator.Send(new DeleteCalendarCommand(calendarId)).ConfigureAwait(false);
 
             // Remove from UI collection
             Calendars.Remove(CalendarToDelete);
@@ -113,7 +116,7 @@ public partial class CalendarSettingsViewModel(IEventRepository eventRepository,
         IsResettingDatabase = true;
         try
         {
-            await eventRepository.ResetDatabaseAsync();
+            await mediator.Send(new ResetDatabaseCommand());
             Calendars.Clear();
 
             IsResetConfirmationOpen = false;
@@ -136,7 +139,7 @@ public partial class CalendarSettingsViewModel(IEventRepository eventRepository,
 
     public async Task LoadCalendarsAsync()
     {
-        var cals = await eventRepository.GetAllCalendarsAsync();
+        var cals = await mediator.Send(new GetAllCalendarsQuery());
         Calendars = new ObservableCollection<CalendarItemViewModel>(cals.Select(p =>
             new CalendarItemViewModel(p, RequestDeleteCalendar)));
     }

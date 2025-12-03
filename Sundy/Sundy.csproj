@@ -5,21 +5,26 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <AvaloniaResource Include="Assets\**"/>
-        <AvaloniaResource Include="Themes\**"/>
+        <AvaloniaResource Include="Assets\**" />
+        <AvaloniaResource Include="Themes\**" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)"/>
-        <PackageReference Include="Avalonia.Themes.Fluent" Version="$(AvaloniaVersion)"/>
-        <PackageReference Include="Avalonia.Fonts.Inter" Version="$(AvaloniaVersion)"/>
+        <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)" />
+        <PackageReference Include="Avalonia.Themes.Fluent" Version="$(AvaloniaVersion)" />
+        <PackageReference Include="Avalonia.Fonts.Inter" Version="$(AvaloniaVersion)" />
         <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
         <PackageReference Include="Avalonia.Diagnostics" Version="$(AvaloniaVersion)">
             <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
             <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
         </PackageReference>
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.0"/>
+        <PackageReference Include="Mediator.Abstractions" Version="3.0.1" />
+        <PackageReference Include="Mediator.SourceGenerator" Version="3.0.1">
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+          <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.0" />
         <PackageReference Include="Serilog.Extensions.Logging" Version="9.0.0" />
         <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
     </ItemGroup>

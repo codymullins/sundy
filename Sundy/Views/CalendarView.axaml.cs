@@ -28,4 +28,13 @@ public partial class CalendarView : UserControl
             e.Handled = true;
         }
     }
+
+    private void OnDayDoubleTapped(object? sender, TappedEventArgs e)
+    {
+        if (sender is Border { DataContext: MonthDayViewModel dayVm } && DataContext is CalendarViewModel calendarVm)
+        {
+            calendarVm.RequestNewEventForDateCommand.Execute(dayVm.Date);
+            e.Handled = true;
+        }
+    }
 }

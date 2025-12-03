@@ -6,28 +6,31 @@ using System.Threading;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Mediator;
 using Sundy.Core;
+using Sundy.Core.Commands;
+using Sundy.Core.Queries;
 
 namespace Sundy.ViewModels;
 
 // Main calendar view
 public partial class CalendarViewModel : ObservableObject
 {
-    private readonly ICalendarProvider provider;
-    private readonly IEventRepository _eventRepository;
+    private readonly IMediator _mediator;
     private readonly object _refreshLock = new();
     private readonly SemaphoreSlim _refreshGate = new(1, 1);
     private bool _refreshQueued;
     private Task _refreshProcessing = Task.CompletedTask;
 
-    public CalendarViewModel(ICalendarProvider provider, IEventRepository eventRepository)
+    public CalendarViewModel(IMediator mediator)
     {
-        _eventRepository = eventRepository;
-        this.provider = provider;
+        _mediator = mediator;
         InitializeTimeSlots();
     }
 
     public event EventHandler<CalendarEvent>? EventEditRequested;
+
+    public event EventHandler<DateTime>? NewEventForDateRequested;
 
     [ObservableProperty] private ObservableCollection<Calendar> _calendars = new();
 
@@ -86,7 +89,7 @@ public partial class CalendarViewModel : ObservableObject
 
     public async Task LoadCalendarsAsync()
     {
-        var cals = await _eventRepository.GetAllCalendarsAsync().ConfigureAwait(false);
+        var cals = await _mediator.Send(new GetAllCalendarsQuery()).ConfigureAwait(false);
         Calendars = new ObservableCollection<Calendar>(cals);
     }
 
@@ -153,12 +156,12 @@ public partial class CalendarViewModel : ObservableObject
         var startRange = new DateTimeOffset(startDate, DateTimeOffset.Now.Offset);
         var endRange = new DateTimeOffset(endDate, DateTimeOffset.Now.Offset);
 
-        var events = await _eventRepository.GetEventsInRangeAsync(
+        var events = await _mediator.Send(new GetEventsInRangeQuery(
             startRange,
             endRange,
-            SelectedCalendar?.Id).ConfigureAwait(false);
+            SelectedCalendar?.Id)).ConfigureAwait(false);
 
-        var calendarLookup = await _eventRepository.GetCalendarLookupAsync().ConfigureAwait(false);
+        var calendarLookup = await _mediator.Send(new GetCalendarLookupQuery()).ConfigureAwait(false);
 
         var days = new ObservableCollection<MonthDayViewModel>();
         for (var date = startDate; date < endDate; date = date.AddDays(1))
@@ -212,12 +215,12 @@ public partial class CalendarViewModel : ObservableObject
         var startRange = new DateTimeOffset(startOfWeek, DateTimeOffset.Now.Offset);
         var endRange = new DateTimeOffset(endOfWeek, DateTimeOffset.Now.Offset);
 
-        var events = await _eventRepository.GetEventsInRangeAsync(
+        var events = await _mediator.Send(new GetEventsInRangeQuery(
             startRange,
             endRange,
-            SelectedCalendar?.Id).ConfigureAwait(false);
+            SelectedCalendar?.Id)).ConfigureAwait(false);
 
-        var calendarLookup = await _eventRepository.GetCalendarLookupAsync().ConfigureAwait(false);
+        var calendarLookup = await _mediator.Send(new GetCalendarLookupQuery()).ConfigureAwait(false);
 
         // Build week day headers
         var weekDays = new ObservableCollection<WeekDayViewModel>();
@@ -252,12 +255,12 @@ public partial class CalendarViewModel : ObservableObject
         var startRange = new DateTimeOffset(start, DateTimeOffset.Now.Offset);
         var endRange = new DateTimeOffset(end, DateTimeOffset.Now.Offset);
 
-        var events = await _eventRepository.GetEventsInRangeAsync(
+        var events = await _mediator.Send(new GetEventsInRangeQuery(
             startRange,
             endRange,
-            SelectedCalendar?.Id).ConfigureAwait(false);
+            SelectedCalendar?.Id)).ConfigureAwait(false);
 
-        var calendarLookup = await _eventRepository.GetCalendarLookupAsync().ConfigureAwait(false);
+        var calendarLookup = await _mediator.Send(new GetCalendarLookupQuery()).ConfigureAwait(false);
 
         var visibleEvents = events
             .Select(e =>
@@ -307,7 +310,7 @@ public partial class CalendarViewModel : ObservableObject
     {
         if (SelectedCalendar == null) return;
 
-        await provider.CreateEventAsync(SelectedCalendar.Id, newEvent, CancellationToken.None).ConfigureAwait(false);
+        await _mediator.Send(new CreateEventCommand(newEvent), CancellationToken.None).ConfigureAwait(false);
 
         _ = RefreshViewAsync().ConfigureAwait(false);;
     }
@@ -315,7 +318,7 @@ public partial class CalendarViewModel : ObservableObject
     [RelayCommand]
     private async Task UpdateEvent(CalendarEvent updatedEvent)
     {
-        await provider.UpdateEventAsync(SelectedCalendar.Id, updatedEvent, CancellationToken.None)
+        await _mediator.Send(new UpdateEventCommand(updatedEvent), CancellationToken.None)
             .ConfigureAwait(false);
         _ = RefreshViewAsync().ConfigureAwait(false);;
     }
@@ -324,9 +327,15 @@ public partial class CalendarViewModel : ObservableObject
     private async Task DeleteEvent(CalendarEvent evt)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(evt.Id);
-        await provider.DeleteEventAsync(SelectedCalendar.Id, evt.Id, CancellationToken.None).ConfigureAwait(false);
+        await _mediator.Send(new DeleteEventCommand(evt.Id), CancellationToken.None).ConfigureAwait(false);
 
-        _ = RefreshViewAsync().ConfigureAwait(false);
+        _ = RefreshViewAsync().ConfigureAwait(false);;
+    }
+
+    [RelayCommand]
+    private void RequestNewEventForDate(DateTime date)
+    {
+        NewEventForDateRequested?.Invoke(this, date);
     }
 
     private void OnEventEditRequested(object? sender, CalendarEvent evt)

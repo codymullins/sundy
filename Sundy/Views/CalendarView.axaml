@@ -44,7 +44,8 @@
                         <DataTemplate>
                             <Border BorderBrush="{DynamicResource BorderBrush}" 
                                     BorderThickness="0,0,1,1"
-                                    Padding="5">
+                                    Padding="5"
+                                    DoubleTapped="OnDayDoubleTapped">
                                 <Border.Styles>
                                     <!-- Default background for current month days -->
                                     <Style Selector="Border">

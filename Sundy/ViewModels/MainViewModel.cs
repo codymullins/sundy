@@ -1,30 +1,34 @@
 ﻿using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Mediator;
 using Sundy.Core;
+using Sundy.Core.Commands;
+using Sundy.Core.Queries;
 
 namespace Sundy.ViewModels;
 
 public partial class MainViewModel : ViewModelBase
 {
-    private readonly IEventRepository eventRepository;
+    private readonly IMediator _mediator;
 
     public MainViewModel(
-        ICalendarProvider calendarProvider,
-        IEventRepository eventRepository)
+        IMediator mediator,
+        CalendarViewModel calendarViewModel)
     {
-        this.eventRepository = eventRepository;
+        _mediator = mediator;
 
-        CalendarViewModel = new CalendarViewModel(calendarProvider, eventRepository);
+        CalendarViewModel = calendarViewModel;
         CalendarViewModel.PropertyChanged += (_, e) =>
         {
-            if (e.PropertyName is nameof(CalendarViewModel.SelectedDate) 
+            if (e.PropertyName is nameof(CalendarViewModel.SelectedDate)
                 or nameof(CalendarViewModel.ViewMode))
             {
                 OnPropertyChanged(nameof(CurrentPeriodDisplay));
             }
         };
         CalendarViewModel.EventEditRequested += async (_, evt) => await EditEvent(evt);
+        CalendarViewModel.NewEventForDateRequested += async (_, date) => await CreateEventForDate(date);
     }
 
     [ObservableProperty]
@@ -118,7 +122,7 @@ public partial class MainViewModel : ViewModelBase
 
     private async Task LoadCalendarListAsync()
     {
-        var calendars = await eventRepository.GetAllCalendarsAsync().ConfigureAwait(false);
+        var calendars = await _mediator.Send(new GetAllCalendarsQuery()).ConfigureAwait(false);
         Calendars = new ObservableCollection<CalendarListItemViewModel>(
             calendars.Select(c => new CalendarListItemViewModel(c, OnCalendarVisibilityChanged)));
         OnPropertyChanged(nameof(HasNoCalendars));
@@ -151,7 +155,7 @@ public partial class MainViewModel : ViewModelBase
     private async Task OpenSettings()
     {
         var settingsVm = new CalendarSettingsViewModel(
-            eventRepository,
+            _mediator,
             onClosed: async () =>
             {
                 IsSettingsDialogOpen = false;
@@ -170,7 +174,7 @@ public partial class MainViewModel : ViewModelBase
     private async Task CreateEvent()
     {
         var editVm = new EventEditViewModel(
-            eventRepository,
+            _mediator,
             onSaved: OnEventSaved,
             onCancelled: () =>
             {
@@ -186,10 +190,30 @@ public partial class MainViewModel : ViewModelBase
         IsEventDialogOpen = true;
     }
 
+    private async Task CreateEventForDate(DateTime date)
+    {
+        var editVm = new EventEditViewModel(
+            _mediator,
+            onSaved: OnEventSaved,
+            onCancelled: () =>
+            {
+                IsEventDialogOpen = false;
+                EventEditViewModel = null;
+            });
+
+        await editVm.InitializeAsync(
+            existingEvent: null,
+            defaultCalendarId: CalendarViewModel.SelectedCalendar?.Id,
+            defaultDate: DateOnly.FromDateTime(date)).ConfigureAwait(false);
+
+        EventEditViewModel = editVm;
+        IsEventDialogOpen = true;
+    }
+
     private async Task EditEvent(CalendarEvent evt)
     {
         var editVm = new EventEditViewModel(
-            eventRepository,
+            _mediator,
             onSaved: OnEventSaved,
             onCancelled: () =>
             {
@@ -248,7 +272,7 @@ public partial class MainViewModel : ViewModelBase
             EnableBlocking = true,
             ReceiveBlocks = true
         };
-        await eventRepository.CreateCalendarAsync(calendar).ConfigureAwait(false);
+        await _mediator.Send(new CreateCalendarCommand(calendar)).ConfigureAwait(false);
 
         await LoadCalendarListAsync().ConfigureAwait(false);
         await CalendarViewModel.LoadCalendarsAsync().ConfigureAwait(false);

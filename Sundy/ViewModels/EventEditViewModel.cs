@@ -1,13 +1,16 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Mediator;
 using Sundy.Core;
+using Sundy.Core.Commands;
+using Sundy.Core.Queries;
 using Sundy.ViewModels.Scheduler;
 
 namespace Sundy.ViewModels;
 
 public partial class EventEditViewModel(
-    IEventRepository repository,
+    IMediator mediator,
     Action? onSaved = null,
     Action? onCancelled = null)
     : ObservableObject
@@ -48,10 +51,10 @@ public partial class EventEditViewModel(
 
     public bool IsEditMode => _isEditMode;
 
-    public async Task InitializeAsync(CalendarEvent? existingEvent = null, string? defaultCalendarId = null)
+    public async Task InitializeAsync(CalendarEvent? existingEvent = null, string? defaultCalendarId = null, DateOnly? defaultDate = null)
     {
         // Load available calendars
-        var calendars = await repository.GetAllCalendarsAsync().ConfigureAwait(false);
+        var calendars = await mediator.Send(new GetAllCalendarsQuery()).ConfigureAwait(false);
         AvailableCalendars = new ObservableCollection<Calendar>(calendars);
 
         if (existingEvent != null)
@@ -94,13 +97,27 @@ public partial class EventEditViewModel(
                 SelectedCalendar = AvailableCalendars.FirstOrDefault();
             }
 
-            // Default to 1 hour duration
-            var now = DateTime.Now;
-            var nextHour = new DateTime(now.Year, now.Month, now.Day, now.Hour + 1, 0, 0);
-            StartDate = new DateTimeOffset(nextHour);
-            StartTime = nextHour.TimeOfDay;
-            EndDate = new DateTimeOffset(nextHour.AddHours(1));
-            EndTime = nextHour.AddHours(1).TimeOfDay;
+            if (defaultDate.HasValue)
+            {
+                // Use provided date with default times (9-10 AM)
+                var startDateTime = defaultDate.Value.ToDateTime(TimeOnly.FromTimeSpan(TimeSpan.FromHours(9)));
+                var endDateTime = defaultDate.Value.ToDateTime(TimeOnly.FromTimeSpan(TimeSpan.FromHours(10)));
+
+                StartDate = new DateTimeOffset(startDateTime);
+                StartTime = startDateTime.TimeOfDay;
+                EndDate = new DateTimeOffset(endDateTime);
+                EndTime = endDateTime.TimeOfDay;
+            }
+            else
+            {
+                // Default to 1 hour duration starting next hour
+                var now = DateTime.Now;
+                var nextHour = new DateTime(now.Year, now.Month, now.Day, now.Hour + 1, 0, 0);
+                StartDate = new DateTimeOffset(nextHour);
+                StartTime = nextHour.TimeOfDay;
+                EndDate = new DateTimeOffset(nextHour.AddHours(1));
+                EndTime = nextHour.AddHours(1).TimeOfDay;
+            }
         }
 
         OnPropertyChanged(nameof(IsEditMode));
@@ -139,7 +156,7 @@ public partial class EventEditViewModel(
             _originalEvent.Location = string.IsNullOrWhiteSpace(Location) ? null : Location;
             _originalEvent.Description = string.IsNullOrWhiteSpace(Description) ? null : Description;
             _originalEvent.CalendarId = SelectedCalendar.Id;
-            await repository.UpdateEventAsync(_originalEvent, ct).ConfigureAwait(false);
+            await mediator.Send(new UpdateEventCommand(_originalEvent), ct).ConfigureAwait(false);
 
         }
         else
@@ -158,7 +175,7 @@ public partial class EventEditViewModel(
                 SourceEventId = null
             };
 
-            await repository.CreateEventAsync(newEvent, ct).ConfigureAwait(false);
+            await mediator.Send(new CreateEventCommand(newEvent), ct).ConfigureAwait(false);
         }
 
         onSaved?.Invoke();
@@ -171,7 +188,7 @@ public partial class EventEditViewModel(
 
         // TODO: Show confirmation dialog
 
-        await repository.DeleteEventAsync(_originalEvent.Id).ConfigureAwait(false);
+        await mediator.Send(new DeleteEventCommand(_originalEvent.Id)).ConfigureAwait(false);
 
         onSaved?.Invoke();
     }
