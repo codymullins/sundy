@@ -9,11 +9,15 @@ public class WeekDayViewModel
         DayName = date.ToString("ddd").ToUpper();
         Date = date.Day.ToString();
         IsToday = isToday;
+        FullDate = date;
     }
 
     public string DayName { get; }
     public string Date { get; }
     public bool IsToday { get; }
-    // Return null to let XAML handle foreground colors with DynamicResource
-    public string? DateColor => null;
+    public DateTime FullDate { get; }
+    
+    // Properties for UI binding
+    public string TodayBackground => IsToday ? "#3B82F6" : "Transparent";
+    public string TodayForeground => IsToday ? "White" : "#B0B0B0";
 }

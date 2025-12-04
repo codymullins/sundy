@@ -8,7 +8,6 @@ namespace Sundy.ViewModels;
 public partial class EventViewModel : ObservableObject
 {
     private const double HourHeight = 60.0;
-    private const double DayWidth = 100.0; // Approximate, actual is calculated by UniformGrid
 
     public EventViewModel(CalendarEvent evt, Calendar? calendar)
     {
@@ -43,10 +42,30 @@ public partial class EventViewModel : ObservableObject
     private bool _isSelected;
 
     // Canvas positioning for week/day views
-    public double CanvasLeft { get; private set; }
-    public double CanvasTop { get; private set; }
-    public double CanvasWidth { get; private set; }
-    public double CanvasHeight { get; private set; }
+    [ObservableProperty]
+    private double _canvasLeft;
+    
+    [ObservableProperty]
+    private double _canvasTop;
+    
+    [ObservableProperty]
+    private double _canvasWidth;
+    
+    [ObservableProperty]
+    private double _canvasHeight;
+    
+    // For week view positioning as a percentage (0-6 for day index)
+    public int DayIndex { get; private set; }
+    public double WidthPercentage { get; private set; } = 100.0 / 7.0; // Default to 1/7 of grid
+
+    /// <summary>
+    /// Updates the Canvas position for dynamic layout in week/day views
+    /// </summary>
+    public void UpdateCanvasPosition(double left, double width)
+    {
+        CanvasLeft = left;
+        CanvasWidth = width;
+    }
 
     private void CalculatePosition(CalendarEvent evt, DateTime viewStart, CalendarViewMode viewMode)
     {
@@ -65,24 +84,26 @@ public partial class EventViewModel : ObservableObject
         }
 
         CanvasTop = (startMinutes / 60.0) * HourHeight;
-        CanvasHeight = Math.Max(((endMinutes - startMinutes) / 60.0) * HourHeight, 20); // Minimum height
+        CanvasHeight = Math.Max(((endMinutes - startMinutes) / 60.0) * HourHeight, 30); // Minimum height of 30px
 
         if (viewMode == CalendarViewMode.Week)
         {
             // Calculate horizontal position based on day of week
-            var dayIndex = (int)(evt.StartTime.Date - viewStart.Date).TotalDays;
-            if (dayIndex >= 0 && dayIndex < 7)
+            DayIndex = (int)(evt.StartTime.Date - viewStart.Date).TotalDays;
+            if (DayIndex >= 0 && DayIndex < 7)
             {
-                // Width will be handled by the parent container
-                CanvasLeft = dayIndex * DayWidth;
-                CanvasWidth = DayWidth - 8; // Leave some margin
+                // Use percentage-based width calculation for responsiveness
+                // Events should be positioned based on day column index
+                WidthPercentage = (100.0 / 7.0) - 1; // ~13.3% per day minus margin
+                CanvasWidth = 120; // Will be overridden by binding
             }
         }
         else
         {
-            // Day view - full width
-            CanvasLeft = 0;
-            CanvasWidth = double.NaN; // Let it stretch
+            // Day view - full width with margins
+            DayIndex = 0;
+            CanvasLeft = 4;
+            CanvasWidth = double.NaN; // Let container handle width
         }
     }
 

@@ -201,3 +201,43 @@ public class SubtractConverter : IValueConverter
         throw new NotSupportedException();
     }
 }
+
+/// <summary>
+/// Converts day index and container width to Canvas.Left position for week view events
+/// </summary>
+public class DayIndexToLeftConverter : IMultiValueConverter
+{
+    public static readonly DayIndexToLeftConverter Instance = new();
+
+    public object? Convert(IList<object?> values, Type targetType, object? parameter, CultureInfo culture)
+    {
+        if (values.Count < 2) return 0.0;
+        if (values[0] is not int dayIndex) return 0.0;
+        if (values[1] is not double containerWidth || containerWidth <= 0) return 0.0;
+
+        var dayWidth = containerWidth / 7.0;
+        return (dayIndex * dayWidth) + 4; // 4px margin
+    }
+}
+
+/// <summary>
+/// Converts container width to event width for week view (1/7 of container minus margins)
+/// </summary>
+public class ContainerWidthToEventWidthConverter : IValueConverter
+{
+    public static readonly ContainerWidthToEventWidthConverter Instance = new();
+
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        if (value is not double containerWidth || containerWidth <= 0) return 100.0;
+
+        var dayWidth = containerWidth / 7.0;
+        return Math.Max(20, dayWidth - 8); // 8px total margin (4px on each side)
+    }
+
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        throw new NotSupportedException();
+    }
+}
+
