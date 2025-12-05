@@ -30,7 +30,7 @@
             </Transitions>
         </Setter>
     </Style>
-    <Style Selector="Button.modern fluent|SymbolIcon">
+    <Style Selector="Button.modern fluent|FluentIcon">
         <Setter Property="Foreground" Value="{DynamicResource ForegroundPrimary}" />
     </Style>
     <Style Selector="Button.modern:pointerover">
@@ -78,7 +78,7 @@
     <Style Selector="Button.accent:pressed">
         <Setter Property="BorderBrush" Value="{DynamicResource AccentPressed}" />
     </Style>
-    <Style Selector="Button.accent fluent|SymbolIcon">
+    <Style Selector="Button.accent fluent|FluentIcon">
         <Setter Property="Foreground" Value="{DynamicResource ForegroundOnAccent}" />
     </Style>
 

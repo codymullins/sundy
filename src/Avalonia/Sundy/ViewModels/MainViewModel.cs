@@ -49,7 +49,22 @@ public partial class MainViewModel : ViewModelBase
     [ObservableProperty]
     private CalendarSettingsViewModel? _calendarSettingsViewModel;
 
+    [ObservableProperty]
+    private bool _isMobileLayout;
+
+    [ObservableProperty]
+    private bool _isSidebarOpen = true;
+
+    [ObservableProperty]
+    private double _currentWindowWidth;
+
     public bool HasNoCalendars => Calendars.Count == 0;
+
+    public bool IsSidebarVisible => !IsMobileLayout || IsSidebarOpen;
+
+    public double SidebarTranslateX => IsMobileLayout && !IsSidebarOpen ? -280 : 0;
+    
+    public Avalonia.Thickness CalendarMargin => !IsMobileLayout ? new Avalonia.Thickness(280, 0, 0, 0) : new Avalonia.Thickness(0);
 
     public int ViewModeIndex
     {
@@ -111,6 +126,27 @@ public partial class MainViewModel : ViewModelBase
         {
             return $"{startOfWeek:MMM d, yyyy} - {endOfWeek:MMM d, yyyy}";
         }
+    }
+
+    partial void OnIsMobileLayoutChanged(bool value)
+    {
+        OnPropertyChanged(nameof(IsSidebarVisible));
+        OnPropertyChanged(nameof(SidebarTranslateX));
+        OnPropertyChanged(nameof(CalendarMargin));
+
+        // Auto-close on mobile, auto-open on desktop
+        IsSidebarOpen = !value;
+    }
+
+    partial void OnIsSidebarOpenChanged(bool value)
+    {
+        OnPropertyChanged(nameof(IsSidebarVisible));
+        OnPropertyChanged(nameof(SidebarTranslateX));
+    }
+
+    partial void OnCurrentWindowWidthChanged(double value)
+    {
+        IsMobileLayout = value < 768;
     }
 
     public async Task InitializeAsync()
@@ -277,6 +313,18 @@ public partial class MainViewModel : ViewModelBase
         await LoadCalendarListAsync().ConfigureAwait(false);
         await CalendarViewModel.LoadCalendarsAsync().ConfigureAwait(false);
         await CalendarViewModel.RefreshViewAsync().ConfigureAwait(false);
+    }
+
+    [RelayCommand]
+    private void ToggleSidebar()
+    {
+        IsSidebarOpen = !IsSidebarOpen;
+    }
+
+    [RelayCommand]
+    private void CloseSidebar()
+    {
+        IsSidebarOpen = false;
     }
 }
 

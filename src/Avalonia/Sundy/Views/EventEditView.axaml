@@ -4,7 +4,10 @@
              x:Class="Sundy.Views.EventEditView"
              x:DataType="vm:EventEditViewModel"
              xmlns:scheduler="using:Sundy.Controls.Scheduler"
-             Width="600">
+             MaxWidth="700"
+             MinWidth="320"
+             HorizontalAlignment="Stretch"
+             Margin="16,24">
 
     <Border Background="{DynamicResource ModalBackground}"
             BorderBrush="{DynamicResource ModalBorder}"
@@ -121,7 +124,7 @@
                                    FontWeight="SemiBold"
                                    FontSize="14"
                                    Foreground="{DynamicResource ForegroundPrimary}" />
-    
+
                         <!-- Time Selection Preview -->
                         <Button Command="{Binding OpenSchedulerCommand}"
                                 Background="Transparent"
@@ -161,7 +164,7 @@
                                               Fill="Transparent" />
                                     </Viewbox>
                                 </Border>
-                                
+
                                 <!-- Time Details -->
                                 <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="4">
                                     <TextBlock Text="{Binding Scheduler.SelectedDate, StringFormat='{}{0:dddd, MMMM d, yyyy}'}"
@@ -175,7 +178,7 @@
                                                FontSize="12"
                                                Foreground="{DynamicResource ForegroundDisabled}" />
                                 </StackPanel>
-                                
+
                                 <!-- Edit Icon -->
                                 <Border Grid.Column="2"
                                         Width="32"
@@ -192,7 +195,7 @@
                                 </Border>
                             </Grid>
                         </Button>
-    
+
                         <!-- All Day Checkbox -->
                         <CheckBox Content="All day event"
                                   IsChecked="{Binding IsAllDay}"

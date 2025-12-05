@@ -1,8 +1,6 @@
 ﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003AThrowHelper_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003F_002E_002E_003FLibrary_003FApplication_0020Support_003FJetBrains_003FRider2025_002E3_003Fresharper_002Dhost_003FSourcesCache_003F4743f513c7ddc8411223a46f0ca426ed929391acebcff993721dff2f0c6b34_003FThrowHelper_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=2a1e29d9_002D6f6b_002D4119_002Dbcf4_002D9086c30efe9d/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="MetaStore_CanInitialize" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
-  &lt;TestAncestor&gt;
-    &lt;TestId&gt;xUnit::434F7C14-50EA-4396-BAF2-2DAED8CA36D9::net9.0::Sundy.Test.MetaTests&lt;/TestId&gt;
-  &lt;/TestAncestor&gt;
+  &lt;Project Location="/Users/cody/code/codymullins/Sundy/src/Sundy.Test" Presentation="&amp;lt;Sundy.Test&amp;gt;" /&gt;
 &lt;/SessionState&gt;</s:String>
 	<s:Boolean x:Key="/Default/UnloadedProject/UnloadedProjects/=4e9d8f05_002D5b07_002D4d71_002D8af8_002Dad854961f63a_0023Sundy_002EiOS/@EntryIndexedValue">True</s:Boolean></wpf:ResourceDictionary>

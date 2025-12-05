@@ -1,27 +1,40 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Presenters;
 using Avalonia.Input;
+using Avalonia.VisualTree;
 using Sundy.ViewModels;
 
 namespace Sundy.Views;
 
 public partial class CalendarView : UserControl
 {
-    private Canvas? _weekEventsCanvas;
-    private Canvas? _dayEventsCanvas;
-    
     public CalendarView()
     {
         InitializeComponent();
         
-        // Subscribe to layout updates
         LayoutUpdated += OnLayoutUpdated;
+        DataContextChanged += OnDataContextChanged;
     }
 
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnAttachedToVisualTree(e);
         UpdateEventPositions();
+    }
+    
+    private void OnDataContextChanged(object? sender, EventArgs e)
+    {
+        if (DataContext is CalendarViewModel vm)
+        {
+            vm.PropertyChanged += (_, args) =>
+            {
+                if (args.PropertyName is nameof(CalendarViewModel.IsWeekView) or nameof(CalendarViewModel.IsDayView) or nameof(CalendarViewModel.VisibleEvents))
+                {
+                    Avalonia.Threading.Dispatcher.UIThread.Post(UpdateEventPositions, Avalonia.Threading.DispatcherPriority.Render);
+                }
+            };
+        }
     }
 
     private void OnLayoutUpdated(object? sender, EventArgs e)
@@ -31,42 +44,55 @@ public partial class CalendarView : UserControl
 
     private void UpdateEventPositions()
     {
-        // Find the WeekEventsCanvas if we're in week view
-        _weekEventsCanvas ??= this.FindControl<Canvas>("WeekEventsCanvas");
-        _dayEventsCanvas ??= this.FindControl<Canvas>("DayEventsCanvas");
+        if (DataContext is not CalendarViewModel vm) return;
         
-        if (_weekEventsCanvas != null && DataContext is CalendarViewModel { IsWeekView: true } vm)
+        if (vm.IsWeekView)
         {
-            UpdateWeekEventPositions(_weekEventsCanvas, vm);
+            var itemsControl = this.FindControl<ItemsControl>("WeekEventsItemsControl");
+            if (itemsControl != null)
+            {
+                UpdateWeekEventPositions(itemsControl, vm);
+            }
         }
         
-        if (_dayEventsCanvas != null && DataContext is CalendarViewModel { IsDayView: true } dayVm)
+        if (vm.IsDayView)
         {
-            UpdateDayEventPositions(_dayEventsCanvas, dayVm);
+            var itemsControl = this.FindControl<ItemsControl>("DayEventsItemsControl");
+            if (itemsControl != null)
+            {
+                UpdateDayEventPositions(itemsControl, vm);
+            }
         }
     }
 
-    private void UpdateWeekEventPositions(Canvas canvas, CalendarViewModel vm)
+    private void UpdateWeekEventPositions(ItemsControl itemsControl, CalendarViewModel vm)
     {
-        var canvasWidth = canvas.Bounds.Width;
+        var presenter = itemsControl.FindDescendantOfType<ItemsPresenter>();
+        var panel = presenter?.Panel;
+        
+        if (panel == null) return;
+        
+        var canvasWidth = panel.Bounds.Width;
         if (canvasWidth <= 0) return;
 
         var dayWidth = canvasWidth / 7.0;
         
         foreach (var eventVm in vm.VisibleEvents)
         {
-            // Calculate position based on day index
             var left = (eventVm.DayIndex * dayWidth) + 4;
             var width = Math.Max(20, dayWidth - 8);
-            
-            // Update the event's properties for binding
             eventVm.UpdateCanvasPosition(left, width);
         }
     }
 
-    private void UpdateDayEventPositions(Canvas canvas, CalendarViewModel vm)
+    private void UpdateDayEventPositions(ItemsControl itemsControl, CalendarViewModel vm)
     {
-        var canvasWidth = canvas.Bounds.Width;
+        var presenter = itemsControl.FindDescendantOfType<ItemsPresenter>();
+        var panel = presenter?.Panel;
+        
+        if (panel == null) return;
+        
+        var canvasWidth = panel.Bounds.Width;
         if (canvasWidth <= 0) return;
 
         var width = Math.Max(20, canvasWidth - 12);

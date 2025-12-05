@@ -3,8 +3,10 @@
              xmlns:vm="using:Sundy.ViewModels"
              x:Class="Sundy.Views.CalendarSettingsView"
              x:DataType="vm:CalendarSettingsViewModel"
-             Width="700">
-
+             MaxWidth="700"
+             MinWidth="320"
+             HorizontalAlignment="Stretch"
+             Margin="16,24">
     <Grid>
         <Border Background="{DynamicResource ModalBackground}"
                 BorderBrush="{DynamicResource ModalBorder}"

@@ -3,7 +3,7 @@
              xmlns:local="using:Sundy"
              x:Class="Sundy.App"
              xmlns:styling="using:Avalonia.Styling"
-             RequestedThemeVariant="Default">
+             RequestedThemeVariant="Dark">
     <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
 
     <Application.DataTemplates>

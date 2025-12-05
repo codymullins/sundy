@@ -9,6 +9,16 @@
         <scheduler:SubtractConverter x:Key="SubtractConverter" Offset="12"/>
     </UserControl.Resources>
 
+    <UserControl.Styles>
+        <Style Selector="Border.event-border:pointerover">
+            <Setter Property="Opacity" Value="0.8" />
+        </Style>
+        <Style Selector="Border.event-border.selected">
+            <Setter Property="BorderThickness" Value="3" />
+            <Setter Property="BoxShadow" Value="0 0 8 2 #4D7C3AED" />
+        </Style>
+    </UserControl.Styles>
+
     <Grid Background="{DynamicResource BackgroundPrimary}">
         <!-- Month View -->
         <Panel IsVisible="{Binding IsMonthView}">
@@ -232,10 +242,10 @@
                             </ItemsControl>
 
                             <!-- Events overlay using Canvas with ItemContainerStyle for positioning -->
-                            <ItemsControl ItemsSource="{Binding VisibleEvents}">
+                            <ItemsControl x:Name="WeekEventsItemsControl" ItemsSource="{Binding VisibleEvents}">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
-                                        <Canvas x:Name="WeekEventsCanvas" />
+                                        <Canvas />
                                     </ItemsPanelTemplate>
                                 </ItemsControl.ItemsPanel>
                                 <ItemsControl.ItemContainerTheme>
@@ -256,16 +266,8 @@
                                                 DoubleTapped="OnEventDoubleTapped"
                                                 BorderBrush="{DynamicResource AccentPrimary}"
                                                 BorderThickness="0"
+                                                Classes="event-border"
                                                 Classes.selected="{Binding IsSelected}">
-                                            <Border.Styles>
-                                                <Style Selector="Border:pointerover">
-                                                    <Setter Property="Opacity" Value="0.8" />
-                                                </Style>
-                                                <Style Selector="Border.selected">
-                                                    <Setter Property="BorderThickness" Value="3" />
-                                                    <Setter Property="BoxShadow" Value="0 0 8 2 {DynamicResource AccentGlowColor}" />
-                                                </Style>
-                                            </Border.Styles>
                                             <StackPanel>
                                                 <TextBlock Text="{Binding Title}"
                                                            Foreground="White"
@@ -354,10 +356,10 @@
                             </ItemsControl>
 
                             <!-- Events overlay -->
-                            <ItemsControl ItemsSource="{Binding VisibleEvents}">
+                            <ItemsControl x:Name="DayEventsItemsControl" ItemsSource="{Binding VisibleEvents}">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
-                                        <Canvas x:Name="DayEventsCanvas" />
+                                        <Canvas />
                                     </ItemsPanelTemplate>
                                 </ItemsControl.ItemsPanel>
                                 <ItemsControl.ItemContainerTheme>
@@ -378,16 +380,8 @@
                                                 DoubleTapped="OnEventDoubleTapped"
                                                 BorderBrush="{DynamicResource AccentPrimary}"
                                                 BorderThickness="0"
+                                                Classes="event-border"
                                                 Classes.selected="{Binding IsSelected}">
-                                            <Border.Styles>
-                                                <Style Selector="Border:pointerover">
-                                                    <Setter Property="Opacity" Value="0.8" />
-                                                </Style>
-                                                <Style Selector="Border.selected">
-                                                    <Setter Property="BorderThickness" Value="3" />
-                                                    <Setter Property="BoxShadow" Value="0 0 8 2 {DynamicResource AccentGlowColor}" />
-                                                </Style>
-                                            </Border.Styles>
                                             <StackPanel>
                                                 <TextBlock Text="{Binding Title}"
                                                            Foreground="White"
