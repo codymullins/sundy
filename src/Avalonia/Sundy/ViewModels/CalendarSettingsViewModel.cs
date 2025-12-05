@@ -48,10 +48,11 @@ public partial class CalendarSettingsViewModel(IMediator mediator, Func<Task>? o
     }
 
     [RelayCommand]
-    private async Task RequestDeleteCalendar(CalendarItemViewModel calendar, CancellationToken ct)
+    private Task RequestDeleteCalendar(CalendarItemViewModel calendar, CancellationToken ct)
     {
         CalendarToDelete = calendar;
         IsDeleteConfirmationOpen = true;
+        return Task.CompletedTask;
     }
 
     [RelayCommand]

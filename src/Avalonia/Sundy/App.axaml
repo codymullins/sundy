@@ -16,7 +16,7 @@
                 <!-- Light Theme (Default) -->
                 <ResourceInclude Source="avares://Sundy/Themes/LightTheme.axaml"/>
             </ResourceDictionary.MergedDictionaries>
-            
+
             <!-- Dark Theme -->
             <ResourceDictionary.ThemeDictionaries>
                 <ResourceDictionary x:Key="Dark">
@@ -31,6 +31,7 @@
     <Application.Styles>
         <FluentTheme />
         <StyleInclude Source="/Views/Styles.axaml" />
+        <StyleInclude Source="avares://Sundy/Controls/SegmentedControl.axaml" />
         <StyleInclude Source="avares://Sundy/Controls/Scheduler/TimeBlockControl.axaml" />
         <StyleInclude Source="avares://Sundy/Controls/Scheduler/CurrentTimeIndicator.axaml" />
     </Application.Styles>

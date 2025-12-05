@@ -6,10 +6,12 @@
              xmlns:scheduler="using:Sundy.Controls.Scheduler"
              Width="600">
 
-    <Border Background="{DynamicResource BackgroundPrimary}"
+    <Border Background="{DynamicResource ModalBackground}"
+            BorderBrush="{DynamicResource ModalBorder}"
+            BorderThickness="1"
             CornerRadius="8"
             Padding="24"
-            BoxShadow="0 4 16 #30000000">
+            BoxShadow="0 4 16 0 #80000000">
         <Grid RowDefinitions="Auto,*,Auto">
             <!-- Header with Calendar Selection -->
             <Grid Grid.Row="0"
@@ -37,9 +39,10 @@
                             <Border Background="{DynamicResource BackgroundPrimary}"
                                     BorderBrush="{DynamicResource BorderBrush}"
                                     BorderThickness="1"
-                                    CornerRadius="4"
-                                    Padding="4"
-                                    MinWidth="200">
+                                    CornerRadius="8"
+                                    Padding="8"
+                                    MinWidth="200"
+                                    BoxShadow="0 4 12 0 #40000000">
                                 <ItemsControl ItemsSource="{Binding AvailableCalendars}">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
@@ -48,11 +51,19 @@
                                                 CommandParameter="{Binding}"
                                                 Background="Transparent"
                                                 BorderThickness="0"
+                                                CornerRadius="6"
                                                 HorizontalAlignment="Stretch"
                                                 HorizontalContentAlignment="Left"
                                                 Padding="8,6"
                                                 Cursor="Hand">
                                                 <Button.Styles>
+                                                    <Style Selector="Button">
+                                                        <Setter Property="Transitions">
+                                                            <Transitions>
+                                                                <BrushTransition Property="Background" Duration="0:0:0.15"/>
+                                                            </Transitions>
+                                                        </Setter>
+                                                    </Style>
                                                     <Style Selector="Button:pointerover">
                                                         <Setter Property="Background" Value="{DynamicResource BackgroundSecondary}" />
                                                     </Style>
@@ -118,11 +129,19 @@
                                 BorderThickness="1"
                                 CornerRadius="8"
                                 Padding="16"
+                                MinHeight="60"
                                 Cursor="Hand"
                                 HorizontalAlignment="Stretch"
                                 HorizontalContentAlignment="Stretch"
                                 IsEnabled="{Binding !IsBlockingEvent}">
                             <Button.Styles>
+                                <Style Selector="Button">
+                                    <Setter Property="Transitions">
+                                        <Transitions>
+                                            <BrushTransition Property="Background" Duration="0:0:0.15"/>
+                                        </Transitions>
+                                    </Setter>
+                                </Style>
                                 <Style Selector="Button:pointerover">
                                     <Setter Property="Background" Value="{DynamicResource BackgroundSecondary}" />
                                 </Style>
@@ -132,7 +151,7 @@
                                 <Border Grid.Column="0"
                                         Width="48"
                                         Height="48"
-                                        Background="#3B82F6"
+                                        Background="{DynamicResource AccentPrimary}"
                                         CornerRadius="8"
                                         VerticalAlignment="Center">
                                     <Viewbox Width="24" Height="24">
@@ -162,7 +181,7 @@
                                         Width="32"
                                         Height="32"
                                         Background="{DynamicResource BackgroundPressed}"
-                                        CornerRadius="6"
+                                        CornerRadius="8"
                                         VerticalAlignment="Center">
                                     <Viewbox Width="16" Height="16">
                                         <Path Data="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"
@@ -205,6 +224,7 @@
                         Content="Delete"
                         Command="{Binding DeleteCommand}"
                         Classes="danger"
+                        MinWidth="100"
                         IsVisible="{Binding IsEditMode}" />
 
                 <Panel Grid.Column="1" />
@@ -213,13 +233,13 @@
                         Content="Cancel"
                         Command="{Binding CancelCommand}"
                         Classes="modern"
-                        Width="100" />
+                        MinWidth="100" />
 
                 <Button Grid.Column="3"
                         Content="{Binding SaveButtonText}"
                         Command="{Binding SaveCommand}"
                         Classes="accent"
-                        Width="100" />
+                        MinWidth="100" />
             </Grid>
         </Grid>
     </Border>

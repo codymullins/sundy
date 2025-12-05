@@ -108,10 +108,10 @@
                                                 </Setter>
 
                                                 <Style Selector="^:selected /template/ Border#SelectionBorder">
-                                                    <Setter Property="BorderBrush" Value="#FFD700" />
+                                                    <Setter Property="BorderBrush" Value="{DynamicResource AccentPrimary}" />
                                                 </Style>
                                                 <Style Selector="^:focus /template/ Border#SelectionBorder">
-                                                    <Setter Property="BorderBrush" Value="#FFD700" />
+                                                    <Setter Property="BorderBrush" Value="{DynamicResource AccentPrimary}" />
                                                 </Style>
                                             </ControlTheme>
                                         </ListBox.ItemContainerTheme>
@@ -254,7 +254,7 @@
                                                 Cursor="Hand"
                                                 Tapped="OnEventTapped"
                                                 DoubleTapped="OnEventDoubleTapped"
-                                                BorderBrush="#FFD700"
+                                                BorderBrush="{DynamicResource AccentPrimary}"
                                                 BorderThickness="0"
                                                 Classes.selected="{Binding IsSelected}">
                                             <Border.Styles>
@@ -263,7 +263,7 @@
                                                 </Style>
                                                 <Style Selector="Border.selected">
                                                     <Setter Property="BorderThickness" Value="3" />
-                                                    <Setter Property="BoxShadow" Value="0 0 8 2 #FFD700" />
+                                                    <Setter Property="BoxShadow" Value="0 0 8 2 {DynamicResource AccentGlowColor}" />
                                                 </Style>
                                             </Border.Styles>
                                             <StackPanel>
@@ -376,7 +376,7 @@
                                                 Cursor="Hand"
                                                 Tapped="OnEventTapped"
                                                 DoubleTapped="OnEventDoubleTapped"
-                                                BorderBrush="#FFD700"
+                                                BorderBrush="{DynamicResource AccentPrimary}"
                                                 BorderThickness="0"
                                                 Classes.selected="{Binding IsSelected}">
                                             <Border.Styles>
@@ -385,7 +385,7 @@
                                                 </Style>
                                                 <Style Selector="Border.selected">
                                                     <Setter Property="BorderThickness" Value="3" />
-                                                    <Setter Property="BoxShadow" Value="0 0 8 2 #FFD700" />
+                                                    <Setter Property="BoxShadow" Value="0 0 8 2 {DynamicResource AccentGlowColor}" />
                                                 </Style>
                                             </Border.Styles>
                                             <StackPanel>

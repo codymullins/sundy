@@ -6,10 +6,12 @@
              Width="700">
 
     <Grid>
-        <Border Background="{DynamicResource BackgroundPrimary}"
+        <Border Background="{DynamicResource ModalBackground}"
+                BorderBrush="{DynamicResource ModalBorder}"
+                BorderThickness="1"
                 CornerRadius="8"
                 Padding="24"
-                BoxShadow="0 4 16 #30000000">
+                BoxShadow="0 4 16 0 #80000000">
             <Grid RowDefinitions="Auto,*,Auto,Auto,Auto">
                 <!-- Header -->
                 <TextBlock Grid.Row="0"
@@ -40,16 +42,17 @@
                                 <DataTemplate>
                                     <Border BorderBrush="{DynamicResource BorderBrush}"
                                             BorderThickness="1"
-                                            CornerRadius="6"
+                                            CornerRadius="8"
                                             Padding="16"
-                                            Margin="0,0,0,8">
+                                            Margin="0,0,0,8"
+                                            Background="{DynamicResource BackgroundSecondary}">
                                         <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,*,Auto">
                                             <!-- Calendar Color and Name -->
                                             <Border Grid.Row="0" Grid.Column="0"
                                                     Width="24"
                                                     Height="24"
                                                     Background="{Binding Color}"
-                                                    CornerRadius="4"
+                                                    CornerRadius="6"
                                                     VerticalAlignment="Center"
                                                     Margin="0,0,12,0" />
 
@@ -96,8 +99,7 @@
                                     Content="Create"
                                     Command="{Binding CreateCalendarCommand}"
                                     Classes="accent"
-                                    Height="36"
-                                    Width="100" />
+                                    MinWidth="100" />
                         </Grid>
                     </StackPanel>
                 </Border>
@@ -123,7 +125,7 @@
                                 Command="{Binding ResetDatabaseCommand}"
                                 Classes="danger"
                                 HorizontalAlignment="Left"
-                                Width="150"
+                                MinWidth="150"
                                 IsEnabled="{Binding !IsResettingDatabase}" />
                     </StackPanel>
                 </Border>
@@ -134,23 +136,25 @@
                         Command="{Binding CloseCommand}"
                         Classes="modern"
                         HorizontalAlignment="Right"
-                        Width="100"
+                        MinWidth="100"
                         Margin="0,20,0,0" />
             </Grid>
         </Border>
 
         <!-- Delete Confirmation Dialog Overlay -->
         <Border IsVisible="{Binding IsDeleteConfirmationOpen}"
-                Background="#80000000"
+                Background="{DynamicResource ModalOverlay}"
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Stretch">
-            <Border Background="{DynamicResource BackgroundPrimary}"
+            <Border Background="{DynamicResource ModalBackground}"
+                    BorderBrush="{DynamicResource ModalBorder}"
+                    BorderThickness="1"
                     CornerRadius="8"
                     Padding="24"
                     MaxWidth="400"
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
-                    BoxShadow="0 4 16 #40000000">
+                    BoxShadow="0 4 16 0 #40000000">
                 <StackPanel Spacing="16">
                     <TextBlock Text="Delete Calendar?"
                                FontSize="20"
@@ -169,15 +173,13 @@
                         <Button Grid.Column="0"
                                 Content="Cancel"
                                 Command="{Binding CancelDeleteCommand}"
-                                Classes="modern"
-                                IsEnabled="{Binding !IsDeleting}"
-                                HorizontalAlignment="Stretch" />
+                                Classes="modern full-width"
+                                IsEnabled="{Binding !IsDeleting}" />
                         <Button Grid.Column="1"
                                 Content="Delete"
                                 Command="{Binding ConfirmDeleteCommand}"
-                                Classes="danger"
-                                IsEnabled="{Binding !IsDeleting}"
-                                HorizontalAlignment="Stretch" />
+                                Classes="danger full-width"
+                                IsEnabled="{Binding !IsDeleting}" />
                     </Grid>
                 </StackPanel>
             </Border>
@@ -185,16 +187,18 @@
 
         <!-- Reset Database Confirmation Dialog Overlay -->
         <Border IsVisible="{Binding IsResetConfirmationOpen}"
-                Background="#80000000"
+                Background="{DynamicResource ModalOverlay}"
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Stretch">
-            <Border Background="{DynamicResource BackgroundPrimary}"
+            <Border Background="{DynamicResource ModalBackground}"
+                    BorderBrush="{DynamicResource ModalBorder}"
+                    BorderThickness="1"
                     CornerRadius="8"
                     Padding="24"
                     MaxWidth="450"
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
-                    BoxShadow="0 4 16 #40000000">
+                    BoxShadow="0 4 16 0 #40000000">
                 <StackPanel Spacing="16">
                     <TextBlock Text="Reset Database?"
                                FontSize="20"
@@ -215,7 +219,7 @@
                     </StackPanel>
 
                     <TextBlock TextWrapping="Wrap"
-                               Foreground="#FFD32F2F"
+                               Foreground="{DynamicResource DangerPrimary}"
                                FontWeight="SemiBold"
                                Text="This action cannot be undone!" />
 
@@ -223,15 +227,13 @@
                         <Button Grid.Column="0"
                                 Content="Cancel"
                                 Command="{Binding CancelResetCommand}"
-                                Classes="modern"
-                                IsEnabled="{Binding !IsResettingDatabase}"
-                                HorizontalAlignment="Stretch" />
+                                Classes="modern full-width"
+                                IsEnabled="{Binding !IsResettingDatabase}" />
                         <Button Grid.Column="1"
                                 Content="Reset Database"
                                 Command="{Binding ConfirmResetCommand}"
-                                Classes="danger"
-                                IsEnabled="{Binding !IsResettingDatabase}"
-                                HorizontalAlignment="Stretch" />
+                                Classes="danger full-width"
+                                IsEnabled="{Binding !IsResettingDatabase}" />
                     </Grid>
                 </StackPanel>
             </Border>

@@ -3,7 +3,7 @@
 <Style Selector="DatePicker">
     <Setter Property="BorderBrush" Value="{DynamicResource BorderBrushHover}" />
     <Setter Property="BorderThickness" Value="1" />
-    <Setter Property="CornerRadius" Value="4" />
+    <Setter Property="CornerRadius" Value="8" />
 </Style>
 
 <Style Selector="DatePicker:focus">
@@ -15,8 +15,16 @@
         <Setter Property="BorderBrush" Value="{DynamicResource BorderBrushHover}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Padding" Value="12,6" />
-        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="MinHeight" Value="36" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
         <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Transitions">
+            <Transitions>
+                <BrushTransition Property="Background" Duration="0:0:0.15"/>
+            </Transitions>
+        </Setter>
     </Style>
     <Style Selector="Button.modern:pointerover">
         <Setter Property="Background" Value="{DynamicResource BackgroundSecondary}" />
@@ -29,12 +37,20 @@
     <!-- Accent Button Style -->
     <Style Selector="Button.accent">
         <Setter Property="Background" Value="{DynamicResource AccentPrimary}" />
-        <Setter Property="Foreground" Value="{DynamicResource ForegroundOnAccent}" />
+        <Setter Property="Foreground" Value="#000000" />
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="Padding" Value="16,8" />
-        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="CornerRadius" Value="8" />
         <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="MinHeight" Value="36" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
         <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Transitions">
+            <Transitions>
+                <BrushTransition Property="Background" Duration="0:0:0.15"/>
+            </Transitions>
+        </Setter>
     </Style>
 
     <Style Selector="Button.accent:pointerover">
@@ -52,8 +68,16 @@
         <Setter Property="BorderBrush" Value="{DynamicResource DangerPrimary}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Padding" Value="12,6" />
-        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="MinHeight" Value="36" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
         <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Transitions">
+            <Transitions>
+                <BrushTransition Property="Background" Duration="0:0:0.15"/>
+            </Transitions>
+        </Setter>
     </Style>
 
     <Style Selector="Button.danger:pointerover">
@@ -67,7 +91,7 @@
     <!-- Link Button Style (looks like a hyperlink) -->
     <Style Selector="Button.link">
         <Setter Property="Background" Value="Transparent" />
-        <Setter Property="Foreground" Value="{DynamicResource AccentPrimary}" />
+        <Setter Property="Foreground" Value="{DynamicResource ForegroundPrimaryColor}" />
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="Padding" Value="0" />
         <Setter Property="Cursor" Value="Hand" />
@@ -82,12 +106,52 @@
         <Setter Property="Foreground" Value="{DynamicResource AccentPressed}" />
     </Style>
 
+    <!-- Full-Width Button Utility Class -->
+    <Style Selector="Button.full-width">
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="MinHeight" Value="36" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+    </Style>
+
+    <!-- Menu Item Button Style (for flyouts and dropdowns) -->
+    <Style Selector="Button.menu-item">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="8,6" />
+        <Setter Property="MinHeight" Value="32" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="HorizontalContentAlignment" Value="Left" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="CornerRadius" Value="6" />
+        <Setter Property="Transitions">
+            <Transitions>
+                <BrushTransition Property="Background" Duration="0:0:0.15"/>
+            </Transitions>
+        </Setter>
+    </Style>
+
+    <Style Selector="Button.menu-item:pointerover">
+        <Setter Property="Background" Value="{DynamicResource BackgroundSecondary}" />
+    </Style>
+
+    <Style Selector="Button.menu-item:pressed">
+        <Setter Property="Background" Value="{DynamicResource BackgroundPressed}" />
+    </Style>
+
     <!-- TextBox Styling -->
     <Style Selector="TextBox">
-        <Setter Property="Padding" Value="8" />
+        <Setter Property="Padding" Value="10" />
+        <Setter Property="Background" Value="{DynamicResource BackgroundTertiary}" />
         <Setter Property="BorderBrush" Value="{DynamicResource BorderBrushHover}" />
         <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="Transitions">
+            <Transitions>
+                <BrushTransition Property="BorderBrush" Duration="0:0:0.15"/>
+            </Transitions>
+        </Setter>
     </Style>
 
     <Style Selector="TextBox:focus">
@@ -98,11 +162,38 @@
     <Style Selector="ComboBox">
         <Setter Property="Padding" Value="8" />
         <Setter Property="BorderBrush" Value="{DynamicResource BorderBrushHover}" />
-        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="CornerRadius" Value="8" />
     </Style>
 
     <!-- CheckBox Styling -->
     <Style Selector="CheckBox">
         <Setter Property="Padding" Value="6,0,0,0" />
+    </Style>
+
+    <Style Selector="CheckBox /template/ Border#NormalRectangle">
+        <Setter Property="CornerRadius" Value="3" />
+        <Setter Property="Width" Value="18" />
+        <Setter Property="Height" Value="18" />
+    </Style>
+
+    <Style Selector="CheckBox:checked /template/ Border#NormalRectangle">
+        <Setter Property="Background" Value="{DynamicResource AccentPrimary}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource AccentPrimary}" />
+    </Style>
+
+    <!-- CheckBox Hover State (for sidebar items) -->
+    <Style Selector="CheckBox">
+        <Setter Property="Transitions">
+            <Transitions>
+                <BrushTransition Property="Background" Duration="0:0:0.15"/>
+            </Transitions>
+        </Setter>
+    </Style>
+
+    <Style Selector="CheckBox:pointerover">
+        <Setter Property="Background" Value="{DynamicResource BackgroundSecondary}" />
+        <Setter Property="CornerRadius" Value="6" />
+        <Setter Property="Margin" Value="-4,0,-4,0" />
+        <Setter Property="Padding" Value="10,4" />
     </Style>
 </Styles>

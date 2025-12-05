@@ -2,135 +2,162 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:Sundy.ViewModels"
              xmlns:views="using:Sundy.Views"
+             xmlns:controls="using:Sundy.Controls"
+             xmlns:avalonia="clr-namespace:FluentIcons.Avalonia;assembly=FluentIcons.Avalonia"
              x:Class="Sundy.Views.MainView"
              x:DataType="vm:MainViewModel">
-    
-    <Design.DataContext>
-        <vm:MainViewModel/>
-    </Design.DataContext>
-    
+
     <!-- Root Grid with Dialog Overlay -->
     <Grid>
         <Grid RowDefinitions="Auto,*">
-        <!-- Top Navigation Bar -->
-        <Border Grid.Row="0" Background="{DynamicResource BackgroundSecondary}" Padding="10">
-            <Grid ColumnDefinitions="*,Auto">
-                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="10">
-                    <Button Content="Today" 
-                            Command="{Binding GoToTodayCommand}"
-                            Classes="modern"/>
-                    <Button Content="◄" 
-                            Command="{Binding PreviousPeriodCommand}"
-                            Classes="modern"/>
-                    <Button Content="►" 
-                            Command="{Binding NextPeriodCommand}"
-                            Classes="modern"/>
-                    <TextBlock Text="{Binding CurrentPeriodDisplay}" 
-                               VerticalAlignment="Center"
-                               FontSize="18"
-                               FontWeight="SemiBold"
-                               Foreground="{DynamicResource ForegroundPrimary}"
-                               Margin="10,0,0,0"/>
-                </StackPanel>
-                
-                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10">
-                    <ComboBox SelectedIndex="{Binding ViewModeIndex}"
-                              Width="120">
-                        <ComboBoxItem Content="Day"/>
-                        <ComboBoxItem Content="Week"/>
-                        <ComboBoxItem Content="Month"/>
-                    </ComboBox>
-                    <Button Content="⚙ Settings" 
-                            Command="{Binding OpenSettingsCommand}"
-                            Classes="modern"/>
-                    <Button Content="+ New Event" 
-                            Command="{Binding CreateEventCommand}"
-                            Classes="accent"/>
-                </StackPanel>
-            </Grid>
-        </Border>
-        
-        <!-- Main Content Area -->
-        <Grid Grid.Row="1" ColumnDefinitions="200,*">
-            <!-- Sidebar: Calendar List -->
-            <Border Grid.Column="0" 
-                    Background="{DynamicResource BackgroundTertiary}" 
-                    BorderBrush="{DynamicResource BorderBrush}" 
-                    BorderThickness="0,0,1,0"
-                    Padding="10">
-                <StackPanel Spacing="10">
-                    <TextBlock Text="My Calendars" 
-                               FontWeight="Bold" 
-                               FontSize="14"
-                               Foreground="{DynamicResource ForegroundPrimary}"/>
-                    
-                    <ItemsControl ItemsSource="{Binding Calendars}">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <CheckBox IsChecked="{Binding IsVisible}"
-                                          Margin="0,5">
-                                    <StackPanel Orientation="Horizontal" Spacing="8">
-                                        <Ellipse Width="12" 
-                                                 Height="12" 
-                                                 Fill="{Binding Color}"/>
-                                        <TextBlock Text="{Binding Name}"/>
-                                    </StackPanel>
-                                </CheckBox>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                    
-                    <!-- Show "New Local Calendar" link when no calendars exist -->
-                    <Button Content="+ New Local Calendar"
+            <!-- Top Navigation Bar -->
+            <Border Grid.Row="0"
+                    Background="{DynamicResource BackgroundSecondary}"
+                    Padding="16,12"
+                    BoxShadow="0 1 4 0 #20000000">
+                <Grid ColumnDefinitions="*,Auto">
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="10">
+                        <Button Content="Today"
+                                Command="{Binding GoToTodayCommand}"
+                                Classes="modern" />
+                        <Button Content="◄"
+                                Command="{Binding PreviousPeriodCommand}"
+                                Classes="modern"
+                                MinWidth="36" />
+                        <Button Content="►"
+                                Command="{Binding NextPeriodCommand}"
+                                Classes="modern"
+                                MinWidth="36" />
+                        <TextBlock Text="{Binding CurrentPeriodDisplay}"
+                                   VerticalAlignment="Center"
+                                   FontSize="18"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource ForegroundPrimary}"
+                                   Margin="10,0,0,0" />
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10">
+                        <controls:SegmentedControl SelectedIndex="{Binding ViewModeIndex}">
+                            <x:String>Day</x:String>
+                            <x:String>Week</x:String>
+                            <x:String>Month</x:String>
+                        </controls:SegmentedControl>
+                        <Button Command="{Binding OpenSettingsCommand}"
+                                Classes="modern">
+                            <StackPanel Orientation="Horizontal" Spacing="7">
+                                <avalonia:FluentIcon Icon="Settings"
+                                                     Width="16"
+                                                     Height="16"
+                                                     VerticalAlignment="Center" />
+                                <TextBlock Text="Settings" />
+                            </StackPanel>
+                        </Button>
+                        <Button Command="{Binding CreateEventCommand}"
+                                Classes="accent">
+                            <StackPanel Orientation="Horizontal" Spacing="7">
+                                <avalonia:FluentIcon Icon="Add"
+                                                     Width="16"
+                                                     Height="16"
+                                                     VerticalAlignment="Center" />
+                                <TextBlock Text="New Event" />
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- Main Content Area -->
+            <Grid Grid.Row="1" ColumnDefinitions="200,*">
+                <!-- Sidebar: Calendar List -->
+                <Border Grid.Column="0"
+                        Background="{DynamicResource BackgroundTertiary}"
+                        BorderBrush="{DynamicResource BorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Margin="10"
+                        Padding="16"
+                        BoxShadow="0 2 8 0 #20000000">
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="My Calendars"
+                                   FontWeight="Bold"
+                                   FontSize="14"
+                                   Foreground="{DynamicResource ForegroundPrimary}" />
+
+                        <ItemsControl ItemsSource="{Binding Calendars}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <CheckBox IsChecked="{Binding IsVisible}"
+                                              Margin="0,5">
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <Ellipse Width="12"
+                                                     Height="12"
+                                                     Fill="{Binding Color}" />
+                                            <TextBlock Text="{Binding Name}" />
+                                        </StackPanel>
+                                    </CheckBox>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <!-- Show "New Local Calendar" link when no calendars exist -->
+                        <Button
                             Command="{Binding CreateNewCalendarCommand}"
                             IsVisible="{Binding HasNoCalendars}"
                             Classes="link"
                             HorizontalAlignment="Left"
-                            Margin="0,10,0,0"/>
-                </StackPanel>
-            </Border>
-            
-            <!-- Calendar View Area -->
-            <ContentControl Grid.Column="1" 
-                            Content="{Binding CalendarViewModel}"
-                            Background="{DynamicResource BackgroundPrimary}">
-                <ContentControl.ContentTemplate>
-                    <DataTemplate>
-                        <views:CalendarView/>
-                    </DataTemplate>
-                </ContentControl.ContentTemplate>
-            </ContentControl>
+                            Margin="0,10,0,0">
+                            <StackPanel Orientation="Horizontal" Spacing="7">
+                                <avalonia:SymbolIcon Symbol="AddCircle"
+                                                     Width="12"
+                                                     Height="12"
+                                                     VerticalAlignment="Center" />
+                                <TextBlock Text="New Local Calendar" />
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </Border>
+
+                <!-- Calendar View Area -->
+                <ContentControl Grid.Column="1"
+                                Content="{Binding CalendarViewModel}"
+                                Background="{DynamicResource BackgroundPrimary}">
+                    <ContentControl.ContentTemplate>
+                        <DataTemplate>
+                            <views:CalendarView />
+                        </DataTemplate>
+                    </ContentControl.ContentTemplate>
+                </ContentControl>
+            </Grid>
         </Grid>
-        </Grid>
-        
+
         <!-- Event Dialog Overlay -->
         <Border IsVisible="{Binding IsEventDialogOpen}"
-                Background="#80000000"
+                Background="{DynamicResource ModalOverlay}"
                 Tapped="OnOverlayTapped">
-            <Grid HorizontalAlignment="Center" 
+            <Grid HorizontalAlignment="Center"
                   VerticalAlignment="Center"
                   Tapped="OnDialogContentTapped">
                 <ContentControl Content="{Binding EventEditViewModel}">
                     <ContentControl.ContentTemplate>
                         <DataTemplate>
-                            <views:EventEditView/>
+                            <views:EventEditView />
                         </DataTemplate>
                     </ContentControl.ContentTemplate>
                 </ContentControl>
             </Grid>
         </Border>
-        
+
         <!-- Settings Dialog Overlay -->
         <Border IsVisible="{Binding IsSettingsDialogOpen}"
-                Background="#80000000"
+                Background="{DynamicResource ModalOverlay}"
                 Tapped="OnSettingsOverlayTapped">
-            <Grid HorizontalAlignment="Center" 
+            <Grid HorizontalAlignment="Center"
                   VerticalAlignment="Center"
                   Tapped="OnDialogContentTapped">
                 <ContentControl Content="{Binding CalendarSettingsViewModel}">
                     <ContentControl.ContentTemplate>
                         <DataTemplate>
-                            <views:CalendarSettingsView/>
+                            <views:CalendarSettingsView />
                         </DataTemplate>
                     </ContentControl.ContentTemplate>
                 </ContentControl>
