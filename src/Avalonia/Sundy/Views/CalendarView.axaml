@@ -86,7 +86,7 @@
                                         </TextBlock.Styles>
                                     </TextBlock>
 
-                                    <ListBox Grid.Row="0" ItemsSource="{Binding Events}"
+                                    <ListBox Grid.Row="1" ItemsSource="{Binding Events}"
                                              SelectedItem="{Binding SelectedEvent}"
                                              Background="Transparent"
                                              SelectionMode="Single">

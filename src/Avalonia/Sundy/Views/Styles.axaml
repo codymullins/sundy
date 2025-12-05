@@ -11,12 +11,14 @@
 </Style>
     <!-- Modern Button Style -->
     <Style Selector="Button.modern">
-        <Setter Property="Background" Value="{DynamicResource BackgroundPrimary}" />
+        <Setter Property="Background" Value="{DynamicResource BackgroundTertiary}" />
         <Setter Property="BorderBrush" Value="{DynamicResource BorderBrushHover}" />
         <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="Padding" Value="12,6" />
-        <Setter Property="CornerRadius" Value="8" />
-        <Setter Property="MinHeight" Value="36" />
+        <Setter Property="Padding" Value="20,8" />
+        <Setter Property="CornerRadius" Value="18" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="FontWeight" Value="Medium" />
+        <Setter Property="Height" Value="36" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="HorizontalContentAlignment" Value="Center" />
         <Setter Property="Cursor" Value="Hand" />
@@ -34,31 +36,42 @@
         <Setter Property="Background" Value="{DynamicResource BackgroundPressed}" />
     </Style>
 
-    <!-- Accent Button Style -->
+    <!-- Accent Button Style (pill shape, matches SegmentedControl) -->
     <Style Selector="Button.accent">
         <Setter Property="Background" Value="{DynamicResource AccentPrimary}" />
         <Setter Property="Foreground" Value="{DynamicResource ForegroundPrimary}" />
-        <Setter Property="BorderThickness" Value="0" />
-        <Setter Property="Padding" Value="16,8" />
-        <Setter Property="CornerRadius" Value="8" />
-        <Setter Property="FontWeight" Value="SemiBold" />
-        <Setter Property="MinHeight" Value="36" />
+        <Setter Property="BorderBrush" Value="{DynamicResource AccentPrimary}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="20,8" />
+        <Setter Property="CornerRadius" Value="18" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="FontWeight" Value="Medium" />
+        <Setter Property="Height" Value="36" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="HorizontalContentAlignment" Value="Center" />
         <Setter Property="Cursor" Value="Hand" />
         <Setter Property="Transitions">
             <Transitions>
                 <BrushTransition Property="Background" Duration="0:0:0.15"/>
+                <BrushTransition Property="BorderBrush" Duration="0:0:0.15"/>
             </Transitions>
         </Setter>
     </Style>
 
-    <Style Selector="Button.accent:pointerover">
+    <Style Selector="Button.accent:pointerover /template/ ContentPresenter">
         <Setter Property="Background" Value="{DynamicResource AccentHover}" />
     </Style>
 
-    <Style Selector="Button.accent:pressed">
+    <Style Selector="Button.accent:pointerover">
+        <Setter Property="BorderBrush" Value="{DynamicResource AccentHover}" />
+    </Style>
+
+    <Style Selector="Button.accent:pressed /template/ ContentPresenter">
         <Setter Property="Background" Value="{DynamicResource AccentPressed}" />
+    </Style>
+
+    <Style Selector="Button.accent:pressed">
+        <Setter Property="BorderBrush" Value="{DynamicResource AccentPressed}" />
     </Style>
 
     <!-- Danger Button Style -->
@@ -174,6 +187,17 @@
         <Setter Property="CornerRadius" Value="3" />
         <Setter Property="Width" Value="18" />
         <Setter Property="Height" Value="18" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Transitions">
+            <Transitions>
+                <BrushTransition Property="BorderBrush" Duration="0:0:0.15"/>
+            </Transitions>
+        </Setter>
+    </Style>
+
+    <Style Selector="CheckBox:pointerover /template/ Border#NormalRectangle">
+        <Setter Property="BorderBrush" Value="{DynamicResource AccentPrimary}" />
+        <Setter Property="Background" Value="Transparent" />
     </Style>
 
     <Style Selector="CheckBox:checked /template/ Border#NormalRectangle">
@@ -183,16 +207,6 @@
 
     <!-- CheckBox Hover State (for sidebar items) -->
     <Style Selector="CheckBox">
-        <Setter Property="Transitions">
-            <Transitions>
-                <BrushTransition Property="Background" Duration="0:0:0.15"/>
-            </Transitions>
-        </Setter>
-        <Setter Property="CornerRadius" Value="6" />
-    </Style>
-
-    <Style Selector="CheckBox:pointerover">
-        <Setter Property="Background" Value="{DynamicResource BackgroundSecondary}" />
         <Setter Property="CornerRadius" Value="6" />
         <Setter Property="Margin" Value="-4,0,-4,0" />
         <Setter Property="Padding" Value="10,4" />

@@ -71,7 +71,7 @@
                 <!-- Sidebar: Calendar List -->
                 <Border Grid.Column="0"
                         Background="{DynamicResource BackgroundTertiary}"
-                        BorderBrush="{DynamicResource BorderBrush}"
+                        BorderBrush="{DynamicResource AccentSubtle}"
                         BorderThickness="1"
                         CornerRadius="8"
                         Margin="10"

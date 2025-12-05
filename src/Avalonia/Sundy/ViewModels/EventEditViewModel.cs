@@ -112,7 +112,7 @@ public partial class EventEditViewModel(
             {
                 // Default to 1 hour duration starting next hour
                 var now = DateTime.Now;
-                var nextHour = new DateTime(now.Year, now.Month, now.Day, now.Hour + 1, 0, 0);
+                var nextHour = now.Date.AddHours(now.Hour + 1);
                 StartDate = new DateTimeOffset(nextHour);
                 StartTime = nextHour.TimeOfDay;
                 EndDate = new DateTimeOffset(nextHour.AddHours(1));
@@ -211,8 +211,8 @@ public partial class EventEditViewModel(
     {
         // Initialize scheduler with current event date/time
         Scheduler.SelectedDate = DateOnly.FromDateTime(StartDate.DateTime);
-        Scheduler.TimeBlock.StartTime = TimeOnly.FromTimeSpan(StartTime);
-        Scheduler.TimeBlock.EndTime = TimeOnly.FromTimeSpan(EndTime);
+        Scheduler.TimeBlock.StartTime = TimeSpanToTimeOnly(StartTime);
+        Scheduler.TimeBlock.EndTime = TimeSpanToTimeOnly(EndTime);
 
         if (OnSchedulerOpenRequested != null)
         {
@@ -265,7 +265,7 @@ public partial class EventEditViewModel(
             EndDate = StartDate.AddDays(1); // Next day
 
             // Update scheduler display
-            Scheduler.TimeBlock.StartTime = TimeOnly.FromTimeSpan(StartTime);
+            Scheduler.TimeBlock.StartTime = TimeSpanToTimeOnly(StartTime);
             Scheduler.TimeBlock.EndTime = new TimeOnly(23, 59); // Show as end of day in UI
         }
         else
@@ -279,8 +279,8 @@ public partial class EventEditViewModel(
             }
 
             // Update scheduler display
-            Scheduler.TimeBlock.StartTime = TimeOnly.FromTimeSpan(StartTime);
-            Scheduler.TimeBlock.EndTime = TimeOnly.FromTimeSpan(EndTime);
+            Scheduler.TimeBlock.StartTime = TimeSpanToTimeOnly(StartTime);
+            Scheduler.TimeBlock.EndTime = TimeSpanToTimeOnly(EndTime);
         }
     }
 
@@ -301,16 +301,28 @@ public partial class EventEditViewModel(
         // If end time is before start time on same day, adjust it
         if (StartDate.Date == EndDate.Date && EndTime <= value)
         {
-            EndTime = value.Add(TimeSpan.FromHours(1));
+            var newEndTime = value.Add(TimeSpan.FromHours(1));
+            // Clamp to max valid TimeOnly value if it exceeds 24 hours
+            EndTime = newEndTime.TotalHours >= 24 ? TimeSpan.FromHours(23).Add(TimeSpan.FromMinutes(59)) : newEndTime;
         }
 
-        // Update scheduler display
-        Scheduler.TimeBlock.StartTime = TimeOnly.FromTimeSpan(value);
+        // Update scheduler display - safely convert TimeSpan to TimeOnly
+        Scheduler.TimeBlock.StartTime = TimeSpanToTimeOnly(value);
     }
 
     partial void OnEndTimeChanged(TimeSpan value)
     {
-        // Update scheduler display
-        Scheduler.TimeBlock.EndTime = TimeOnly.FromTimeSpan(value);
+        // Update scheduler display - safely convert TimeSpan to TimeOnly
+        Scheduler.TimeBlock.EndTime = TimeSpanToTimeOnly(value);
+    }
+
+    private static TimeOnly TimeSpanToTimeOnly(TimeSpan value)
+    {
+        // Clamp TimeSpan to valid TimeOnly range (0 to 23:59:59)
+        if (value.TotalHours >= 24)
+            return new TimeOnly(23, 59, 59);
+        if (value < TimeSpan.Zero)
+            return TimeOnly.MinValue;
+        return TimeOnly.FromTimeSpan(value);
     }
 }

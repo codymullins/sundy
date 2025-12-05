@@ -18,6 +18,6 @@ public class WeekDayViewModel
     public DateTime FullDate { get; }
     
     // Properties for UI binding
-    public string TodayBackground => IsToday ? "#3B82F6" : "Transparent";
+    public string TodayBackground => IsToday ? "#6366F1" : "Transparent";
     public string TodayForeground => IsToday ? "White" : "#B0B0B0";
 }
