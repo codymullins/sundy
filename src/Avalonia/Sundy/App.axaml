@@ -29,7 +29,8 @@
     </Application.Resources>
 
     <Application.Styles>
-        <FluentTheme />
+        <SimpleTheme />
+        <StyleInclude Source="avares://Sundy/Themes/ControlThemes.axaml" />
         <StyleInclude Source="/Views/Styles.axaml" />
         <StyleInclude Source="avares://Sundy/Controls/SegmentedControl.axaml" />
         <StyleInclude Source="avares://Sundy/Controls/Scheduler/TimeBlockControl.axaml" />

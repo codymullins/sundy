@@ -37,7 +37,7 @@
     <!-- Accent Button Style -->
     <Style Selector="Button.accent">
         <Setter Property="Background" Value="{DynamicResource AccentPrimary}" />
-        <Setter Property="Foreground" Value="#000000" />
+        <Setter Property="Foreground" Value="{DynamicResource ForegroundPrimary}" />
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="Padding" Value="16,8" />
         <Setter Property="CornerRadius" Value="8" />
@@ -188,6 +188,7 @@
                 <BrushTransition Property="Background" Duration="0:0:0.15"/>
             </Transitions>
         </Setter>
+        <Setter Property="CornerRadius" Value="6" />
     </Style>
 
     <Style Selector="CheckBox:pointerover">

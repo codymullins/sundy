@@ -91,7 +91,7 @@
     </Style>
 
     <Style Selector="controls|SegmentedControl RadioButton:checked">
-        <Setter Property="Foreground" Value="{DynamicResource ForegroundOnAccent}"/>
+        <Setter Property="Foreground" Value="{DynamicResource ForegroundPrimary}"/>
         <Setter Property="FontWeight" Value="SemiBold"/>
     </Style>
 

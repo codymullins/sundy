@@ -37,7 +37,7 @@
     <SolidColorBrush x:Key="BorderBrushHover" Color="{StaticResource BorderBrushHoverColor}"/>
 
     <!-- Accent Colors -->
-    <Color x:Key="AccentPrimaryColor">#7C3AED</Color>
+    <Color x:Key="AccentPrimaryColor">#4F2991</Color>
     <Color x:Key="AccentHoverColor">#8B5CF6</Color>
     <Color x:Key="AccentPressedColor">#6D28D9</Color>
     <Color x:Key="AccentGlowColor">#4D7C3AED</Color>

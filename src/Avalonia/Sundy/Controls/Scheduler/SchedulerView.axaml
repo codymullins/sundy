@@ -22,18 +22,21 @@
                         Padding="8"
                         VerticalAlignment="Center"
                         Cursor="Hand">
-                    <PathIcon Data="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" 
-                              Width="20" Height="20"
-                              Foreground="{DynamicResource ForegroundPrimary}"/>
+                    <Path Data="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"
+                          Width="20" Height="20"
+                          Fill="{DynamicResource ForegroundPrimary}"
+                          Stretch="Uniform" />
                 </Button>
                 
                 <!-- Month/Year and week days -->
                 <StackPanel Grid.Column="1" Spacing="12">
                     <!-- Title row with settings icon and month -->
                     <StackPanel Orientation="Horizontal" Spacing="12" HorizontalAlignment="Left">
-                        <PathIcon Data="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                                  Width="20" Height="20"
-                                  Foreground="{DynamicResource ForegroundMuted}"/>
+                        <Path Data="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                              Width="20" Height="20"
+                              Stroke="{DynamicResource ForegroundMuted}"
+                              StrokeThickness="2"
+                              Stretch="Uniform" />
                         <TextBlock Text="{Binding SelectedDate, StringFormat=MMMM}"
                                    FontSize="18"
                                    Foreground="{DynamicResource ForegroundPrimary}"
@@ -140,9 +143,10 @@
                         Padding="8"
                         VerticalAlignment="Center"
                         Cursor="Hand">
-                    <PathIcon Data="M8.59 16.59L10 18l6-6-6-6-1.41 1.41L13.17 12z" 
-                              Width="20" Height="20"
-                              Foreground="{DynamicResource ForegroundPrimary}"/>
+                    <Path Data="M8.59 16.59L10 18l6-6-6-6-1.41 1.41L13.17 12z"
+                          Width="20" Height="20"
+                          Fill="{DynamicResource ForegroundPrimary}"
+                          Stretch="Uniform" />
                 </Button>
             </Grid>
         </Border>
