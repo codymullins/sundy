@@ -1,5 +1,6 @@
 <Styles xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:fluent="using:FluentIcons.Avalonia">
 <Style Selector="DatePicker">
     <Setter Property="BorderBrush" Value="{DynamicResource BorderBrushHover}" />
     <Setter Property="BorderThickness" Value="1" />
@@ -12,6 +13,7 @@
     <!-- Modern Button Style -->
     <Style Selector="Button.modern">
         <Setter Property="Background" Value="{DynamicResource BackgroundTertiary}" />
+        <Setter Property="Foreground" Value="{DynamicResource ForegroundPrimary}" />
         <Setter Property="BorderBrush" Value="{DynamicResource BorderBrushHover}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Padding" Value="20,8" />
@@ -28,6 +30,9 @@
             </Transitions>
         </Setter>
     </Style>
+    <Style Selector="Button.modern fluent|SymbolIcon">
+        <Setter Property="Foreground" Value="{DynamicResource ForegroundPrimary}" />
+    </Style>
     <Style Selector="Button.modern:pointerover">
         <Setter Property="Background" Value="{DynamicResource BackgroundSecondary}" />
     </Style>
@@ -39,7 +44,7 @@
     <!-- Accent Button Style (pill shape, matches SegmentedControl) -->
     <Style Selector="Button.accent">
         <Setter Property="Background" Value="{DynamicResource AccentPrimary}" />
-        <Setter Property="Foreground" Value="{DynamicResource ForegroundPrimary}" />
+        <Setter Property="Foreground" Value="{DynamicResource ForegroundOnAccent}" />
         <Setter Property="BorderBrush" Value="{DynamicResource AccentPrimary}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Padding" Value="20,8" />
@@ -72,6 +77,9 @@
 
     <Style Selector="Button.accent:pressed">
         <Setter Property="BorderBrush" Value="{DynamicResource AccentPressed}" />
+    </Style>
+    <Style Selector="Button.accent fluent|SymbolIcon">
+        <Setter Property="Foreground" Value="{DynamicResource ForegroundOnAccent}" />
     </Style>
 
     <!-- Danger Button Style -->

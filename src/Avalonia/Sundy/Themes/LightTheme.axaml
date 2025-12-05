@@ -71,7 +71,7 @@
 
     <!-- Modal/Dialog Colors -->
     <Color x:Key="ModalOverlayColor">#80606060</Color>
-    <Color x:Key="ModalBackgroundColor">#FFFFFF</Color>
+    <Color x:Key="ModalBackgroundColor">#F5F5F5</Color>
     <Color x:Key="ModalBorderColor">#6366F1</Color>
 
     <SolidColorBrush x:Key="ModalOverlay" Color="{StaticResource ModalOverlayColor}"/>
@@ -87,7 +87,7 @@
 
     <!-- Time Block Colors -->
     <Color x:Key="TimeBlockHandleColor">#000000</Color>
-    <Color x:Key="TimeBlockBrushColor">#CC00D4E5</Color>
+    <Color x:Key="TimeBlockBrushColor">#CC6366F1</Color>
 
     <SolidColorBrush x:Key="TimeBlockHandle" Color="{StaticResource TimeBlockHandleColor}"/>
     <SolidColorBrush x:Key="TimeBlockBrush" Color="{StaticResource TimeBlockBrushColor}"/>

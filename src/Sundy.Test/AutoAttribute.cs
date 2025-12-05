@@ -45,6 +45,13 @@ public class AutoAttribute : AutoDataAttribute
             // Build the service provider
             var serviceProvider = services.BuildServiceProvider();
 
+            // Initialize the database schema
+            using (var scope = serviceProvider.CreateScope())
+            {
+                var dbContext = scope.ServiceProvider.GetRequiredService<SundyDbContext>();
+                dbContext.Database.EnsureCreated();
+            }
+
             // Register a resolver that gets services from the DI container
             fixture.Customize(new SupportMutableValueTypesCustomization());
             fixture.Customizations.Add(new ServiceProviderRelay(serviceProvider));

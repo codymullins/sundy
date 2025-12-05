@@ -45,9 +45,8 @@
                         <Button Command="{Binding OpenSettingsCommand}"
                                 Classes="modern">
                             <StackPanel Orientation="Horizontal" Spacing="7">
-                                <avalonia:FluentIcon Icon="Settings"
-                                                     Width="16"
-                                                     Height="16"
+                                <avalonia:SymbolIcon Symbol="Settings"
+                                                     FontSize="16"
                                                      VerticalAlignment="Center" />
                                 <TextBlock Text="Settings" />
                             </StackPanel>
@@ -55,9 +54,8 @@
                         <Button Command="{Binding CreateEventCommand}"
                                 Classes="accent">
                             <StackPanel Orientation="Horizontal" Spacing="7">
-                                <avalonia:FluentIcon Icon="Add"
-                                                     Width="16"
-                                                     Height="16"
+                                <avalonia:SymbolIcon Symbol="Add"
+                                                     FontSize="16"
                                                      VerticalAlignment="Center" />
                                 <TextBlock Text="New Event" />
                             </StackPanel>
