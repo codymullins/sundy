@@ -36,6 +36,8 @@ public partial class CalendarViewModel : ObservableObject
 
     [ObservableProperty] private ObservableCollection<EventViewModel> _visibleEvents = new();
 
+    public IReadOnlyList<string>? VisibleCalendarIds { get; set; }
+
     [ObservableProperty] private DateTime _selectedDate = DateTime.Today;
 
     [ObservableProperty] private Calendar? _selectedCalendar;
@@ -159,7 +161,8 @@ public partial class CalendarViewModel : ObservableObject
         var events = await _mediator.Send(new GetEventsInRangeQuery(
             startRange,
             endRange,
-            SelectedCalendar?.Id)).ConfigureAwait(false);
+            SelectedCalendar?.Id,
+            VisibleCalendarIds)).ConfigureAwait(false);
 
         var calendarLookup = await _mediator.Send(new GetCalendarLookupQuery()).ConfigureAwait(false);
 
@@ -218,7 +221,8 @@ public partial class CalendarViewModel : ObservableObject
         var events = await _mediator.Send(new GetEventsInRangeQuery(
             startRange,
             endRange,
-            SelectedCalendar?.Id)).ConfigureAwait(false);
+            SelectedCalendar?.Id,
+            VisibleCalendarIds)).ConfigureAwait(false);
 
         var calendarLookup = await _mediator.Send(new GetCalendarLookupQuery()).ConfigureAwait(false);
 
@@ -258,7 +262,8 @@ public partial class CalendarViewModel : ObservableObject
         var events = await _mediator.Send(new GetEventsInRangeQuery(
             startRange,
             endRange,
-            SelectedCalendar?.Id)).ConfigureAwait(false);
+            SelectedCalendar?.Id,
+            VisibleCalendarIds)).ConfigureAwait(false);
 
         var calendarLookup = await _mediator.Send(new GetCalendarLookupQuery()).ConfigureAwait(false);
 

@@ -12,6 +12,7 @@ public class GetEventsInRangeQueryHandler(EventStore repository)
             request.StartTime,
             request.EndTime,
             request.CalendarId,
+            request.VisibleCalendarIds,
             cancellationToken);
     }
 }

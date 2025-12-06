@@ -4,7 +4,12 @@ namespace Sundy.Core;
 
 public class EventStore(SundyDbContext dbContext)
 {
-    public async Task<List<CalendarEvent>> GetEventsInRangeAsync(DateTimeOffset startTime, DateTimeOffset endTime, string? calendarId = null, CancellationToken ct = default)
+    public async Task<List<CalendarEvent>> GetEventsInRangeAsync(
+        DateTimeOffset startTime,
+        DateTimeOffset endTime,
+        string? calendarId = null,
+        IReadOnlyList<string>? visibleCalendarIds = null,
+        CancellationToken ct = default)
     {
         var query = dbContext.Events
             .AsNoTracking()
@@ -15,7 +20,15 @@ public class EventStore(SundyDbContext dbContext)
             query = query.Where(e => e.CalendarId == calendarId);
         }
 
-        return await query.ToListAsync(ct).ConfigureAwait(false);
+        var results = await query.ToListAsync(ct).ConfigureAwait(false);
+
+        if (visibleCalendarIds is not null)
+        {
+            var ids = new HashSet<string>(visibleCalendarIds);
+            results = results.Where(e => ids.Contains(e.CalendarId)).ToList();
+        }
+
+        return results;
     }
 
     public async Task<CalendarEvent?> GetEventByIdAsync(string eventId, CancellationToken ct = default)

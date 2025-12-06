@@ -162,10 +162,19 @@ public partial class MainViewModel : ViewModelBase
         Calendars = new ObservableCollection<CalendarListItemViewModel>(
             calendars.Select(c => new CalendarListItemViewModel(c, OnCalendarVisibilityChanged)));
         OnPropertyChanged(nameof(HasNoCalendars));
+
+        CalendarViewModel.VisibleCalendarIds = Calendars
+            .Where(c => c.IsVisible)
+            .Select(c => c.Id)
+            .ToList();
     }
 
     private async void OnCalendarVisibilityChanged()
     {
+        CalendarViewModel.VisibleCalendarIds = Calendars
+            .Where(c => c.IsVisible)
+            .Select(c => c.Id)
+            .ToList();
         await CalendarViewModel.RefreshViewAsync().ConfigureAwait(false);
     }
 
@@ -331,6 +340,7 @@ public partial class MainViewModel : ViewModelBase
 // ViewModel for calendar items in the sidebar list
 public partial class CalendarListItemViewModel(Calendar calendar, Action? onVisibilityChanged = null) : ObservableObject
 {
+    public string Id => calendar.Id;
     public string Name => calendar.Name;
     public string Color => calendar.Color;
 

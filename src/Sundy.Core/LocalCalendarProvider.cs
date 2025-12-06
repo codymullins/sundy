@@ -42,6 +42,6 @@ public class LocalCalendarProvider(EventStore eventStore) : ICalendarProvider
         DateTimeOffset end,
         CancellationToken ct = default)
     {
-        return await eventStore.GetEventsInRangeAsync(start, end, calendarId, ct).ConfigureAwait(false);
+        return await eventStore.GetEventsInRangeAsync(start, end, calendarId, visibleCalendarIds: null, ct).ConfigureAwait(false);
     }
 }

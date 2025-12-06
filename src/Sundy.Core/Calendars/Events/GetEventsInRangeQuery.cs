@@ -5,4 +5,5 @@ namespace Sundy.Core.Queries;
 public record GetEventsInRangeQuery(
     DateTimeOffset StartTime,
     DateTimeOffset EndTime,
-    string? CalendarId = null) : IRequest<List<CalendarEvent>>;
+    string? CalendarId = null,
+    IReadOnlyList<string>? VisibleCalendarIds = null) : IRequest<List<CalendarEvent>>;

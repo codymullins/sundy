@@ -1,17 +1,27 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.WebAssembly">
     <PropertyGroup>
-        <TargetFramework>net9.0-browser</TargetFramework>
+        <TargetFramework>net10.0-browser</TargetFramework>
         <OutputType>Exe</OutputType>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <Nullable>enable</Nullable>
         <WasmEnableSIMD>true</WasmEnableSIMD>
-        <RunAOTCompilation>true</RunAOTCompilation>
+        <RunAOTCompilation>false</RunAOTCompilation>
+        <PublishTrimmed>false</PublishTrimmed>
     </PropertyGroup>
 
+    <!-- Enable interceptors for EF Core NativeAOT (experimental) -->
+    <!-- ref: https://learn.microsoft.com/en-us/ef/core/performance/nativeaot-and-precompiled-queries#publishing-an-ef-nativeaot-application-->
+    <PropertyGroup>
+        <InterceptorsNamespaces>$(InterceptorsNamespaces);Microsoft.EntityFrameworkCore.GeneratedInterceptors</InterceptorsNamespaces>
+    </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="Avalonia.Browser" Version="$(AvaloniaVersion)"/>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.0"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.0" />
         <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="3.0.2" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Tasks" Version="10.0.0">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
     </ItemGroup>
 
     <ItemGroup>
