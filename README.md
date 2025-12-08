@@ -6,6 +6,15 @@ Cross-platform calendar app with intelligent cross-calendar time management.
 - Privacy - your data is yours
 - Clean, minimal UX
 
+## Demo
+
+Try the browser version: [https://purple-field-05b9c390f-preview.eastus2.3.azurestaticapps.net/](https://purple-field-05b9c390f-preview.eastus2.3.azurestaticapps.net/)
+
+**Note:**
+- This is a very basic demo of the browser version, which is not as well tested as the desktop version
+- The browser version may be slower and have a larger footprint than normal
+- Data is stored in memory and will not be persisted
+
 ## Getting Started
 
 ### Prerequisites
