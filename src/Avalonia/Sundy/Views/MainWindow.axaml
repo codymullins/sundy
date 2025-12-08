@@ -6,7 +6,7 @@
         xmlns:views1="clr-namespace:Sundy.Views"
         x:Class="Sundy.Views.MainWindow"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-        Icon="/Assets/avalonia-logo.ico"
+        Icon="/Assets/logo.png"
         Title="Sundy Calendar">
     <views1:MainView />
 </Window>
