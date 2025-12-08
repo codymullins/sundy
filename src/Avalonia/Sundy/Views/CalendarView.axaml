@@ -73,28 +73,49 @@
                         <DataTemplate>
                             <Border BorderBrush="{DynamicResource BorderBrush}"
                                     BorderThickness="0,0,1,1"
-                                    Padding="5"
                                     DoubleTapped="OnDayDoubleTapped">
                                 <Border.Styles>
-                                    <!-- Default background for current month days -->
                                     <Style Selector="Border">
                                         <Setter Property="Background" Value="{DynamicResource BackgroundPrimary}" />
                                     </Style>
                                 </Border.Styles>
+                                <Border Padding="5"
+                                        Classes.is-today="{Binding IsToday}">
+                                    <Border.Styles>
+                                        <Style Selector="Border.is-today">
+                                            <Setter Property="BorderBrush" Value="{DynamicResource AccentPrimary}" />
+                                            <Setter Property="BorderThickness" Value="2" />
+                                        </Style>
+                                    </Border.Styles>
                                 <Grid RowDefinitions="Auto,*">
-                                    <TextBlock Grid.Row="0"
-                                               Text="{Binding Day}"
-                                               FontSize="12"
-                                               HorizontalAlignment="Right"
-                                               Margin="0,0,5,5">
-                                        <TextBlock.Styles>
-                                            <!-- Default text color for current month -->
-                                            <Style Selector="TextBlock">
-                                                <Setter Property="Foreground"
-                                                        Value="{DynamicResource ForegroundPrimary}" />
+                                    <Border Grid.Row="0"
+                                            HorizontalAlignment="Right"
+                                            Margin="0,0,5,5"
+                                            CornerRadius="12"
+                                            Width="24"
+                                            Height="24"
+                                            Classes.is-today="{Binding IsToday}">
+                                        <Border.Styles>
+                                            <Style Selector="Border.is-today">
+                                                <Setter Property="Background" Value="{DynamicResource AccentPrimary}" />
                                             </Style>
-                                        </TextBlock.Styles>
-                                    </TextBlock>
+                                        </Border.Styles>
+                                        <TextBlock Text="{Binding Day}"
+                                                   FontSize="12"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center">
+                                            <TextBlock.Styles>
+                                                <Style Selector="TextBlock">
+                                                    <Setter Property="Foreground"
+                                                            Value="{DynamicResource ForegroundPrimary}" />
+                                                </Style>
+                                                <Style Selector="Border.is-today TextBlock">
+                                                    <Setter Property="Foreground" Value="White" />
+                                                    <Setter Property="FontWeight" Value="SemiBold" />
+                                                </Style>
+                                            </TextBlock.Styles>
+                                        </TextBlock>
+                                    </Border>
 
                                     <ListBox Grid.Row="1" ItemsSource="{Binding Events}"
                                              SelectedItem="{Binding SelectedEvent}"
@@ -141,6 +162,7 @@
                                         </ListBox.ItemTemplate>
                                     </ListBox>
                                 </Grid>
+                                </Border>
                             </Border>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
