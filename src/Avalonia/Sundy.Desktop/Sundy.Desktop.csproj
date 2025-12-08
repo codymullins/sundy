@@ -5,6 +5,23 @@
         See https://docs.avaloniaui.net/docs/guides/platforms/platform-specific-code/dotnet for more details.-->
         <TargetFramework>net10.0</TargetFramework>
         <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+        <PublishSingleFile>true</PublishSingleFile>
+        <SelfContained>true</SelfContained>
+        <PublishTrimmed>true</PublishTrimmed>
+        <PublishReadyToRun>true</PublishReadyToRun>
+        <UseAppHost>true</UseAppHost>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="$([MSBuild]::IsOSPlatform('OSX'))">
+        <CFBundleName>Sundy</CFBundleName>
+        <CFBundleDisplayName>Sundy</CFBundleDisplayName>
+        <CFBundleIdentifier>com.codymullins.sundy</CFBundleIdentifier>
+        <CFBundleVersion>1.0.0</CFBundleVersion>
+        <CFBundlePackageType>APPL</CFBundlePackageType>
+        <CFBundleSignature>????</CFBundleSignature>
+        <CFBundleExecutable>Sundy.Desktop</CFBundleExecutable>
+        <CFBundleIconFile>AppIcon.icns</CFBundleIconFile>
+        <NSHighResolutionCapable>true</NSHighResolutionCapable>
     </PropertyGroup>
 
     <PropertyGroup>
@@ -25,5 +42,12 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Sundy\Sundy.csproj"/>
+    </ItemGroup>
+
+    <!-- macOS Icon Configuration -->
+    <ItemGroup Condition="$([MSBuild]::IsOSPlatform('OSX'))">
+        <BundleResource Include="..\Sundy\Assets\AppIcon.icns">
+            <Link>Resources\AppIcon.icns</Link>
+        </BundleResource>
     </ItemGroup>
 </Project>
