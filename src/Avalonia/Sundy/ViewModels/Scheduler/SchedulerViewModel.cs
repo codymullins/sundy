@@ -111,6 +111,10 @@ public partial class SchedulerViewModel : ObservableObject
     [RelayCommand]
     private void SelectDate(DateOnly date)
     {
+        foreach (var dayItem in DayItems)
+        {
+            dayItem.IsSelected = dayItem.Date == date;
+        }
         SelectedDate = date;
     }
 
