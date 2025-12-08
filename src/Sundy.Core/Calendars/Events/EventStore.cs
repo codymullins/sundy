@@ -54,7 +54,20 @@ public class EventStore(SundyDbContext dbContext)
 
     public async Task UpdateEventAsync(CalendarEvent evt, CancellationToken ct = default)
     {
-        dbContext.Events.Update(evt);
+        var existing = await dbContext.Events.FindAsync([evt.Id], ct).ConfigureAwait(false);
+        if (existing == null)
+        {
+            throw new InvalidOperationException($"Event with ID {evt.Id} not found.");
+        }
+        
+        existing.Title = evt.Title;
+        existing.StartTime = evt.StartTime;
+        existing.EndTime = evt.EndTime;
+        existing.Location = evt.Location;
+        existing.Description = evt.Description;
+        existing.CalendarId = evt.CalendarId;
+        existing.IsBlockingEvent = evt.IsBlockingEvent;
+        
         await dbContext.SaveChangesAsync(ct).ConfigureAwait(false);
     }
 
