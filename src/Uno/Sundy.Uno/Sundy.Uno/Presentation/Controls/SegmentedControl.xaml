@@ -88,11 +88,7 @@
                                     Background="{StaticResource AccentPrimary}"
                                     CornerRadius="16"
                                     HorizontalAlignment="Left"
-                                    VerticalAlignment="Stretch">
-                                <Border.RenderTransform>
-                                    <CompositeTransform x:Name="PART_IndicatorTransform" />
-                                </Border.RenderTransform>
-                            </Border>
+                                    VerticalAlignment="Stretch" />
 
                             <!-- Segment buttons container -->
                             <StackPanel x:Name="PART_SegmentContainer"

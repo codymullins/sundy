@@ -1,12 +1,14 @@
+using Microsoft.UI.Composition;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Hosting;
 using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Markup;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Numerics;
 using Windows.Foundation;
 
 namespace Sundy.Uno.Presentation.Controls;
@@ -22,12 +24,14 @@ public class SegmentedControl : Control
             new PropertyMetadata(0, OnSelectedIndexChanged));
 
     private readonly ObservableCollection<string> _segments = new();
-    private CompositeTransform? _indicatorTransform;
     private StackPanel? _segmentContainer;
     private Border? _indicator;
     private readonly List<RadioButton> _radioButtons = new();
-    private Storyboard? _currentStoryboard;
     private bool _isUpdatingSelection;
+    
+    // Composition animation fields
+    private Compositor? _compositor;
+    private Visual? _indicatorVisual;
 
     public int SelectedIndex
     {
@@ -58,7 +62,12 @@ public class SegmentedControl : Control
 
         _segmentContainer = GetTemplateChild("PART_SegmentContainer") as StackPanel;
         _indicator = GetTemplateChild("PART_Indicator") as Border;
-        _indicatorTransform = GetTemplateChild("PART_IndicatorTransform") as CompositeTransform;
+
+        if (_indicator != null)
+        {
+            _indicatorVisual = ElementCompositionPreview.GetElementVisual(_indicator);
+            _compositor = _indicatorVisual.Compositor;
+        }
 
         if (_segmentContainer != null)
         {
@@ -153,7 +162,7 @@ public class SegmentedControl : Control
 
     private void UpdateIndicatorPosition(bool animate)
     {
-        if (_indicator == null || _indicatorTransform == null || _segmentContainer == null)
+        if (_segmentContainer == null || _indicator == null)
             return;
 
         if (SelectedIndex < 0 || SelectedIndex >= _radioButtons.Count)
@@ -174,7 +183,10 @@ public class SegmentedControl : Control
             var targetWidth = selectedButton.ActualWidth;
             var targetX = position.X;
 
-            if (animate)
+            if (targetWidth <= 0)
+                return;
+
+            if (animate && _compositor != null && _indicatorVisual != null)
             {
                 AnimateIndicator(targetWidth, targetX);
             }
@@ -182,7 +194,10 @@ public class SegmentedControl : Control
             {
                 // Set directly without animation
                 _indicator.Width = targetWidth;
-                _indicatorTransform.TranslateX = targetX;
+                if (_indicatorVisual != null)
+                {
+                    _indicatorVisual.Offset = new Vector3((float)targetX, 0, 0);
+                }
             }
         }
         catch
@@ -194,62 +209,43 @@ public class SegmentedControl : Control
 
     private void AnimateIndicator(double targetWidth, double targetX)
     {
-        if (_indicator == null || _indicatorTransform == null)
+        if (_indicator == null || _compositor == null || _indicatorVisual == null)
             return;
 
-        // Stop any current animation and preserve the current values
-        if (_currentStoryboard != null)
+        var duration = TimeSpan.FromMilliseconds(150);
+        var easing = _compositor.CreateCubicBezierEasingFunction(
+            new Vector2(0.25f, 0.1f),
+            new Vector2(0.25f, 1f)); // Cubic ease out
+
+        // Animate offset (position)
+        var offsetAnimation = _compositor.CreateVector3KeyFrameAnimation();
+        offsetAnimation.InsertKeyFrame(1f, new Vector3((float)targetX, 0, 0), easing);
+        offsetAnimation.Duration = duration;
+
+        // Animate size (scale-based approach for width)
+        // We need to set the actual width and animate the visual's scale
+        var currentWidth = double.IsNaN(_indicator.Width) || _indicator.Width <= 0 
+            ? targetWidth 
+            : _indicator.Width;
+        
+        // Set target width immediately (composition will handle the visual smoothly)
+        _indicator.Width = targetWidth;
+
+        // Start the offset animation
+        _indicatorVisual.StartAnimation("Offset", offsetAnimation);
+
+        // For width animation, we use a scale animation relative to the new width
+        if (Math.Abs(currentWidth - targetWidth) > 0.1)
         {
-            _currentStoryboard.Stop();
-            _currentStoryboard = null;
+            var scaleFrom = (float)(currentWidth / targetWidth);
+            var scaleAnimation = _compositor.CreateVector3KeyFrameAnimation();
+            scaleAnimation.InsertKeyFrame(0f, new Vector3(scaleFrom, 1f, 1f));
+            scaleAnimation.InsertKeyFrame(1f, new Vector3(1f, 1f, 1f), easing);
+            scaleAnimation.Duration = duration;
+            
+            // Set transform origin to left edge
+            _indicatorVisual.CenterPoint = new Vector3(0, (float)(_indicator.ActualHeight / 2), 0);
+            _indicatorVisual.StartAnimation("Scale", scaleAnimation);
         }
-
-        // Get current values for smooth animation from current position
-        var currentWidth = _indicator.Width;
-        var currentX = _indicatorTransform.TranslateX;
-
-        // Handle NaN or invalid values
-        if (double.IsNaN(currentWidth) || currentWidth <= 0)
-            currentWidth = targetWidth;
-        if (double.IsNaN(currentX))
-            currentX = targetX;
-
-        var storyboard = new Storyboard();
-
-        // Animate Width - requires EnableDependentAnimation for non-independent properties
-        var widthAnimation = new DoubleAnimation
-        {
-            From = currentWidth,
-            To = targetWidth,
-            Duration = new Duration(TimeSpan.FromMilliseconds(200)),
-            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseInOut },
-            EnableDependentAnimation = true
-        };
-        Storyboard.SetTarget(widthAnimation, _indicator);
-        Storyboard.SetTargetProperty(widthAnimation, "Width");
-
-        // Animate TranslateX - this is an independent animation (GPU accelerated)
-        var translateAnimation = new DoubleAnimation
-        {
-            From = currentX,
-            To = targetX,
-            Duration = new Duration(TimeSpan.FromMilliseconds(200)),
-            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseInOut }
-        };
-        Storyboard.SetTarget(translateAnimation, _indicatorTransform);
-        Storyboard.SetTargetProperty(translateAnimation, "TranslateX");
-
-        storyboard.Children.Add(widthAnimation);
-        storyboard.Children.Add(translateAnimation);
-
-        // Ensure final values are applied after animation completes
-        storyboard.Completed += (s, e) =>
-        {
-            _indicator.Width = targetWidth;
-            _indicatorTransform.TranslateX = targetX;
-        };
-
-        _currentStoryboard = storyboard;
-        storyboard.Begin();
     }
 }
