@@ -1,0 +1,10 @@
+{
+  "background_color": "#ffffff",
+  "description": "Sundy.Uno",
+  "display": "standalone",
+  "name": "Sundy.Uno",
+  "short_name": "Sundy.Uno",
+  "start_url": "/index.html",
+  "theme_color": "#ffffff",
+  "scope": "/"
+}

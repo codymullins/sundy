@@ -1,0 +1,99 @@
+<UserControl
+    x:Class="Sundy.Uno.Presentation.Controls.EventEditControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="using:Sundy.Uno.ViewModels"
+    xmlns:conv="using:Sundy.Uno.Presentation.Converters"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    d:DesignHeight="600"
+    d:DesignWidth="600">
+
+    <UserControl.Resources>
+        <conv:BoolToVisibilityConverter x:Key="BoolToVisibility" />
+        <conv:InverseBooleanConverter x:Key="InverseBooleanConverter" />
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,16">
+            <TextBlock Text="{Binding DialogTitle}"
+                       FontSize="22"
+                       FontWeight="SemiBold"
+                       Foreground="{StaticResource ForegroundPrimary}" />
+            <ComboBox Grid.Column="1"
+                      ItemsSource="{Binding AvailableCalendars}"
+                      SelectedItem="{Binding SelectedCalendar, Mode=TwoWay}"
+                      DisplayMemberPath="Name"
+                      PlaceholderText="Select calendar"
+                      Width="220" />
+        </Grid>
+
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <StackPanel Spacing="12">
+                <StackPanel>
+                    <TextBlock Text="Title" Foreground="{StaticResource ForegroundPrimary}" />
+                    <TextBox Text="{Binding Title, Mode=TwoWay}" PlaceholderText="Event title" />
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Spacing="12">
+                    <StackPanel Width="200">
+                        <TextBlock Text="Start date" Foreground="{StaticResource ForegroundPrimary}" />
+                        <DatePicker Date="{Binding StartDate, Mode=TwoWay}" />
+                    </StackPanel>
+                    <StackPanel Width="160">
+                        <TextBlock Text="Start time" Foreground="{StaticResource ForegroundPrimary}" />
+                        <TimePicker Time="{Binding StartTime, Mode=TwoWay}" IsEnabled="{Binding IsAllDay, Converter={StaticResource InverseBooleanConverter}}" />
+                    </StackPanel>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Spacing="12">
+                    <StackPanel Width="200">
+                        <TextBlock Text="End date" Foreground="{StaticResource ForegroundPrimary}" />
+                        <DatePicker Date="{Binding EndDate, Mode=TwoWay}" />
+                    </StackPanel>
+                    <StackPanel Width="160">
+                        <TextBlock Text="End time" Foreground="{StaticResource ForegroundPrimary}" />
+                        <TimePicker Time="{Binding EndTime, Mode=TwoWay}" IsEnabled="{Binding IsAllDay, Converter={StaticResource InverseBooleanConverter}}" />
+                    </StackPanel>
+                </StackPanel>
+
+                <CheckBox Content="All day event" IsChecked="{Binding IsAllDay, Mode=TwoWay}" Foreground="{StaticResource ForegroundPrimary}" />
+
+                <StackPanel>
+                    <TextBlock Text="Location" Foreground="{StaticResource ForegroundPrimary}" />
+                    <TextBox Text="{Binding Location, Mode=TwoWay}" PlaceholderText="Add location" />
+                </StackPanel>
+
+                <StackPanel>
+                    <TextBlock Text="Description" Foreground="{StaticResource ForegroundPrimary}" />
+                    <TextBox Text="{Binding Description, Mode=TwoWay}" AcceptsReturn="True" TextWrapping="Wrap" Height="120" />
+                </StackPanel>
+            </StackPanel>
+        </ScrollViewer>
+
+        <Grid Grid.Row="2" ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="10" Margin="0,16,0,0">
+                    <Button Grid.Column="0"
+                            Content="Delete"
+                            Command="{Binding DeleteCommand}"
+                            Visibility="{Binding IsEditMode, Converter={StaticResource BoolToVisibility}}"
+                            Style="{StaticResource DangerButtonStyle}" />
+
+            <Button Grid.Column="2"
+                    Content="Cancel"
+                    Command="{Binding CancelCommand}"
+                    Style="{StaticResource ModernButtonStyle}" />
+
+            <Button Grid.Column="3"
+                    Content="{Binding SaveButtonText}"
+                    Command="{Binding SaveCommand}"
+                    Style="{StaticResource AccentButtonStyle}" />
+        </Grid>
+    </Grid>
+</UserControl>

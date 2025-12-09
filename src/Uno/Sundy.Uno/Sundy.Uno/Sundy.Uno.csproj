@@ -1,0 +1,61 @@
+<Project Sdk="Uno.Sdk">
+    <PropertyGroup>
+        <TargetFrameworks>net10.0-browserwasm;net10.0-desktop</TargetFrameworks>
+
+        <OutputType>Exe</OutputType>
+        <UnoSingleProject>true</UnoSingleProject>
+
+        <!-- Display name -->
+        <ApplicationTitle>Sundy.Uno</ApplicationTitle>
+        <!-- App Identifier -->
+        <ApplicationId>com.companyname.Sundy.Uno</ApplicationId>
+        <!-- Versions -->
+        <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
+        <ApplicationVersion>1</ApplicationVersion>
+        <!-- Package Publisher -->
+        <ApplicationPublisher>O=Sundy.Uno</ApplicationPublisher>
+        <!-- Package Description -->
+        <Description>Sundy.Uno powered by Uno Platform.</Description>
+
+        <!--
+          UnoFeatures are used to quickly add and manage features enabled for your app.
+          https://aka.platform.uno/singleproject-features
+        -->
+        <UnoFeatures>
+            Lottie;
+            Hosting;
+            Toolkit;
+            Logging;
+            LoggingSerilog;
+            Mvvm;
+            Configuration;
+            Localization;
+            Navigation;
+            ThemeService;
+            SkiaRenderer;
+        </UnoFeatures>
+    </PropertyGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\..\..\Sundy.Core\Sundy.Core.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="CommunityToolkit.Mvvm" />
+      <PackageReference Include="Mediator.Abstractions" />
+      <PackageReference Include="Mediator.SourceGenerator">
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        <PrivateAssets>all</PrivateAssets>
+      </PackageReference>
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" />
+      <PackageReference Include="Serilog.Extensions.Logging" />
+      <PackageReference Include="Serilog.Sinks.Console" />
+    </ItemGroup>
+    
+    <ItemGroup>
+        <!-- App Icon for all platforms -->
+        <UnoIcon Include="Assets\Icons\icon.svg" />
+        
+        <!-- Other images, excluding the .icns file -->
+        <UnoImage Include="Assets\Images\*.png" />
+    </ItemGroup>
+</Project>
