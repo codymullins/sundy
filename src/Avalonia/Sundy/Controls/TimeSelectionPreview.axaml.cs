@@ -7,8 +7,8 @@ namespace Sundy.Controls;
 
 public partial class TimeSelectionPreview : UserControl
 {
-    public static readonly StyledProperty<DateTime> SelectedDateProperty =
-        AvaloniaProperty.Register<TimeSelectionPreview, DateTime>(nameof(SelectedDate));
+    public static readonly StyledProperty<DateOnly> SelectedDateProperty =
+        AvaloniaProperty.Register<TimeSelectionPreview, DateOnly>(nameof(SelectedDate));
 
     public static readonly StyledProperty<string?> TimeRangeTextProperty =
         AvaloniaProperty.Register<TimeSelectionPreview, string?>(nameof(TimeRangeText));
@@ -19,7 +19,7 @@ public partial class TimeSelectionPreview : UserControl
     public static readonly StyledProperty<ICommand?> CommandProperty =
         AvaloniaProperty.Register<TimeSelectionPreview, ICommand?>(nameof(Command));
 
-    public DateTime SelectedDate
+    public DateOnly SelectedDate
     {
         get => GetValue(SelectedDateProperty);
         set => SetValue(SelectedDateProperty, value);
