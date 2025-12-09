@@ -23,11 +23,6 @@
         <CFBundleIconFile>AppIcon.icns</CFBundleIconFile>
         <NSHighResolutionCapable>true</NSHighResolutionCapable>
     </PropertyGroup>
-
-    <PropertyGroup>
-        <ApplicationManifest>app.manifest</ApplicationManifest>
-    </PropertyGroup>
-
     <ItemGroup>
         <PackageReference Include="Avalonia.Desktop" Version="$(AvaloniaVersion)"/>
         <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
@@ -35,19 +30,12 @@
             <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
             <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
         </PackageReference>
-        <PackageReference Include="Serilog.Extensions.Logging" Version="10.0.0" />
-        <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
-        <PackageReference Include="Serilog.Sinks.File" Version="7.0.1-dev-02315" />
+        <PackageReference Include="Serilog.Extensions.Logging" Version="10.0.0"/>
+        <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1"/>
+        <PackageReference Include="Serilog.Sinks.File" Version="7.0.1-dev-02315"/>
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\Sundy\Sundy.csproj"/>
-    </ItemGroup>
-
-    <!-- macOS Icon Configuration -->
-    <ItemGroup Condition="$([MSBuild]::IsOSPlatform('OSX'))">
-        <BundleResource Include="..\Sundy\Assets\AppIcon.icns">
-            <Link>Resources\AppIcon.icns</Link>
-        </BundleResource>
     </ItemGroup>
 </Project>
