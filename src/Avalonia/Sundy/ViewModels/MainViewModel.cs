@@ -63,8 +63,6 @@ public partial class MainViewModel : ViewModelBase
     public bool IsSidebarVisible => !IsMobileLayout || IsSidebarOpen;
 
     public double SidebarTranslateX => IsMobileLayout && !IsSidebarOpen ? -280 : 0;
-    
-    public Avalonia.Thickness CalendarMargin => !IsMobileLayout ? new Avalonia.Thickness(280, 0, 0, 0) : new Avalonia.Thickness(0);
 
     public int ViewModeIndex
     {
@@ -132,7 +130,6 @@ public partial class MainViewModel : ViewModelBase
     {
         OnPropertyChanged(nameof(IsSidebarVisible));
         OnPropertyChanged(nameof(SidebarTranslateX));
-        OnPropertyChanged(nameof(CalendarMargin));
 
         // Auto-close on mobile, auto-open on desktop
         IsSidebarOpen = !value;
