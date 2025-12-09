@@ -8,9 +8,9 @@
              x:Class="Sundy.Controls.Scheduler.SchedulerView"
              x:DataType="vm:SchedulerViewModel"
              Background="{DynamicResource BackgroundPrimary}">
-    
+
     <Grid RowDefinitions="Auto,*">
-        
+
         <!-- Week Header -->
         <Border Grid.Row="0" Background="{DynamicResource BackgroundSecondary}" Padding="8,12">
             <Grid ColumnDefinitions="Auto,*,Auto">
@@ -27,7 +27,7 @@
                           Fill="{DynamicResource ForegroundPrimary}"
                           Stretch="Uniform" />
                 </Button>
-                
+
                 <!-- Month/Year and week days -->
                 <StackPanel Grid.Column="1" Spacing="12">
                     <!-- Title row with settings icon and month -->
@@ -42,99 +42,59 @@
                                    Foreground="{DynamicResource ForegroundPrimary}"
                                    VerticalAlignment="Center"/>
                     </StackPanel>
-                    
+
                     <!-- Week days grid -->
-                    <UniformGrid Columns="7">
-                        <UniformGrid.Styles>
-                            <Style Selector="Button">
-                                <Setter Property="Background" Value="Transparent"/>
-                                <Setter Property="BorderThickness" Value="0"/>
-                                <Setter Property="Padding" Value="4"/>
-                                <Setter Property="Cursor" Value="Hand"/>
-                            </Style>
-                        </UniformGrid.Styles>
-                        
-                        <!-- Sunday -->
-                        <Button Command="{Binding SelectDateCommand}" CommandParameter="{Binding WeekDays[0]}">
-                            <StackPanel HorizontalAlignment="Center" Spacing="4">
-                                <TextBlock Text="S" FontSize="12" Foreground="{DynamicResource ForegroundMuted}" HorizontalAlignment="Center"/>
-                                <Border CornerRadius="16" Width="32" Height="32" HorizontalAlignment="Center"
-                                        Background="{Binding WeekDays[0], Converter={x:Static scheduler:DateToBackgroundConverter.Instance}, ConverterParameter={Binding SelectedDate}}">
-                                    <TextBlock Text="{Binding WeekDays[0].Day}" FontSize="14" FontWeight="Medium"
-                                               Foreground="{DynamicResource ForegroundPrimary}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                </Border>
-                            </StackPanel>
-                        </Button>
-                        
-                        <!-- Monday -->
-                        <Button Command="{Binding SelectDateCommand}" CommandParameter="{Binding WeekDays[1]}">
-                            <StackPanel HorizontalAlignment="Center" Spacing="4">
-                                <TextBlock Text="M" FontSize="12" Foreground="{DynamicResource ForegroundMuted}" HorizontalAlignment="Center"/>
-                                <Border CornerRadius="16" Width="32" Height="32" HorizontalAlignment="Center">
-                                    <TextBlock Text="{Binding WeekDays[1].Day}" FontSize="14" FontWeight="Medium"
-                                               Foreground="{DynamicResource ForegroundMuted}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                </Border>
-                            </StackPanel>
-                        </Button>
-                        
-                        <!-- Tuesday -->
-                        <Button Command="{Binding SelectDateCommand}" CommandParameter="{Binding WeekDays[2]}">
-                            <StackPanel HorizontalAlignment="Center" Spacing="4">
-                                <TextBlock Text="T" FontSize="12" Foreground="{DynamicResource ForegroundMuted}" HorizontalAlignment="Center"/>
-                                <Border CornerRadius="16" Width="32" Height="32" HorizontalAlignment="Center">
-                                    <TextBlock Text="{Binding WeekDays[2].Day}" FontSize="14" FontWeight="Medium"
-                                               Foreground="{DynamicResource ForegroundMuted}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                </Border>
-                            </StackPanel>
-                        </Button>
-                        
-                        <!-- Wednesday -->
-                        <Button Command="{Binding SelectDateCommand}" CommandParameter="{Binding WeekDays[3]}">
-                            <StackPanel HorizontalAlignment="Center" Spacing="4">
-                                <TextBlock Text="W" FontSize="12" Foreground="{DynamicResource ForegroundMuted}" HorizontalAlignment="Center"/>
-                                <Border CornerRadius="16" Width="32" Height="32" HorizontalAlignment="Center">
-                                    <TextBlock Text="{Binding WeekDays[3].Day}" FontSize="14" FontWeight="Medium"
-                                               Foreground="{DynamicResource ForegroundMuted}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                </Border>
-                            </StackPanel>
-                        </Button>
-                        
-                        <!-- Thursday -->
-                        <Button Command="{Binding SelectDateCommand}" CommandParameter="{Binding WeekDays[4]}">
-                            <StackPanel HorizontalAlignment="Center" Spacing="4">
-                                <TextBlock Text="T" FontSize="12" Foreground="{DynamicResource ForegroundMuted}" HorizontalAlignment="Center"/>
-                                <Border CornerRadius="16" Width="32" Height="32" HorizontalAlignment="Center">
-                                    <TextBlock Text="{Binding WeekDays[4].Day}" FontSize="14" FontWeight="Medium"
-                                               Foreground="{DynamicResource ForegroundMuted}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                </Border>
-                            </StackPanel>
-                        </Button>
-                        
-                        <!-- Friday -->
-                        <Button Command="{Binding SelectDateCommand}" CommandParameter="{Binding WeekDays[5]}">
-                            <StackPanel HorizontalAlignment="Center" Spacing="4">
-                                <TextBlock Text="F" FontSize="12" Foreground="{DynamicResource ForegroundMuted}" HorizontalAlignment="Center"/>
-                                <Border CornerRadius="16" Width="32" Height="32" HorizontalAlignment="Center">
-                                    <TextBlock Text="{Binding WeekDays[5].Day}" FontSize="14" FontWeight="Medium"
-                                               Foreground="{DynamicResource ForegroundMuted}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                </Border>
-                            </StackPanel>
-                        </Button>
-                        
-                        <!-- Saturday (Selected in screenshot) -->
-                        <Button Command="{Binding SelectDateCommand}" CommandParameter="{Binding WeekDays[6]}">
-                            <StackPanel HorizontalAlignment="Center" Spacing="4">
-                                <TextBlock Text="S" FontSize="12" Foreground="{DynamicResource ForegroundMuted}" HorizontalAlignment="Center"/>
-                                <Border CornerRadius="16" Width="32" Height="32" HorizontalAlignment="Center"
-                                        Background="{DynamicResource AccentPrimary}">
-                                    <TextBlock Text="{Binding WeekDays[6].Day}" FontSize="14" FontWeight="Medium"
-                                               Foreground="{DynamicResource ForegroundOnAccent}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                </Border>
-                            </StackPanel>
-                        </Button>
-                    </UniformGrid>
+                    <ItemsControl ItemsSource="{Binding DayItems}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <UniformGrid Columns="7"/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="vm:DayItemViewModel">
+                                <Button Command="{Binding $parent[ItemsControl].((vm:SchedulerViewModel)DataContext).SelectDateCommand}"
+                                        CommandParameter="{Binding Date}"
+                                        Background="Transparent"
+                                        BorderThickness="0"
+                                        Padding="4"
+                                        Cursor="Hand">
+                                    <StackPanel HorizontalAlignment="Center" Spacing="4">
+                                        <TextBlock Text="{Binding DayOfWeekShort}" FontSize="12"
+                                                   Foreground="{DynamicResource ForegroundMuted}" HorizontalAlignment="Center"/>
+                                        <Border CornerRadius="16" Width="32" Height="32" HorizontalAlignment="Center"
+                                                Classes.selected="{Binding IsSelected}"
+                                                Classes.today="{Binding IsToday}">
+                                            <Border.Styles>
+                                                <Style Selector="Border">
+                                                    <Setter Property="Background" Value="Transparent"/>
+                                                </Style>
+                                                <Style Selector="Border.today:not(.selected)">
+                                                    <Setter Property="Background" Value="#404040"/>
+                                                </Style>
+                                                <Style Selector="Border.selected">
+                                                    <Setter Property="Background" Value="{DynamicResource AccentPrimary}"/>
+                                                </Style>
+                                            </Border.Styles>
+                                            <TextBlock Text="{Binding DayNumber}" FontSize="14" FontWeight="Medium"
+                                                       HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                       Classes.selected="{Binding IsSelected}">
+                                                <TextBlock.Styles>
+                                                    <Style Selector="TextBlock">
+                                                        <Setter Property="Foreground" Value="{DynamicResource ForegroundMuted}"/>
+                                                    </Style>
+                                                    <Style Selector="TextBlock.selected">
+                                                        <Setter Property="Foreground" Value="{DynamicResource ForegroundOnAccent}"/>
+                                                    </Style>
+                                                </TextBlock.Styles>
+                                            </TextBlock>
+                                        </Border>
+                                    </StackPanel>
+                                </Button>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
                 </StackPanel>
-                
+
                 <!-- Next Week button -->
                 <Button Grid.Column="2"
                         Command="{Binding NavigateNextWeekCommand}"
@@ -150,112 +110,112 @@
                 </Button>
             </Grid>
         </Border>
-        
+
         <!-- Time Grid with ScrollViewer -->
         <ScrollViewer x:Name="TimeGridScrollViewer"
-                      Grid.Row="1" 
+                      Grid.Row="1"
                       VerticalScrollBarVisibility="Auto"
                       HorizontalScrollBarVisibility="Disabled">
-            <Canvas Height="{Binding TotalHeight}" 
+            <Canvas Height="{Binding TotalHeight}"
                     Background="{DynamicResource BackgroundPrimary}"
                     ClipToBounds="True">
                 <!-- Hour lines (hardcoded) -->
                 <!-- 12 AM -->
                 <TextBlock Text="12 AM" Canvas.Left="8" Canvas.Top="0" Foreground="{DynamicResource SchedulerTimeText}" FontSize="11"/>
                 <Rectangle Height="1" Fill="{DynamicResource SchedulerLine}" Width="1000" Canvas.Left="60" Canvas.Top="0"/>
-                
+
                 <!-- 1 AM -->
                 <TextBlock Text="1 AM" Canvas.Left="8" Canvas.Top="60" Foreground="{DynamicResource SchedulerTimeText}" FontSize="11"/>
                 <Rectangle Height="1" Fill="{DynamicResource SchedulerLine}" Width="1000" Canvas.Left="60" Canvas.Top="60"/>
-                
+
                 <!-- 2 AM -->
                 <TextBlock Text="2 AM" Canvas.Left="8" Canvas.Top="120" Foreground="{DynamicResource SchedulerTimeText}" FontSize="11"/>
                 <Rectangle Height="1" Fill="{DynamicResource SchedulerLine}" Width="1000" Canvas.Left="60" Canvas.Top="120"/>
-                
+
                 <!-- 3 AM -->
                 <TextBlock Text="3 AM" Canvas.Left="8" Canvas.Top="180" Foreground="{DynamicResource SchedulerTimeText}" FontSize="11"/>
                 <Rectangle Height="1" Fill="{DynamicResource SchedulerLine}" Width="1000" Canvas.Left="60" Canvas.Top="180"/>
-                
+
                 <!-- 4 AM -->
                 <TextBlock Text="4 AM" Canvas.Left="8" Canvas.Top="240" Foreground="{DynamicResource SchedulerTimeText}" FontSize="11"/>
                 <Rectangle Height="1" Fill="{DynamicResource SchedulerLine}" Width="1000" Canvas.Left="60" Canvas.Top="240"/>
-                
+
                 <!-- 5 AM -->
                 <TextBlock Text="5 AM" Canvas.Left="8" Canvas.Top="300" Foreground="{DynamicResource SchedulerTimeText}" FontSize="11"/>
                 <Rectangle Height="1" Fill="{DynamicResource SchedulerLine}" Width="1000" Canvas.Left="60" Canvas.Top="300"/>
-                
+
                 <!-- 6 AM -->
                 <TextBlock Text="6 AM" Canvas.Left="8" Canvas.Top="360" Foreground="{DynamicResource SchedulerTimeText}" FontSize="11"/>
                 <Rectangle Height="1" Fill="{DynamicResource SchedulerLine}" Width="1000" Canvas.Left="60" Canvas.Top="360"/>
-                
+
                 <!-- 7 AM -->
                 <TextBlock Text="7 AM" Canvas.Left="8" Canvas.Top="420" Foreground="{DynamicResource SchedulerTimeText}" FontSize="11"/>
                 <Rectangle Height="1" Fill="{DynamicResource SchedulerLine}" Width="1000" Canvas.Left="60" Canvas.Top="420"/>
-                
+
                 <!-- 8 AM -->
                 <TextBlock Text="8 AM" Canvas.Left="8" Canvas.Top="480" Foreground="{DynamicResource SchedulerTimeText}" FontSize="11"/>
                 <Rectangle Height="1" Fill="{DynamicResource SchedulerLine}" Width="1000" Canvas.Left="60" Canvas.Top="480"/>
-                
+
                 <!-- 9 AM -->
                 <TextBlock Text="9 AM" Canvas.Left="8" Canvas.Top="540" Foreground="{DynamicResource SchedulerTimeText}" FontSize="11"/>
                 <Rectangle Height="1" Fill="{DynamicResource SchedulerLine}" Width="1000" Canvas.Left="60" Canvas.Top="540"/>
-                
+
                 <!-- 10 AM -->
                 <TextBlock Text="10 AM" Canvas.Left="8" Canvas.Top="600" Foreground="{DynamicResource SchedulerTimeText}" FontSize="11"/>
                 <Rectangle Height="1" Fill="{DynamicResource SchedulerLine}" Width="1000" Canvas.Left="60" Canvas.Top="600"/>
-                
+
                 <!-- 11 AM -->
                 <TextBlock Text="11 AM" Canvas.Left="8" Canvas.Top="660" Foreground="{DynamicResource SchedulerTimeText}" FontSize="11"/>
                 <Rectangle Height="1" Fill="{DynamicResource SchedulerLine}" Width="1000" Canvas.Left="60" Canvas.Top="660"/>
-                
+
                 <!-- 12 PM -->
                 <TextBlock Text="12 PM" Canvas.Left="8" Canvas.Top="720" Foreground="{DynamicResource SchedulerTimeText}" FontSize="11"/>
                 <Rectangle Height="1" Fill="{DynamicResource SchedulerLine}" Width="1000" Canvas.Left="60" Canvas.Top="720"/>
-                
+
                 <!-- 1 PM -->
                 <TextBlock Text="1 PM" Canvas.Left="8" Canvas.Top="780" Foreground="{DynamicResource SchedulerTimeText}" FontSize="11"/>
                 <Rectangle Height="1" Fill="{DynamicResource SchedulerLine}" Width="1000" Canvas.Left="60" Canvas.Top="780"/>
-                
+
                 <!-- 2 PM -->
                 <TextBlock Text="2 PM" Canvas.Left="8" Canvas.Top="840" Foreground="{DynamicResource SchedulerTimeText}" FontSize="11"/>
                 <Rectangle Height="1" Fill="{DynamicResource SchedulerLine}" Width="1000" Canvas.Left="60" Canvas.Top="840"/>
-                
+
                 <!-- 3 PM -->
                 <TextBlock Text="3 PM" Canvas.Left="8" Canvas.Top="900" Foreground="{DynamicResource SchedulerTimeText}" FontSize="11"/>
                 <Rectangle Height="1" Fill="{DynamicResource SchedulerLine}" Width="1000" Canvas.Left="60" Canvas.Top="900"/>
-                
+
                 <!-- 4 PM -->
                 <TextBlock Text="4 PM" Canvas.Left="8" Canvas.Top="960" Foreground="{DynamicResource SchedulerTimeText}" FontSize="11"/>
                 <Rectangle Height="1" Fill="{DynamicResource SchedulerLine}" Width="1000" Canvas.Left="60" Canvas.Top="960"/>
-                
+
                 <!-- 5 PM -->
                 <TextBlock Text="5 PM" Canvas.Left="8" Canvas.Top="1020" Foreground="{DynamicResource SchedulerTimeText}" FontSize="11"/>
                 <Rectangle Height="1" Fill="{DynamicResource SchedulerLine}" Width="1000" Canvas.Left="60" Canvas.Top="1020"/>
-                
+
                 <!-- 6 PM -->
                 <TextBlock Text="6 PM" Canvas.Left="8" Canvas.Top="1080" Foreground="{DynamicResource SchedulerTimeText}" FontSize="11"/>
                 <Rectangle Height="1" Fill="{DynamicResource SchedulerLine}" Width="1000" Canvas.Left="60" Canvas.Top="1080"/>
-                
+
                 <!-- 7 PM -->
                 <TextBlock Text="7 PM" Canvas.Left="8" Canvas.Top="1140" Foreground="{DynamicResource SchedulerTimeText}" FontSize="11"/>
                 <Rectangle Height="1" Fill="{DynamicResource SchedulerLine}" Width="1000" Canvas.Left="60" Canvas.Top="1140"/>
-                
+
                 <!-- 8 PM -->
                 <TextBlock Text="8 PM" Canvas.Left="8" Canvas.Top="1200" Foreground="{DynamicResource SchedulerTimeText}" FontSize="11"/>
                 <Rectangle Height="1" Fill="{DynamicResource SchedulerLine}" Width="1000" Canvas.Left="60" Canvas.Top="1200"/>
-                
+
                 <!-- 9 PM -->
                 <TextBlock Text="9 PM" Canvas.Left="8" Canvas.Top="1260" Foreground="{DynamicResource SchedulerTimeText}" FontSize="11"/>
                 <Rectangle Height="1" Fill="{DynamicResource SchedulerLine}" Width="1000" Canvas.Left="60" Canvas.Top="1260"/>
-                
+
                 <!-- 10 PM -->
                 <TextBlock Text="10 PM" Canvas.Left="8" Canvas.Top="1320" Foreground="{DynamicResource SchedulerTimeText}" FontSize="11"/>
                 <Rectangle Height="1" Fill="{DynamicResource SchedulerLine}" Width="1000" Canvas.Left="60" Canvas.Top="1320"/>
-                
+
                 <!-- 11 PM -->
                 <TextBlock Text="11 PM" Canvas.Left="8" Canvas.Top="1380" Foreground="{DynamicResource SchedulerTimeText}" FontSize="11"/>
                 <Rectangle Height="1" Fill="{DynamicResource SchedulerLine}" Width="1000" Canvas.Left="60" Canvas.Top="1380"/>
-                
+
                 <!-- Current time indicator -->
                 <scheduler:CurrentTimeIndicator CurrentTime="{Binding CurrentTime}"
                                                  IndicatorBrush="{DynamicResource AccentPrimary}"
@@ -268,7 +228,7 @@
                         </MultiBinding>
                     </Canvas.Top>
                 </scheduler:CurrentTimeIndicator>
-                
+
                 <!-- Time block selector -->
                 <scheduler:TimeBlockControl TimeBlock="{Binding TimeBlock}"
                                              PixelsPerMinute="{Binding PixelsPerMinute}"
@@ -295,10 +255,10 @@
                         </MultiBinding>
                     </scheduler:TimeBlockControl.Height>
                 </scheduler:TimeBlockControl>
-                
+
             </Canvas>
         </ScrollViewer>
-        
+
     </Grid>
-    
+
 </UserControl>

@@ -66,16 +66,19 @@ public partial class EventEditView : UserControl
         // Handle confirm
         void OnConfirmed(object? s, EventArgs args)
         {
+            // Apply the scheduler selection back to the event
+            viewModel.ApplySchedulerSelection();
+            schedulerWindow.Close();
+        }
+
+        // Handle cancel
+        void OnCancelled(object? s, EventArgs args)
+        {
             schedulerWindow.Close();
         }
 
         viewModel.Scheduler.Confirmed += OnConfirmed;
-
-        // Handle cancel
-        viewModel.Scheduler.Cancelled += (_, _) =>
-        {
-            schedulerWindow.Close();
-        };
+        viewModel.Scheduler.Cancelled += OnCancelled;
 
         // Show dialog
         if (owner != null)
@@ -85,20 +88,13 @@ public partial class EventEditView : UserControl
 
         // Cleanup
         viewModel.Scheduler.Confirmed -= OnConfirmed;
+        viewModel.Scheduler.Cancelled -= OnCancelled;
     }
 
     private async Task ShowSchedulerOverlay(EventEditViewModel viewModel)
     {
-#if DEBUG
-        System.Diagnostics.Debug.WriteLine("ShowSchedulerOverlay: Method called");
-#endif
-
         // Find the root grid in the parent MainView to add our overlay
         var topLevel = TopLevel.GetTopLevel(this);
-
-#if DEBUG
-        System.Diagnostics.Debug.WriteLine($"ShowSchedulerOverlay: TopLevel type = {topLevel?.GetType().Name ?? "null"}");
-#endif
 
         // Navigate to find the MainView's root Grid
         Grid? rootGrid = null;
@@ -107,24 +103,15 @@ public partial class EventEditView : UserControl
         {
             // Browser mode: Get the root Grid via Content property
             rootGrid = mainView.Content as Grid;
-#if DEBUG
-            System.Diagnostics.Debug.WriteLine($"ShowSchedulerOverlay: Browser mode - rootGrid = {(rootGrid != null ? "found" : "null")}");
-#endif
         }
         else if (topLevel is Window window && window.Content is MainView windowMainView)
         {
             // Desktop mode: Window -> MainView -> Grid
             rootGrid = windowMainView.Content as Grid;
-#if DEBUG
-            System.Diagnostics.Debug.WriteLine($"ShowSchedulerOverlay: Desktop mode - rootGrid = {(rootGrid != null ? "found" : "null")}");
-#endif
         }
 
         if (rootGrid == null)
         {
-#if DEBUG
-            System.Diagnostics.Debug.WriteLine("ShowSchedulerOverlay: Failed to find root Grid, returning");
-#endif
             return;
         }
 
@@ -137,10 +124,6 @@ public partial class EventEditView : UserControl
             HorizontalAlignment = HorizontalAlignment.Stretch,
             VerticalAlignment = VerticalAlignment.Stretch
         };
-
-#if DEBUG
-        System.Diagnostics.Debug.WriteLine("ShowSchedulerOverlay: Overlay Border created with Stretch alignment");
-#endif
 
         // Create the scheduler control
         var schedulerControl = new SchedulerControl(viewModel.Scheduler)
@@ -155,10 +138,6 @@ public partial class EventEditView : UserControl
 
         // Add the overlay to the root grid
         rootGrid.Children.Add(overlay);
-
-#if DEBUG
-        System.Diagnostics.Debug.WriteLine("ShowSchedulerOverlay: Overlay added to root Grid successfully");
-#endif
 
         // Task completion source to wait for close
         var tcs = new TaskCompletionSource<bool>();

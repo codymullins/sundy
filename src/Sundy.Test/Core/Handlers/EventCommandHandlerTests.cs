@@ -276,4 +276,86 @@ public class EventCommandHandlerTests
         Assert.True(retrieved.IsBlockingEvent);
         Assert.Equal(sourceEventId, retrieved.SourceEventId);
     }
+
+    [Theory, Auto]
+    public async Task CreateEventCommandHandler_PreservesTimezoneOffset_RoundTrip(IMediator mediator)
+    {
+        // Arrange
+        var calendar = TestDataBuilder.CreateTestCalendar();
+        await mediator.Send(new CreateCalendarCommand(calendar));
+
+        // Create event with explicit non-UTC timezone offset (e.g., PDT -07:00)
+        var pacificOffset = TimeSpan.FromHours(-7);
+        var startTime = new DateTimeOffset(2024, 6, 15, 14, 30, 0, pacificOffset); // 2:30 PM PDT
+        var endTime = new DateTimeOffset(2024, 6, 15, 16, 0, 0, pacificOffset);    // 4:00 PM PDT
+
+        var evt = new CalendarEvent
+        {
+            Id = Guid.NewGuid().ToString(),
+            CalendarId = calendar.Id,
+            Title = "Timezone Test Event",
+            StartTime = startTime,
+            EndTime = endTime
+        };
+
+        // Act
+        await mediator.Send(new CreateEventCommand(evt));
+        var retrieved = await mediator.Send(new GetEventByIdQuery(evt.Id));
+
+        // Assert
+        Assert.NotNull(retrieved);
+
+        // The UTC instant should be preserved (times represent the same moment)
+        Assert.Equal(startTime.UtcDateTime, retrieved.StartTime.UtcDateTime);
+        Assert.Equal(endTime.UtcDateTime, retrieved.EndTime.UtcDateTime);
+
+        // When converted to local time, should display the same wall-clock time
+        // as the original when viewed in the same timezone
+        var retrievedLocalStart = retrieved.StartTime.ToOffset(pacificOffset);
+        var retrievedLocalEnd = retrieved.EndTime.ToOffset(pacificOffset);
+
+        Assert.Equal(14, retrievedLocalStart.Hour); // 2:30 PM
+        Assert.Equal(30, retrievedLocalStart.Minute);
+        Assert.Equal(16, retrievedLocalEnd.Hour);   // 4:00 PM
+        Assert.Equal(0, retrievedLocalEnd.Minute);
+    }
+
+    [Theory, Auto]
+    public async Task CreateEventCommandHandler_NearMidnight_PreservesCorrectDate(IMediator mediator)
+    {
+        // Arrange
+        var calendar = TestDataBuilder.CreateTestCalendar();
+        await mediator.Send(new CreateCalendarCommand(calendar));
+
+        // Event at 11:30 PM in a timezone ahead of UTC (e.g., UTC+10)
+        // This is already the next day in UTC
+        var aestOffset = TimeSpan.FromHours(10);
+        var startTime = new DateTimeOffset(2024, 6, 15, 23, 30, 0, aestOffset); // 11:30 PM AEST on June 15
+        var endTime = new DateTimeOffset(2024, 6, 16, 0, 30, 0, aestOffset);    // 12:30 AM AEST on June 16
+
+        var evt = new CalendarEvent
+        {
+            Id = Guid.NewGuid().ToString(),
+            CalendarId = calendar.Id,
+            Title = "Midnight Crossing Event",
+            StartTime = startTime,
+            EndTime = endTime
+        };
+
+        // Act
+        await mediator.Send(new CreateEventCommand(evt));
+        var retrieved = await mediator.Send(new GetEventByIdQuery(evt.Id));
+
+        // Assert
+        Assert.NotNull(retrieved);
+
+        // Convert back to original timezone and verify date/time
+        var retrievedLocalStart = retrieved.StartTime.ToOffset(aestOffset);
+        var retrievedLocalEnd = retrieved.EndTime.ToOffset(aestOffset);
+
+        Assert.Equal(15, retrievedLocalStart.Day);  // June 15
+        Assert.Equal(23, retrievedLocalStart.Hour); // 11:30 PM
+        Assert.Equal(16, retrievedLocalEnd.Day);    // June 16
+        Assert.Equal(0, retrievedLocalEnd.Hour);    // 12:30 AM
+    }
 }

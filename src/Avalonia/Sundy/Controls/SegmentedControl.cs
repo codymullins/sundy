@@ -32,7 +32,7 @@ public class SegmentedControl : TemplatedControl
     private TranslateTransform? _indicatorTransform;
     private StackPanel? _segmentContainer;
     private Border? _indicator;
-    private readonly List<RadioButton> _radioButtons = new();
+    private readonly List<RadioButton> _radioButtons = [];
 
     public SegmentedControl()
     {

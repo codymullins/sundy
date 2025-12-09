@@ -1,0 +1,78 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="using:Sundy.Controls"
+             x:Class="Sundy.Controls.TimeSelectionPreview"
+             x:DataType="controls:TimeSelectionPreview">
+
+    <Button Command="{Binding Command, RelativeSource={RelativeSource AncestorType=controls:TimeSelectionPreview}}"
+            Background="{DynamicResource BackgroundTertiary}"
+            BorderBrush="{DynamicResource BorderBrushHover}"
+            BorderThickness="1"
+            CornerRadius="8"
+            Padding="16"
+            MinHeight="60"
+            Cursor="Hand"
+            HorizontalAlignment="Stretch"
+            HorizontalContentAlignment="Stretch"
+            IsEnabled="{Binding IsEnabled, RelativeSource={RelativeSource AncestorType=controls:TimeSelectionPreview}}">
+        <Button.Styles>
+            <Style Selector="Button">
+                <Setter Property="Transitions">
+                    <Transitions>
+                        <BrushTransition Property="Background" Duration="0:0:0.15"/>
+                        <BrushTransition Property="BorderBrush" Duration="0:0:0.15"/>
+                    </Transitions>
+                </Setter>
+            </Style>
+            <Style Selector="Button:pointerover">
+                <Setter Property="Background" Value="{DynamicResource BackgroundSecondary}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource BorderBrushFocus}" />
+            </Style>
+        </Button.Styles>
+        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="16">
+            <!-- Calendar Icon -->
+            <Border Grid.Column="0"
+                    Width="48"
+                    Height="48"
+                    Background="{DynamicResource AccentPrimary}"
+                    CornerRadius="8"
+                    VerticalAlignment="Center">
+                <Viewbox Width="24" Height="24">
+                    <Path Data="M8 2v2m8-2v2M3 8h18M5 4h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2z"
+                          Stroke="White"
+                          StrokeThickness="2"
+                          Fill="Transparent" />
+                </Viewbox>
+            </Border>
+
+            <!-- Time Details -->
+            <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="4">
+                <TextBlock Text="{Binding SelectedDate, RelativeSource={RelativeSource AncestorType=controls:TimeSelectionPreview}, StringFormat='{}{0:dddd, MMMM d, yyyy}'}"
+                           FontSize="16"
+                           FontWeight="SemiBold"
+                           Foreground="{DynamicResource ForegroundPrimary}" />
+                <TextBlock Text="{Binding TimeRangeText, RelativeSource={RelativeSource AncestorType=controls:TimeSelectionPreview}}"
+                           FontSize="14"
+                           Foreground="{DynamicResource ForegroundMuted}" />
+                <TextBlock Text="{Binding DurationText, RelativeSource={RelativeSource AncestorType=controls:TimeSelectionPreview}, StringFormat='Duration: {0}'}"
+                           FontSize="12"
+                           Foreground="{DynamicResource ForegroundDisabled}" />
+            </StackPanel>
+
+            <!-- Edit Icon -->
+            <Border Grid.Column="2"
+                    Width="32"
+                    Height="32"
+                    Background="{DynamicResource BackgroundPressed}"
+                    CornerRadius="8"
+                    VerticalAlignment="Center">
+                <Viewbox Width="16" Height="16">
+                    <Path Data="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"
+                          Stroke="{DynamicResource ForegroundMuted}"
+                          StrokeThickness="2"
+                          Fill="Transparent" />
+                </Viewbox>
+            </Border>
+        </Grid>
+    </Button>
+</UserControl>
