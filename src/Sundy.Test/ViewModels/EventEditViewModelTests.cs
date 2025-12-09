@@ -101,7 +101,7 @@ public class EventEditViewModelTests
         Assert.Equal("Existing Event", viewModel.Title);
         Assert.Equal("Conference Room", viewModel.Location);
         Assert.Equal("Important meeting", viewModel.Description);
-        Assert.Equal(new DateTime(2024, 6, 10), viewModel.StartDate.DateTime.Date);
+        Assert.Equal(new DateTime(2024, 6, 10), viewModel.StartDate.Date);
         Assert.Equal(TimeSpan.FromHours(14).Add(TimeSpan.FromMinutes(30)), viewModel.StartTime);
         Assert.Equal(TimeSpan.FromHours(16), viewModel.EndTime);
     }
@@ -136,7 +136,7 @@ public class EventEditViewModelTests
         // Arrange
         var mediatorMock = new Mock<IMediator>();
         var viewModel = new EventEditViewModel(mediatorMock.Object);
-        viewModel.StartDate = new DateTimeOffset(new DateTime(2024, 6, 10));
+        viewModel.StartDate = new DateTime(2024, 6, 10);
         viewModel.StartTime = TimeSpan.FromHours(10);
         viewModel.EndTime = TimeSpan.FromHours(11);
 
@@ -155,14 +155,14 @@ public class EventEditViewModelTests
         var mediatorMock = new Mock<IMediator>();
         var viewModel = new EventEditViewModel(mediatorMock.Object);
         var startDate = new DateTime(2024, 6, 10);
-        viewModel.StartDate = new DateTimeOffset(startDate);
-        viewModel.EndDate = new DateTimeOffset(startDate);
+        viewModel.StartDate = startDate;
+        viewModel.EndDate = startDate;
 
         // Act
         viewModel.IsAllDay = true;
 
         // Assert - Tests line 265
-        Assert.Equal(startDate.AddDays(1).Date, viewModel.EndDate.DateTime.Date);
+        Assert.Equal(startDate.AddDays(1).Date, viewModel.EndDate.Date);
     }
 
     [Fact]
@@ -171,8 +171,8 @@ public class EventEditViewModelTests
         // Arrange
         var mediatorMock = new Mock<IMediator>();
         var viewModel = new EventEditViewModel(mediatorMock.Object);
-        viewModel.StartDate = new DateTimeOffset(new DateTime(2024, 6, 10));
-        viewModel.EndDate = new DateTimeOffset(new DateTime(2024, 6, 11));
+        viewModel.StartDate = new DateTime(2024, 6, 10);
+        viewModel.EndDate = new DateTime(2024, 6, 11);
         viewModel.StartTime = TimeSpan.Zero;
         viewModel.EndTime = TimeSpan.Zero;
 
@@ -211,14 +211,14 @@ public class EventEditViewModelTests
         // Arrange
         var mediatorMock = new Mock<IMediator>();
         var viewModel = new EventEditViewModel(mediatorMock.Object);
-        viewModel.StartDate = new DateTimeOffset(new DateTime(2024, 6, 10));
-        viewModel.EndDate = new DateTimeOffset(new DateTime(2024, 6, 8));
+        viewModel.StartDate = new DateTime(2024, 6, 10);
+        viewModel.EndDate = new DateTime(2024, 6, 8);
 
         // Act - Tests line 289-293
-        viewModel.StartDate = new DateTimeOffset(new DateTime(2024, 6, 15));
+        viewModel.StartDate = new DateTime(2024, 6, 15);
 
         // Assert
-        Assert.Equal(new DateTime(2024, 6, 15).Date, viewModel.EndDate.DateTime.Date);
+        Assert.Equal(new DateTime(2024, 6, 15).Date, viewModel.EndDate.Date);
     }
 
     [Fact]
@@ -228,8 +228,8 @@ public class EventEditViewModelTests
         var mediatorMock = new Mock<IMediator>();
         var viewModel = new EventEditViewModel(mediatorMock.Object);
         var date = new DateTime(2024, 6, 10);
-        viewModel.StartDate = new DateTimeOffset(date);
-        viewModel.EndDate = new DateTimeOffset(date);
+        viewModel.StartDate = date;
+        viewModel.EndDate = date;
         viewModel.StartTime = TimeSpan.FromHours(10);
         viewModel.EndTime = TimeSpan.FromHours(11);
 
@@ -247,8 +247,8 @@ public class EventEditViewModelTests
         var mediatorMock = new Mock<IMediator>();
         var viewModel = new EventEditViewModel(mediatorMock.Object);
         var date = new DateTime(2024, 6, 10);
-        viewModel.StartDate = new DateTimeOffset(date);
-        viewModel.EndDate = new DateTimeOffset(date);
+        viewModel.StartDate = date;
+        viewModel.EndDate = date;
         viewModel.StartTime = TimeSpan.FromHours(9);
         viewModel.EndTime = TimeSpan.FromHours(10);
 
@@ -266,8 +266,8 @@ public class EventEditViewModelTests
         var mediatorMock = new Mock<IMediator>();
         var viewModel = new EventEditViewModel(mediatorMock.Object);
         var date = new DateTime(2024, 6, 10);
-        viewModel.StartDate = new DateTimeOffset(date);
-        viewModel.EndDate = new DateTimeOffset(date);
+        viewModel.StartDate = date;
+        viewModel.EndDate = date;
         viewModel.StartTime = TimeSpan.FromHours(22);
         viewModel.EndTime = TimeSpan.FromHours(23);
 

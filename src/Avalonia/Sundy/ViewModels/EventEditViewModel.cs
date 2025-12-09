@@ -27,11 +27,11 @@ public partial class EventEditViewModel(
 
     [ObservableProperty] private Calendar? _selectedCalendar;
 
-    [ObservableProperty] private DateTimeOffset _startDate = DateTimeOffset.Now.Date;
+    [ObservableProperty] private DateTime _startDate = DateTime.Today;
 
     [ObservableProperty] private TimeSpan _startTime = TimeSpan.FromHours(9);
 
-    [ObservableProperty] private DateTimeOffset _endDate = DateTimeOffset.Now.Date;
+    [ObservableProperty] private DateTime _endDate = DateTime.Today;
 
     [ObservableProperty] private TimeSpan _endTime = TimeSpan.FromHours(10);
 
@@ -70,9 +70,9 @@ public partial class EventEditViewModel(
             Description = existingEvent.Description ?? string.Empty;
             IsBlockingEvent = existingEvent.IsBlockingEvent;
 
-            StartDate = existingEvent.StartTime;
+            StartDate = existingEvent.StartTime.DateTime;
             StartTime = existingEvent.StartTime.TimeOfDay;
-            EndDate = existingEvent.EndTime;
+            EndDate = existingEvent.EndTime.DateTime;
             EndTime = existingEvent.EndTime.TimeOfDay;
 
             // Set selected calendar
@@ -103,9 +103,9 @@ public partial class EventEditViewModel(
                 var startDateTime = defaultDate.Value.ToDateTime(TimeOnly.FromTimeSpan(TimeSpan.FromHours(9)));
                 var endDateTime = defaultDate.Value.ToDateTime(TimeOnly.FromTimeSpan(TimeSpan.FromHours(10)));
 
-                StartDate = new DateTimeOffset(startDateTime);
+                StartDate = startDateTime;
                 StartTime = startDateTime.TimeOfDay;
-                EndDate = new DateTimeOffset(endDateTime);
+                EndDate = endDateTime;
                 EndTime = endDateTime.TimeOfDay;
             }
             else
@@ -113,9 +113,9 @@ public partial class EventEditViewModel(
                 // Default to 1 hour duration starting next hour
                 var now = DateTime.Now;
                 var nextHour = now.Date.AddHours(now.Hour + 1);
-                StartDate = new DateTimeOffset(nextHour);
+                StartDate = nextHour;
                 StartTime = nextHour.TimeOfDay;
-                EndDate = new DateTimeOffset(nextHour.AddHours(1));
+                EndDate = nextHour.AddHours(1);
                 EndTime = nextHour.AddHours(1).TimeOfDay;
             }
         }
@@ -210,7 +210,7 @@ public partial class EventEditViewModel(
     private async Task OpenScheduler()
     {
         // Initialize scheduler with current event date/time
-        Scheduler.SelectedDate = DateOnly.FromDateTime(StartDate.DateTime);
+        Scheduler.SelectedDate = DateOnly.FromDateTime(StartDate);
         Scheduler.TimeBlock.StartTime = TimeSpanToTimeOnly(StartTime);
         Scheduler.TimeBlock.EndTime = TimeSpanToTimeOnly(EndTime);
 
@@ -224,7 +224,7 @@ public partial class EventEditViewModel(
     {
         // Apply the scheduler selection back to the event
         var selectedDateTime = Scheduler.SelectedDate.ToDateTime(TimeOnly.MinValue);
-        StartDate = new DateTimeOffset(selectedDateTime, StartDate.Offset);
+        StartDate = selectedDateTime;
         StartTime = Scheduler.TimeBlock.StartTime.ToTimeSpan();
         
         // Check if the time block spans midnight
@@ -243,7 +243,7 @@ public partial class EventEditViewModel(
 
     public Func<EventEditViewModel, Task>? OnSchedulerOpenRequested { get; set; }
 
-    private static DateTime CombineDateAndTime(DateTimeOffset date, TimeSpan time)
+    private static DateTime CombineDateAndTime(DateTime date, TimeSpan time)
     {
         return new DateTime(
             date.Year,
@@ -284,7 +284,7 @@ public partial class EventEditViewModel(
         }
     }
 
-    partial void OnStartDateChanged(DateTimeOffset value)
+    partial void OnStartDateChanged(DateTime value)
     {
         // If end date is before start date, adjust it
         if (EndDate < value)
@@ -293,7 +293,7 @@ public partial class EventEditViewModel(
         }
 
         // Update scheduler display
-        Scheduler.SelectedDate = DateOnly.FromDateTime(value.DateTime);
+        Scheduler.SelectedDate = DateOnly.FromDateTime(value);
     }
 
     partial void OnStartTimeChanged(TimeSpan value)
