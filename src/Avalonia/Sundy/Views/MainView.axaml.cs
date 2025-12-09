@@ -1,5 +1,6 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using Sundy.ViewModels;
 
@@ -58,5 +59,15 @@ public partial class MainView : UserControl
     {
         // Prevent tap from propagating to backdrop
         e.Handled = true;
+    }
+
+    private void OnDragRegionPointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        // Only handle left button presses for window dragging
+        if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+        {
+            var window = TopLevel.GetTopLevel(this) as Window;
+            window?.BeginMoveDrag(e);
+        }
     }
 }

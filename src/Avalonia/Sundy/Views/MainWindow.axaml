@@ -7,6 +7,10 @@
         x:Class="Sundy.Views.MainWindow"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         Icon="/Assets/logo.png"
-        Title="Sundy Calendar">
+        Title="Sundy Calendar"
+        SystemDecorations="Full"
+        ExtendClientAreaChromeHints="PreferSystemChrome,OSXThickTitleBar"
+        ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaTitleBarHeightHint="-1">
     <views1:MainView />
 </Window>

@@ -62,7 +62,10 @@ public partial class MainViewModel : ViewModelBase
 
     public bool IsSidebarVisible => !IsMobileLayout || IsSidebarOpen;
 
-    public double SidebarTranslateX => IsMobileLayout && !IsSidebarOpen ? -280 : 0;
+    public double SidebarTranslateX => !IsSidebarOpen ? -280 : 0;
+
+    // Desktop embedded sidebar - only visible when not mobile AND toggled on
+    public bool IsDesktopSidebarVisible => !IsMobileLayout && IsSidebarPanelVisible;
 
     public int ViewModeIndex
     {
@@ -130,9 +133,7 @@ public partial class MainViewModel : ViewModelBase
     {
         OnPropertyChanged(nameof(IsSidebarVisible));
         OnPropertyChanged(nameof(SidebarTranslateX));
-
-        // Auto-close on mobile, auto-open on desktop
-        IsSidebarOpen = !value;
+        OnPropertyChanged(nameof(IsDesktopSidebarVisible));
     }
 
     partial void OnIsSidebarOpenChanged(bool value)
@@ -143,7 +144,15 @@ public partial class MainViewModel : ViewModelBase
 
     partial void OnCurrentWindowWidthChanged(double value)
     {
-        IsMobileLayout = value < 768;
+        var willBeMobile = value < 768;
+
+        // Close mobile sidebar BEFORE layout change to prevent animation flash
+        if (willBeMobile && !IsMobileLayout)
+        {
+            IsSidebarOpen = false;
+        }
+
+        IsMobileLayout = willBeMobile;
     }
 
     public async Task InitializeAsync()
@@ -331,6 +340,21 @@ public partial class MainViewModel : ViewModelBase
     private void CloseSidebar()
     {
         IsSidebarOpen = false;
+    }
+
+    // Embedded sidebar panel management (desktop)
+    [ObservableProperty]
+    private bool _isSidebarPanelVisible;
+
+    partial void OnIsSidebarPanelVisibleChanged(bool value)
+    {
+        OnPropertyChanged(nameof(IsDesktopSidebarVisible));
+    }
+
+    [RelayCommand]
+    private void ToggleSidebarPanel()
+    {
+        IsSidebarPanelVisible = !IsSidebarPanelVisible;
     }
 }
 
