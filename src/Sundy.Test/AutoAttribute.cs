@@ -26,9 +26,9 @@ public class AutoAttribute : AutoDataAttribute
             // Add Mediator
             services.AddMediator(options => { options.ServiceLifetime = ServiceLifetime.Scoped; });
 
-            // Use in-memory database for tests
-            // Keep the connection open for the lifetime of the test to maintain the in-memory database
-            var connection = new Microsoft.Data.Sqlite.SqliteConnection("Data Source=:memory:");
+            // Use file-based SQLite database for tests with a new guid each time
+            var dbPath = Path.Combine(Path.GetTempPath(), $"sundy_test_{Guid.NewGuid()}.db");
+            var connection = new Microsoft.Data.Sqlite.SqliteConnection($"Data Source={dbPath}");
             connection.Open();
             
             services.AddDbContext<SundyDbContext>(options =>
