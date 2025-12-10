@@ -241,3 +241,26 @@ public class ContainerWidthToEventWidthConverter : IValueConverter
     }
 }
 
+/// <summary>
+/// Converts sidebar visibility to navigation margin - when sidebar is visible, less left margin is needed
+/// </summary>
+public class SidebarMarginConverter : IValueConverter
+{
+    public static readonly SidebarMarginConverter Instance = new();
+
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        var isSidebarVisible = value is true;
+        // When sidebar is visible, no extra left margin needed (sidebar covers traffic lights)
+        // When sidebar is hidden, need 80px left margin to clear macOS traffic lights
+        return isSidebarVisible
+            ? new Avalonia.Thickness(10, 10, 16, 6)
+            : new Avalonia.Thickness(80, 10, 16, 6);
+    }
+
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        throw new NotSupportedException();
+    }
+}
+

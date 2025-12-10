@@ -3,9 +3,14 @@
              xmlns:vm="using:Sundy.ViewModels"
              xmlns:views="using:Sundy.Views"
              xmlns:controls="using:Sundy.Controls"
+             xmlns:scheduler="using:Sundy.Controls.Scheduler"
              xmlns:avalonia="clr-namespace:FluentIcons.Avalonia;assembly=FluentIcons.Avalonia"
              x:Class="Sundy.Views.MainView"
              x:DataType="vm:MainViewModel">
+
+    <UserControl.Resources>
+        <scheduler:SidebarMarginConverter x:Key="SidebarMarginConverter" />
+    </UserControl.Resources>
 
     <!-- Root Grid with Dialog Overlay -->
     <Grid Background="{DynamicResource BackgroundPrimaryColor}">
@@ -118,8 +123,8 @@
                             VerticalAlignment="Stretch"
                             PointerPressed="OnDragRegionPointerPressed" />
                     <!-- Navigation Controls (left margin clears macOS traffic lights when sidebar collapsed) -->
-                    <Grid ColumnDefinitions="Auto,*,Auto"
-                          Margin="80,10,16,6">
+                    <Grid x:Name="NavigationControls" ColumnDefinitions="Auto,*,Auto"
+                          Margin="{Binding IsDesktopSidebarVisible, Converter={StaticResource SidebarMarginConverter}}">
                         <!-- Sidebar toggle button (visible on both mobile and desktop) -->
                         <Button Grid.Column="0"
                                 Command="{Binding ToggleSidebarPanelCommand}"
