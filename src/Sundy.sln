@@ -29,7 +29,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sundy.Avalonia.Test", "Aval
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "github", "github", "{DC377E51-DC59-4F2B-B154-0B1441CEAFA6}"
 	ProjectSection(SolutionItems) = preProject
-		..\.github\workflows\macos-release.yml = ..\.github\workflows\macos-release.yml
+		..\.github\workflows\dev-release.yml = ..\.github\workflows\dev-release.yml
 	EndProjectSection
 EndProject
 Global
