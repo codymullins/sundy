@@ -8,7 +8,7 @@ on:
 env:
   DOTNET_VERSION: '10.0.x'
   APP_NAME: 'Sundy'
-  PROJECT_PATH: 'Avalonia/Sundy.Desktop/Sundy.Desktop.csproj'
+  PROJECT_PATH: 'src/Avalonia/Sundy.Desktop/Sundy.Desktop.csproj'
 
 jobs:
   build-macos:
@@ -29,7 +29,7 @@ jobs:
           dotnet-quality: 'preview'
 
       - name: Restore dependencies
-        run: dotnet restore Sundy.sln
+        run: dotnet restore src/Sundy.sln
 
       - name: Build and Publish
         run: |
@@ -63,7 +63,7 @@ jobs:
           done
 
           echo "Copying icon..."
-          ICON_SOURCE="Avalonia/Sundy/Assets/AppIcon.icns"
+          ICON_SOURCE="src/Avalonia/Sundy/Assets/AppIcon.icns"
           if [ -f "$ICON_SOURCE" ]; then
             cp "$ICON_SOURCE" "$RESOURCES_DIR/"
           else
