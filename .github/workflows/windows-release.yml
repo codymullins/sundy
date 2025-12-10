@@ -1,0 +1,96 @@
+name: Windows Release
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+env:
+  DOTNET_VERSION: '10.0.x'
+  APP_NAME: 'Sundy'
+  PROJECT_PATH: 'src/Avalonia/Sundy.Desktop/Sundy.Desktop.csproj'
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    strategy:
+      matrix:
+        runtime: [win-x64, win-arm64]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+          dotnet-quality: 'preview'
+
+      - name: Restore dependencies
+        run: dotnet restore ${{ env.PROJECT_PATH }}
+
+      - name: Build and Publish
+        run: |
+          dotnet publish ${{ env.PROJECT_PATH }} `
+            -c Release `
+            -r ${{ matrix.runtime }} `
+            --self-contained true `
+            -p:PublishSingleFile=true `
+            -p:PublishTrimmed=true `
+            -p:PublishReadyToRun=true `
+            -o ./publish/${{ matrix.runtime }}
+
+      - name: Create ZIP archive
+        run: |
+          Compress-Archive -Path "./publish/${{ matrix.runtime }}/*" -DestinationPath "./${{ env.APP_NAME }}-${{ matrix.runtime }}.zip"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.APP_NAME }}-${{ matrix.runtime }}
+          path: ${{ env.APP_NAME }}-${{ matrix.runtime }}.zip
+
+  create-release:
+    needs: build-windows
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Generate release tag
+        id: tag
+        run: echo "tag=dev-$(date +'%Y%m%d-%H%M%S')" >> $GITHUB_OUTPUT
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.tag.outputs.tag }}
+          name: Dev Build ${{ steps.tag.outputs.tag }}
+          body: |
+            ## Development Build
+
+            This is an automated development build from the latest commit on the main branch.
+
+            **Commit:** ${{ github.sha }}
+            **Built:** ${{ github.event.head_commit.timestamp }}
+
+            ### Downloads
+            - `Sundy-win-x64.zip` - Windows x64
+            - `Sundy-win-arm64.zip` - Windows ARM64
+
+            ### Installation
+            1. Download the appropriate ZIP file
+            2. Extract the ZIP file
+            3. Run `Sundy.Desktop.exe`
+
+            > ⚠️ This is a development build and may be unstable.
+          prerelease: true
+          files: |
+            artifacts/**/*.zip
