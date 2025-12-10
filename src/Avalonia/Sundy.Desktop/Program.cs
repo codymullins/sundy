@@ -16,7 +16,7 @@ sealed class Program
     {
         // Configure Serilog before starting the app
         var appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-        var sundyDataPath = Path.Combine(appDataPath, "Sundy");
+        var sundyDataPath = Path.Combine(appDataPath, "sundy");
         var logsPath = Path.Combine(sundyDataPath, "logs");
         Directory.CreateDirectory(logsPath);
         var logPath = Path.Combine(logsPath, "sundy-.log");

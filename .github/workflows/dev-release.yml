@@ -174,15 +174,19 @@ jobs:
         run: |
           APP_BUNDLE="./publish/${{ matrix.runtime }}/${{ env.APP_NAME }}.app"
 
-          # Sign all nested components first (dylibs, frameworks, etc.)
-          find "$APP_BUNDLE" -type f \( -name "*.dylib" -o -perm +111 \) -exec \
-            codesign --force --options runtime --sign "Developer ID Application" {} \;
+          # Sign ALL files in MacOS directory (binaries, dylibs, pdb, etc.)
+          find "$APP_BUNDLE/Contents/MacOS" -type f -exec \
+            codesign --force --options runtime --timestamp --sign "Developer ID Application" {} \;
+
+          # Sign any dylibs in other locations (Resources, Frameworks, etc.)
+          find "$APP_BUNDLE" -type f -name "*.dylib" -exec \
+            codesign --force --options runtime --timestamp --sign "Developer ID Application" {} \;
 
           # Sign the main app bundle
-          codesign --force --options runtime --deep --sign "Developer ID Application" "$APP_BUNDLE"
+          codesign --force --options runtime --timestamp --sign "Developer ID Application" "$APP_BUNDLE"
 
-          # Verify signature
-          codesign --verify --verbose "$APP_BUNDLE"
+          # Verify with strict checking
+          codesign --verify --deep --strict "$APP_BUNDLE"
 
       - name: Notarize app
         env:
