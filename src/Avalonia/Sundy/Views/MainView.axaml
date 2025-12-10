@@ -10,107 +10,117 @@
 
     <UserControl.Resources>
         <scheduler:SidebarMarginConverter x:Key="SidebarMarginConverter" />
+        <scheduler:SidebarWidthConverter x:Key="SidebarWidthConverter" />
     </UserControl.Resources>
 
     <!-- Root Grid with Dialog Overlay -->
     <Grid Background="{DynamicResource BackgroundPrimaryColor}">
         <!-- Main content with optional sidebar -->
         <Grid ColumnDefinitions="Auto,*">
-            <!-- Desktop Sidebar Panel (embedded) -->
             <Border Grid.Column="0"
-                    Width="260"
-                    Margin="6,6,0,6"
-                    Background="{DynamicResource BackgroundTertiary}"
-                    CornerRadius="12"
+                    Width="{Binding IsSidebarPanelVisible, Converter={StaticResource SidebarWidthConverter}}"
                     ClipToBounds="True"
-                    IsVisible="{Binding IsDesktopSidebarVisible}">
-                <Grid RowDefinitions="38,*,Auto">
-                    <!-- Title Bar Area -->
-                    <Border Grid.Row="0"
-                            Background="Transparent">
-                        <TextBlock Text="My Calendars"
-                                   FontWeight="SemiBold"
-                                   FontSize="13"
-                                   Foreground="{DynamicResource ForegroundPrimary}"
-                                   HorizontalAlignment="Center"
-                                   VerticalAlignment="Center" />
-                    </Border>
+                    IsVisible="{Binding !IsMobileLayout}">
+                <Border.Transitions>
+                    <Transitions>
+                        <DoubleTransition Property="Width" Duration="0:0:0.2" Easing="CubicEaseOut" />
+                    </Transitions>
+                </Border.Transitions>
+                <Border Width="260"
+                        Margin="6,6,0,6"
+                        Background="{DynamicResource BackgroundTertiary}"
+                        CornerRadius="12"
+                        ClipToBounds="True">
+                    <Grid RowDefinitions="38,*,Auto">
+                        <!-- Title Bar Area -->
+                        <Border Grid.Row="0"
+                                Background="Transparent">
+                            <TextBlock Text="My Calendars"
+                                       FontWeight="SemiBold"
+                                       FontSize="13"
+                                       Foreground="{DynamicResource ForegroundPrimary}"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center" />
+                        </Border>
 
-                    <!-- Calendar List -->
-                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-                        <StackPanel Spacing="4" Margin="12,0,12,12">
-                            <ItemsControl ItemsSource="{Binding Calendars}">
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <Border Background="Transparent"
-                                                CornerRadius="8"
-                                                Padding="8,10"
-                                                Margin="0,1">
-                                            <Border.Styles>
-                                                <Style Selector="Border:pointerover">
-                                                    <Setter Property="Background" Value="{DynamicResource BackgroundHover}" />
-                                                </Style>
-                                            </Border.Styles>
-                                            <CheckBox IsChecked="{Binding IsVisible}">
-                                                <StackPanel Orientation="Horizontal" Spacing="10">
-                                                    <Ellipse Width="10"
-                                                             Height="10"
-                                                             Fill="{Binding Color}" />
-                                                    <TextBlock Text="{Binding Name}"
-                                                               FontSize="13"
-                                                               Foreground="{DynamicResource ForegroundPrimary}" />
-                                                </StackPanel>
-                                            </CheckBox>
-                                        </Border>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
+                        <!-- Calendar List -->
+                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                            <StackPanel Spacing="4" Margin="12,0,12,12">
+                                <ItemsControl ItemsSource="{Binding Calendars}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Background="Transparent"
+                                                    CornerRadius="8"
+                                                    Padding="8,10"
+                                                    Margin="0,1">
+                                                <Border.Styles>
+                                                    <Style Selector="Border:pointerover">
+                                                        <Setter Property="Background"
+                                                                Value="{DynamicResource BackgroundHover}" />
+                                                    </Style>
+                                                </Border.Styles>
+                                                <CheckBox IsChecked="{Binding IsVisible}">
+                                                    <StackPanel Orientation="Horizontal" Spacing="10">
+                                                        <Ellipse Width="10"
+                                                                 Height="10"
+                                                                 Fill="{Binding Color}" />
+                                                        <TextBlock Text="{Binding Name}"
+                                                                   FontSize="13"
+                                                                   Foreground="{DynamicResource ForegroundPrimary}" />
+                                                    </StackPanel>
+                                                </CheckBox>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
 
-                            <Button Command="{Binding CreateNewCalendarCommand}"
-                                    IsVisible="{Binding HasNoCalendars}"
-                                    Classes="link"
-                                    HorizontalAlignment="Left"
-                                    Margin="4,10,0,0">
-                                <StackPanel Orientation="Horizontal" Spacing="7">
-                                    <avalonia:SymbolIcon Symbol="AddCircle"
-                                                         Width="12"
-                                                         Height="12"
-                                                         VerticalAlignment="Center" />
-                                    <TextBlock Text="New Local Calendar" />
+                                <Button Command="{Binding CreateNewCalendarCommand}"
+                                        IsVisible="{Binding HasNoCalendars}"
+                                        Classes="link"
+                                        HorizontalAlignment="Left"
+                                        Margin="4,10,0,0">
+                                    <StackPanel Orientation="Horizontal" Spacing="7">
+                                        <avalonia:SymbolIcon Symbol="AddCircle"
+                                                             Width="12"
+                                                             Height="12"
+                                                             VerticalAlignment="Center" />
+                                        <TextBlock Text="New Local Calendar" />
+                                    </StackPanel>
+                                </Button>
+                            </StackPanel>
+                        </ScrollViewer>
+
+                        <!-- Settings Button -->
+                        <Border Grid.Row="2"
+                                BorderBrush="{DynamicResource BorderBrush}"
+                                BorderThickness="0,1,0,0"
+                                Padding="12,8">
+                            <Button Command="{Binding OpenSettingsCommand}"
+                                    Background="Transparent"
+                                    BorderThickness="0"
+                                    Padding="8,10"
+                                    CornerRadius="8"
+                                    HorizontalAlignment="Stretch"
+                                    HorizontalContentAlignment="Left">
+                                <Button.Styles>
+                                    <Style Selector="Button:pointerover">
+                                        <Setter Property="Background" Value="{DynamicResource BackgroundHover}" />
+                                    </Style>
+                                </Button.Styles>
+                                <StackPanel Orientation="Horizontal" Spacing="10">
+                                    <PathIcon
+                                        Data="M12.012 2.25c.734.008 1.465.093 2.182.253a.75.75 0 0 1 .582.649l.17 1.527a1.384 1.384 0 0 0 1.927 1.116l1.401-.615a.75.75 0 0 1 .85.174 9.792 9.792 0 0 1 2.204 3.792.75.75 0 0 1-.271.825l-1.242.916a1.381 1.381 0 0 0 0 2.226l1.243.915a.75.75 0 0 1 .272.826 9.797 9.797 0 0 1-2.204 3.792.75.75 0 0 1-.848.175l-1.407-.617a1.38 1.38 0 0 0-1.926 1.114l-.169 1.526a.75.75 0 0 1-.572.647 9.518 9.518 0 0 1-4.406 0 .75.75 0 0 1-.572-.647l-.168-1.524a1.382 1.382 0 0 0-1.926-1.11l-1.406.616a.75.75 0 0 1-.849-.175 9.798 9.798 0 0 1-2.204-3.796.75.75 0 0 1 .272-.826l1.243-.916a1.38 1.38 0 0 0 0-2.226l-1.243-.914a.75.75 0 0 1-.271-.826 9.793 9.793 0 0 1 2.204-3.792.75.75 0 0 1 .85-.174l1.4.615a1.387 1.387 0 0 0 1.93-1.118l.17-1.526a.75.75 0 0 1 .583-.65c.717-.159 1.45-.243 2.201-.252Zm0 1.5a9.135 9.135 0 0 0-1.354.117l-.109.977A2.886 2.886 0 0 1 6.525 7.17l-.898-.394a8.293 8.293 0 0 0-1.348 2.317l.798.587a2.881 2.881 0 0 1 0 4.643l-.799.588c.32.842.776 1.626 1.348 2.322l.905-.397a2.882 2.882 0 0 1 4.017 2.318l.11.984c.889.15 1.798.15 2.687 0l.11-.984a2.881 2.881 0 0 1 4.018-2.322l.905.396a8.296 8.296 0 0 0 1.347-2.318l-.798-.588a2.881 2.881 0 0 1 0-4.643l.796-.587a8.293 8.293 0 0 0-1.348-2.317l-.896.393a2.884 2.884 0 0 1-4.023-2.324l-.11-.976a8.988 8.988 0 0 0-1.333-.117ZM12 8.25a3.75 3.75 0 1 1 0 7.5 3.75 3.75 0 0 1 0-7.5Zm0 1.5a2.25 2.25 0 1 0 0 4.5 2.25 2.25 0 0 0 0-4.5Z"
+                                        Foreground="{DynamicResource ForegroundMuted}"
+                                        Width="16"
+                                        Height="16" />
+                                    <TextBlock Text="Settings"
+                                               FontSize="13"
+                                               Foreground="{DynamicResource ForegroundMuted}" />
                                 </StackPanel>
                             </Button>
-                        </StackPanel>
-                    </ScrollViewer>
-
-                    <!-- Settings Button -->
-                    <Border Grid.Row="2"
-                            BorderBrush="{DynamicResource BorderBrush}"
-                            BorderThickness="0,1,0,0"
-                            Padding="12,8">
-                        <Button Command="{Binding OpenSettingsCommand}"
-                                Background="Transparent"
-                                BorderThickness="0"
-                                Padding="8,10"
-                                CornerRadius="8"
-                                HorizontalAlignment="Stretch"
-                                HorizontalContentAlignment="Left">
-                            <Button.Styles>
-                                <Style Selector="Button:pointerover">
-                                    <Setter Property="Background" Value="{DynamicResource BackgroundHover}" />
-                                </Style>
-                            </Button.Styles>
-                            <StackPanel Orientation="Horizontal" Spacing="10">
-                                <PathIcon Data="M12.012 2.25c.734.008 1.465.093 2.182.253a.75.75 0 0 1 .582.649l.17 1.527a1.384 1.384 0 0 0 1.927 1.116l1.401-.615a.75.75 0 0 1 .85.174 9.792 9.792 0 0 1 2.204 3.792.75.75 0 0 1-.271.825l-1.242.916a1.381 1.381 0 0 0 0 2.226l1.243.915a.75.75 0 0 1 .272.826 9.797 9.797 0 0 1-2.204 3.792.75.75 0 0 1-.848.175l-1.407-.617a1.38 1.38 0 0 0-1.926 1.114l-.169 1.526a.75.75 0 0 1-.572.647 9.518 9.518 0 0 1-4.406 0 .75.75 0 0 1-.572-.647l-.168-1.524a1.382 1.382 0 0 0-1.926-1.11l-1.406.616a.75.75 0 0 1-.849-.175 9.798 9.798 0 0 1-2.204-3.796.75.75 0 0 1 .272-.826l1.243-.916a1.38 1.38 0 0 0 0-2.226l-1.243-.914a.75.75 0 0 1-.271-.826 9.793 9.793 0 0 1 2.204-3.792.75.75 0 0 1 .85-.174l1.4.615a1.387 1.387 0 0 0 1.93-1.118l.17-1.526a.75.75 0 0 1 .583-.65c.717-.159 1.45-.243 2.201-.252Zm0 1.5a9.135 9.135 0 0 0-1.354.117l-.109.977A2.886 2.886 0 0 1 6.525 7.17l-.898-.394a8.293 8.293 0 0 0-1.348 2.317l.798.587a2.881 2.881 0 0 1 0 4.643l-.799.588c.32.842.776 1.626 1.348 2.322l.905-.397a2.882 2.882 0 0 1 4.017 2.318l.11.984c.889.15 1.798.15 2.687 0l.11-.984a2.881 2.881 0 0 1 4.018-2.322l.905.396a8.296 8.296 0 0 0 1.347-2.318l-.798-.588a2.881 2.881 0 0 1 0-4.643l.796-.587a8.293 8.293 0 0 0-1.348-2.317l-.896.393a2.884 2.884 0 0 1-4.023-2.324l-.11-.976a8.988 8.988 0 0 0-1.333-.117ZM12 8.25a3.75 3.75 0 1 1 0 7.5 3.75 3.75 0 0 1 0-7.5Zm0 1.5a2.25 2.25 0 1 0 0 4.5 2.25 2.25 0 0 0 0-4.5Z"
-                                          Foreground="{DynamicResource ForegroundMuted}"
-                                          Width="16"
-                                          Height="16" />
-                                <TextBlock Text="Settings"
-                                           FontSize="13"
-                                           Foreground="{DynamicResource ForegroundMuted}" />
-                            </StackPanel>
-                        </Button>
-                    </Border>
-                </Grid>
+                        </Border>
+                    </Grid>
+                </Border>
             </Border>
 
             <!-- Main Calendar Content -->
@@ -133,10 +143,11 @@
                                 Width="40"
                                 Padding="8"
                                 Margin="0,0,10,0">
-                            <PathIcon Data="M2.75254822,18 L21.2525482,18 C21.6667618,18 22.0025482,18.3357864 22.0025482,18.75 C22.0025482,19.1296958 21.7203943,19.443491 21.3543188,19.4931534 L21.2525482,19.5 L2.75254822,19.5 C2.33833466,19.5 2.00254822,19.1642136 2.00254822,18.75 C2.00254822,18.3703042 2.2847021,18.056509 2.65077766,18.0068466 L2.75254822,18 L21.2525482,18 L2.75254822,18 Z M2.75254822,11.5030063 L21.2525482,11.5030063 C21.6667618,11.5030063 22.0025482,11.8387927 22.0025482,12.2530063 C22.0025482,12.6327021 21.7203943,12.9464972 21.3543188,12.9961597 L21.2525482,13.0030063 L2.75254822,13.0030063 C2.33833466,13.0030063 2.00254822,12.6672199 2.00254822,12.2530063 C2.00254822,11.8733105 2.2847021,11.5595153 2.65077766,11.5098529 L2.75254822,11.5030063 L21.2525482,11.5030063 L2.75254822,11.5030063 Z M2.75168905,5.0032392 L21.251689,5.0032392 C21.6659026,5.0032392 22.001689,5.33902564 22.001689,5.7532392 C22.001689,6.13293497 21.7195352,6.44673016 21.3534596,6.49639258 L21.251689,6.5032392 L2.75168905,6.5032392 C2.33747549,6.5032392 2.00168905,6.16745276 2.00168905,5.7532392 C2.00168905,5.37354343 2.28384293,5.05974824 2.64991849,5.01008582 L2.75168905,5.0032392 L21.251689,5.0032392 L2.75168905,5.0032392 Z"
-                                      Foreground="{DynamicResource ForegroundPrimary}"
-                                      Width="16"
-                                      Height="16"/>
+                            <PathIcon
+                                Data="M2.75254822,18 L21.2525482,18 C21.6667618,18 22.0025482,18.3357864 22.0025482,18.75 C22.0025482,19.1296958 21.7203943,19.443491 21.3543188,19.4931534 L21.2525482,19.5 L2.75254822,19.5 C2.33833466,19.5 2.00254822,19.1642136 2.00254822,18.75 C2.00254822,18.3703042 2.2847021,18.056509 2.65077766,18.0068466 L2.75254822,18 L21.2525482,18 L2.75254822,18 Z M2.75254822,11.5030063 L21.2525482,11.5030063 C21.6667618,11.5030063 22.0025482,11.8387927 22.0025482,12.2530063 C22.0025482,12.6327021 21.7203943,12.9464972 21.3543188,12.9961597 L21.2525482,13.0030063 L2.75254822,13.0030063 C2.33833466,13.0030063 2.00254822,12.6672199 2.00254822,12.2530063 C2.00254822,11.8733105 2.2847021,11.5595153 2.65077766,11.5098529 L2.75254822,11.5030063 L21.2525482,11.5030063 L2.75254822,11.5030063 Z M2.75168905,5.0032392 L21.251689,5.0032392 C21.6659026,5.0032392 22.001689,5.33902564 22.001689,5.7532392 C22.001689,6.13293497 21.7195352,6.44673016 21.3534596,6.49639258 L21.251689,6.5032392 L2.75168905,6.5032392 C2.33747549,6.5032392 2.00168905,6.16745276 2.00168905,5.7532392 C2.00168905,5.37354343 2.28384293,5.05974824 2.64991849,5.01008582 L2.75168905,5.0032392 L21.251689,5.0032392 L2.75168905,5.0032392 Z"
+                                Foreground="{DynamicResource ForegroundPrimary}"
+                                Width="16"
+                                Height="16" />
                         </Button>
                         <Button Grid.Column="0"
                                 IsVisible="{Binding IsMobileLayout}"
@@ -145,10 +156,11 @@
                                 Width="40"
                                 Padding="8"
                                 Margin="0,0,10,0">
-                            <PathIcon Data="M2.75254822,18 L21.2525482,18 C21.6667618,18 22.0025482,18.3357864 22.0025482,18.75 C22.0025482,19.1296958 21.7203943,19.443491 21.3543188,19.4931534 L21.2525482,19.5 L2.75254822,19.5 C2.33833466,19.5 2.00254822,19.1642136 2.00254822,18.75 C2.00254822,18.3703042 2.2847021,18.056509 2.65077766,18.0068466 L2.75254822,18 L21.2525482,18 L2.75254822,18 Z M2.75254822,11.5030063 L21.2525482,11.5030063 C21.6667618,11.5030063 22.0025482,11.8387927 22.0025482,12.2530063 C22.0025482,12.6327021 21.7203943,12.9464972 21.3543188,12.9961597 L21.2525482,13.0030063 L2.75254822,13.0030063 C2.33833466,13.0030063 2.00254822,12.6672199 2.00254822,12.2530063 C2.00254822,11.8733105 2.2847021,11.5595153 2.65077766,11.5098529 L2.75254822,11.5030063 L21.2525482,11.5030063 L2.75254822,11.5030063 Z M2.75168905,5.0032392 L21.251689,5.0032392 C21.6659026,5.0032392 22.001689,5.33902564 22.001689,5.7532392 C22.001689,6.13293497 21.7195352,6.44673016 21.3534596,6.49639258 L21.251689,6.5032392 L2.75168905,6.5032392 C2.33747549,6.5032392 2.00168905,6.16745276 2.00168905,5.7532392 C2.00168905,5.37354343 2.28384293,5.05974824 2.64991849,5.01008582 L2.75168905,5.0032392 L21.251689,5.0032392 L2.75168905,5.0032392 Z"
-                                      Foreground="{DynamicResource ForegroundPrimary}"
-                                      Width="16"
-                                      Height="16"/>
+                            <PathIcon
+                                Data="M2.75254822,18 L21.2525482,18 C21.6667618,18 22.0025482,18.3357864 22.0025482,18.75 C22.0025482,19.1296958 21.7203943,19.443491 21.3543188,19.4931534 L21.2525482,19.5 L2.75254822,19.5 C2.33833466,19.5 2.00254822,19.1642136 2.00254822,18.75 C2.00254822,18.3703042 2.2847021,18.056509 2.65077766,18.0068466 L2.75254822,18 L21.2525482,18 L2.75254822,18 Z M2.75254822,11.5030063 L21.2525482,11.5030063 C21.6667618,11.5030063 22.0025482,11.8387927 22.0025482,12.2530063 C22.0025482,12.6327021 21.7203943,12.9464972 21.3543188,12.9961597 L21.2525482,13.0030063 L2.75254822,13.0030063 C2.33833466,13.0030063 2.00254822,12.6672199 2.00254822,12.2530063 C2.00254822,11.8733105 2.2847021,11.5595153 2.65077766,11.5098529 L2.75254822,11.5030063 L21.2525482,11.5030063 L2.75254822,11.5030063 Z M2.75168905,5.0032392 L21.251689,5.0032392 C21.6659026,5.0032392 22.001689,5.33902564 22.001689,5.7532392 C22.001689,6.13293497 21.7195352,6.44673016 21.3534596,6.49639258 L21.251689,6.5032392 L2.75168905,6.5032392 C2.33747549,6.5032392 2.00168905,6.16745276 2.00168905,5.7532392 C2.00168905,5.37354343 2.28384293,5.05974824 2.64991849,5.01008582 L2.75168905,5.0032392 L21.251689,5.0032392 L2.75168905,5.0032392 Z"
+                                Foreground="{DynamicResource ForegroundPrimary}"
+                                Width="16"
+                                Height="16" />
                         </Button>
 
                         <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10">
@@ -180,10 +192,11 @@
                             <Button Command="{Binding CreateEventCommand}"
                                     Classes="accent">
                                 <StackPanel Orientation="Horizontal" Spacing="7">
-                                    <PathIcon Data="M12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2Zm0 5a.75.75 0 0 0-.743.648l-.007.102v3.5h-3.5a.75.75 0 0 0-.102 1.493l.102.007h3.5v3.5a.75.75 0 0 0 1.493.102l.007-.102v-3.5h3.5a.75.75 0 0 0 .102-1.493l-.102-.007h-3.5v-3.5A.75.75 0 0 0 12 7Z"
-                                              Foreground="{DynamicResource ForegroundPrimary}"
-                                              Width="16"
-                                              Height="16"/>
+                                    <PathIcon
+                                        Data="M12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2Zm0 5a.75.75 0 0 0-.743.648l-.007.102v3.5h-3.5a.75.75 0 0 0-.102 1.493l.102.007h3.5v3.5a.75.75 0 0 0 1.493.102l.007-.102v-3.5h3.5a.75.75 0 0 0 .102-1.493l-.102-.007h-3.5v-3.5A.75.75 0 0 0 12 7Z"
+                                        Foreground="{DynamicResource ForegroundPrimary}"
+                                        Width="16"
+                                        Height="16" />
                                     <TextBlock Text="New Event" />
                                 </StackPanel>
                             </Button>
@@ -231,7 +244,7 @@
                     <TranslateTransform X="{Binding SidebarTranslateX}">
                         <TranslateTransform.Transitions>
                             <Transitions>
-                                <DoubleTransition Property="X" Duration="0:0:0.25" Easing="CubicEaseOut"/>
+                                <DoubleTransition Property="X" Duration="0:0:0.25" Easing="CubicEaseOut" />
                             </Transitions>
                         </TranslateTransform.Transitions>
                     </TranslateTransform>
@@ -255,7 +268,8 @@
                                                 Margin="0,1">
                                             <Border.Styles>
                                                 <Style Selector="Border:pointerover">
-                                                    <Setter Property="Background" Value="{DynamicResource BackgroundHover}" />
+                                                    <Setter Property="Background"
+                                                            Value="{DynamicResource BackgroundHover}" />
                                                 </Style>
                                             </Border.Styles>
                                             <CheckBox IsChecked="{Binding IsVisible}">
@@ -306,10 +320,11 @@
                                 </Style>
                             </Button.Styles>
                             <StackPanel Orientation="Horizontal" Spacing="10">
-                                <PathIcon Data="M12.012 2.25c.734.008 1.465.093 2.182.253a.75.75 0 0 1 .582.649l.17 1.527a1.384 1.384 0 0 0 1.927 1.116l1.401-.615a.75.75 0 0 1 .85.174 9.792 9.792 0 0 1 2.204 3.792.75.75 0 0 1-.271.825l-1.242.916a1.381 1.381 0 0 0 0 2.226l1.243.915a.75.75 0 0 1 .272.826 9.797 9.797 0 0 1-2.204 3.792.75.75 0 0 1-.848.175l-1.407-.617a1.38 1.38 0 0 0-1.926 1.114l-.169 1.526a.75.75 0 0 1-.572.647 9.518 9.518 0 0 1-4.406 0 .75.75 0 0 1-.572-.647l-.168-1.524a1.382 1.382 0 0 0-1.926-1.11l-1.406.616a.75.75 0 0 1-.849-.175 9.798 9.798 0 0 1-2.204-3.796.75.75 0 0 1 .272-.826l1.243-.916a1.38 1.38 0 0 0 0-2.226l-1.243-.914a.75.75 0 0 1-.271-.826 9.793 9.793 0 0 1 2.204-3.792.75.75 0 0 1 .85-.174l1.4.615a1.387 1.387 0 0 0 1.93-1.118l.17-1.526a.75.75 0 0 1 .583-.65c.717-.159 1.45-.243 2.201-.252Zm0 1.5a9.135 9.135 0 0 0-1.354.117l-.109.977A2.886 2.886 0 0 1 6.525 7.17l-.898-.394a8.293 8.293 0 0 0-1.348 2.317l.798.587a2.881 2.881 0 0 1 0 4.643l-.799.588c.32.842.776 1.626 1.348 2.322l.905-.397a2.882 2.882 0 0 1 4.017 2.318l.11.984c.889.15 1.798.15 2.687 0l.11-.984a2.881 2.881 0 0 1 4.018-2.322l.905.396a8.296 8.296 0 0 0 1.347-2.318l-.798-.588a2.881 2.881 0 0 1 0-4.643l.796-.587a8.293 8.293 0 0 0-1.348-2.317l-.896.393a2.884 2.884 0 0 1-4.023-2.324l-.11-.976a8.988 8.988 0 0 0-1.333-.117ZM12 8.25a3.75 3.75 0 1 1 0 7.5 3.75 3.75 0 0 1 0-7.5Zm0 1.5a2.25 2.25 0 1 0 0 4.5 2.25 2.25 0 0 0 0-4.5Z"
-                                          Foreground="{DynamicResource ForegroundMuted}"
-                                          Width="16"
-                                          Height="16" />
+                                <PathIcon
+                                    Data="M12.012 2.25c.734.008 1.465.093 2.182.253a.75.75 0 0 1 .582.649l.17 1.527a1.384 1.384 0 0 0 1.927 1.116l1.401-.615a.75.75 0 0 1 .85.174 9.792 9.792 0 0 1 2.204 3.792.75.75 0 0 1-.271.825l-1.242.916a1.381 1.381 0 0 0 0 2.226l1.243.915a.75.75 0 0 1 .272.826 9.797 9.797 0 0 1-2.204 3.792.75.75 0 0 1-.848.175l-1.407-.617a1.38 1.38 0 0 0-1.926 1.114l-.169 1.526a.75.75 0 0 1-.572.647 9.518 9.518 0 0 1-4.406 0 .75.75 0 0 1-.572-.647l-.168-1.524a1.382 1.382 0 0 0-1.926-1.11l-1.406.616a.75.75 0 0 1-.849-.175 9.798 9.798 0 0 1-2.204-3.796.75.75 0 0 1 .272-.826l1.243-.916a1.38 1.38 0 0 0 0-2.226l-1.243-.914a.75.75 0 0 1-.271-.826 9.793 9.793 0 0 1 2.204-3.792.75.75 0 0 1 .85-.174l1.4.615a1.387 1.387 0 0 0 1.93-1.118l.17-1.526a.75.75 0 0 1 .583-.65c.717-.159 1.45-.243 2.201-.252Zm0 1.5a9.135 9.135 0 0 0-1.354.117l-.109.977A2.886 2.886 0 0 1 6.525 7.17l-.898-.394a8.293 8.293 0 0 0-1.348 2.317l.798.587a2.881 2.881 0 0 1 0 4.643l-.799.588c.32.842.776 1.626 1.348 2.322l.905-.397a2.882 2.882 0 0 1 4.017 2.318l.11.984c.889.15 1.798.15 2.687 0l.11-.984a2.881 2.881 0 0 1 4.018-2.322l.905.396a8.296 8.296 0 0 0 1.347-2.318l-.798-.588a2.881 2.881 0 0 1 0-4.643l.796-.587a8.293 8.293 0 0 0-1.348-2.317l-.896.393a2.884 2.884 0 0 1-4.023-2.324l-.11-.976a8.988 8.988 0 0 0-1.333-.117ZM12 8.25a3.75 3.75 0 1 1 0 7.5 3.75 3.75 0 0 1 0-7.5Zm0 1.5a2.25 2.25 0 1 0 0 4.5 2.25 2.25 0 0 0 0-4.5Z"
+                                    Foreground="{DynamicResource ForegroundMuted}"
+                                    Width="16"
+                                    Height="16" />
                                 <TextBlock Text="Settings"
                                            FontSize="13"
                                            Foreground="{DynamicResource ForegroundMuted}" />

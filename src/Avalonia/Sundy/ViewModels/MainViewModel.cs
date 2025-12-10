@@ -31,32 +31,23 @@ public partial class MainViewModel : ViewModelBase
         CalendarViewModel.NewEventForDateRequested += async (_, date) => await CreateEventForDate(date);
     }
 
-    [ObservableProperty]
-    private CalendarViewModel _calendarViewModel = null!;
+    [ObservableProperty] private CalendarViewModel _calendarViewModel = null!;
 
-    [ObservableProperty]
-    private ObservableCollection<CalendarListItemViewModel> _calendars = new();
+    [ObservableProperty] private ObservableCollection<CalendarListItemViewModel> _calendars = new();
 
-    [ObservableProperty]
-    private bool _isEventDialogOpen;
+    [ObservableProperty] private bool _isEventDialogOpen;
 
-    [ObservableProperty]
-    private EventEditViewModel? _eventEditViewModel;
+    [ObservableProperty] private EventEditViewModel? _eventEditViewModel;
 
-    [ObservableProperty]
-    private bool _isSettingsDialogOpen;
+    [ObservableProperty] private bool _isSettingsDialogOpen;
 
-    [ObservableProperty]
-    private CalendarSettingsViewModel? _calendarSettingsViewModel;
+    [ObservableProperty] private CalendarSettingsViewModel? _calendarSettingsViewModel;
 
-    [ObservableProperty]
-    private bool _isMobileLayout;
+    [ObservableProperty] private bool _isMobileLayout;
 
-    [ObservableProperty]
-    private bool _isSidebarOpen = true;
+    [ObservableProperty] private bool _isSidebarOpen = true;
 
-    [ObservableProperty]
-    private double _currentWindowWidth;
+    [ObservableProperty] private double _currentWindowWidth;
 
     public bool HasNoCalendars => Calendars.Count == 0;
 
@@ -66,6 +57,9 @@ public partial class MainViewModel : ViewModelBase
 
     // Desktop embedded sidebar - only visible when not mobile AND toggled on
     public bool IsDesktopSidebarVisible => !IsMobileLayout && IsSidebarPanelVisible;
+
+    // Desktop sidebar slide animation (-266 to hide: 260 width + 6 margin)
+    public double DesktopSidebarTranslateX => IsSidebarPanelVisible ? 0 : -266;
 
     public int ViewModeIndex
     {
@@ -343,12 +337,12 @@ public partial class MainViewModel : ViewModelBase
     }
 
     // Embedded sidebar panel management (desktop)
-    [ObservableProperty]
-    private bool _isSidebarPanelVisible;
+    [ObservableProperty] private bool _isSidebarPanelVisible;
 
     partial void OnIsSidebarPanelVisibleChanged(bool value)
     {
         OnPropertyChanged(nameof(IsDesktopSidebarVisible));
+        OnPropertyChanged(nameof(DesktopSidebarTranslateX));
     }
 
     [RelayCommand]
