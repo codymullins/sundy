@@ -1,7 +1,7 @@
 bin/
 obj/
 .idea/
-*.sln.DotSettings.user
+#*.sln.DotSettings.user
 /packages/
 riderModule.iml
 .DS_Store
@@ -15,7 +15,7 @@ riderModule.iml
 # User-specific files
 *.rsuser
 *.suo
-*.user
+
 *.userosscache
 *.sln.docstates
 
@@ -142,7 +142,7 @@ $tf/
 _ReSharper*/
 *.[Rr]e[Ss]harper
 *.DotSettings.user
-
+*.user
 # TeamCity is a build add-in
 _TeamCity*
 
