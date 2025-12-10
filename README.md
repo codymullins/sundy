@@ -1,10 +1,39 @@
 Cross-platform calendar app with intelligent cross-calendar time management.
 
+## Why This Project?
+
+I'm building Sundy because:
+- **I want to** - it's a passion project that excites me
+- **I need specific features** I've wanted for a while:
+  - Seamless cross-calendar integration and management
+  - ADHD-friendly features to help with time management
+  - Smart features to prevent missing meetings
+  - Reliable, configurable notifications
+- **Daily use** - this solves real problems I face every day
+- **Speed matters** - I want a fast, lightweight experience
+- **Privacy-first** - my data stays mine, always
+
+### The Problem
+
+Here's my reality:
+- I have a Gmail calendar
+- I have multiple Outlook calendars
+- Some things sneak into my Apple Calendar
+- My wife uses Reminders and the paper calendar on our wall
+
+And here's what happens:
+1. Calendar A gets blocked, but B and C don't know about it
+2. Calendar B gets scheduled later and silently conflicts with A
+3. Calendar C's notifications are muted, or I only see Calendar A because that's my work computer
+4. Where do I put family events? Doctor appointments for me, my wife, the kids... all of them?
+5. No easy way to navigate all of this—add ADHD and object permanence issues and... *"Oops, sorry, can't make that meeting today"*
+6. *"Hey, are you joining the meeting?"* — *"Oh crap! I didn't get that notification!"*
+
 ## Features
-- Offline-first
-- Fast rendering, responsive UI, efficient sync
-- Privacy - your data is yours
-- Clean, minimal UX
+- **Offline-first** - works without an internet connection
+- **Fast & responsive** - efficient rendering and sync
+- **Privacy-focused** - your data stays yours
+- **Clean, minimal UX** - no clutter, just what you need
 
 ## Demo
 
