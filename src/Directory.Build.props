@@ -1,8 +1,12 @@
 <Project>
-  <PropertyGroup>
-    <AvaloniaVersion>11.3.9</AvaloniaVersion>
-    <LangVersion>preview</LangVersion>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-  </PropertyGroup>
+    <PropertyGroup>
+        <AvaloniaVersion>11.3.9</AvaloniaVersion>
+        <LangVersion>preview</LangVersion>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)'=='Release'">
+        <DebugType>none</DebugType>
+        <DebugSymbols>false</DebugSymbols>
+    </PropertyGroup>
 </Project>

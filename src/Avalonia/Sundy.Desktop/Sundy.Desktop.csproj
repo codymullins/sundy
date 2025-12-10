@@ -11,10 +11,6 @@
         <PublishReadyToRun>true</PublishReadyToRun>
         <UseAppHost>true</UseAppHost>
     </PropertyGroup>
-    <PropertyGroup Condition="'$(Configuration)'=='Release'">
-        <DebugType>none</DebugType>
-        <DebugSymbols>false</DebugSymbols>
-    </PropertyGroup>
     <PropertyGroup Condition="$([MSBuild]::IsOSPlatform('OSX'))">
         <CFBundleName>Sundy</CFBundleName>
         <CFBundleDisplayName>Sundy</CFBundleDisplayName>
