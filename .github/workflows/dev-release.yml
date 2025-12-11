@@ -41,9 +41,9 @@ jobs:
             -c Release `
             -r ${{ matrix.runtime }} `
             --self-contained true `
-            -p:PublishSingleFile=true `
-            -p:PublishTrimmed=true `
-            -p:PublishReadyToRun=true `
+            -p:PublishSingleFile=false `
+            -p:PublishTrimmed=false `
+            -p:PublishReadyToRun=false `
             -o ./publish/${{ matrix.runtime }}
 
       - name: Create ZIP archive
@@ -109,9 +109,9 @@ jobs:
             -c Release \
             -r ${{ matrix.runtime }} \
             --self-contained true \
-            -p:PublishSingleFile=true \
-            -p:PublishTrimmed=true \
-            -p:PublishReadyToRun=true \
+            -p:PublishSingleFile=false \
+            -p:PublishTrimmed=false \
+            -p:PublishReadyToRun=false \
             -o ./publish/${{ matrix.runtime }}
 
       - name: Create App Bundle
