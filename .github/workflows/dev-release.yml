@@ -1,17 +1,17 @@
-name: Development Release
+name: Nightly Release
 
 on:
-  push:
-    branches: [main, master]
+  schedule:
+    # Run at midnight UTC (12:00 AM UTC) every day
+    - cron: '0 0 * * *'
   workflow_dispatch:
 
 env:
-  DOTNET_VERSION: '10.0.101'
+  DOTNET_VERSION: '10.0.x'
   APP_NAME: 'Sundy'
-  PROJECT_PATH: 'src/Avalonia/Sundy.Desktop/Sundy.Desktop.csproj'
 
 jobs:
-  build-windows:
+  build-avalonia-windows:
     runs-on: windows-latest
 
     strategy:
@@ -30,33 +30,33 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
-          dotnet-quality: 'preview'
+          dotnet-quality: 'ga'
 
       - name: Restore dependencies
-        run: dotnet restore ${{ env.PROJECT_PATH }}
+        run: dotnet restore src/Avalonia/Sundy.Desktop/Sundy.Desktop.csproj
 
       - name: Build and Publish
         run: |
-          dotnet publish ${{ env.PROJECT_PATH }} `
+          dotnet publish src/Avalonia/Sundy.Desktop/Sundy.Desktop.csproj `
             -c Release `
             -r ${{ matrix.runtime }} `
             --self-contained true `
             -p:PublishSingleFile=false `
             -p:PublishTrimmed=false `
             -p:PublishReadyToRun=false `
-            -o ./publish/${{ matrix.runtime }}
+            -o ./publish/avalonia/${{ matrix.runtime }}
 
       - name: Create ZIP archive
         run: |
-          Compress-Archive -Path "./publish/${{ matrix.runtime }}/*" -DestinationPath "./${{ env.APP_NAME }}-Dev-${{ matrix.platform_name }}.zip"
+          Compress-Archive -Path "./publish/avalonia/${{ matrix.runtime }}/*" -DestinationPath "./${{ env.APP_NAME }}-Avalonia-${{ matrix.platform_name }}.zip"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.APP_NAME }}-Dev-${{ matrix.platform_name }}
-          path: ${{ env.APP_NAME }}-Dev-${{ matrix.platform_name }}.zip
+          name: ${{ env.APP_NAME }}-Avalonia-${{ matrix.platform_name }}
+          path: ${{ env.APP_NAME }}-Avalonia-${{ matrix.platform_name }}.zip
 
-  build-macos:
+  build-avalonia-macos:
     runs-on: macos-latest
 
     strategy:
@@ -75,7 +75,7 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
-          dotnet-quality: 'preview'
+          dotnet-quality: 'ga'
 
       - name: Install certificate
         env:
@@ -101,23 +101,23 @@ jobs:
           security list-keychain -d user -s $KEYCHAIN_PATH
 
       - name: Restore dependencies
-        run: dotnet restore ${{ env.PROJECT_PATH }}
+        run: dotnet restore src/Avalonia/Sundy.Desktop/Sundy.Desktop.csproj
 
       - name: Build and Publish
         run: |
-          dotnet publish ${{ env.PROJECT_PATH }} \
+          dotnet publish src/Avalonia/Sundy.Desktop/Sundy.Desktop.csproj \
             -c Release \
             -r ${{ matrix.runtime }} \
             --self-contained true \
             -p:PublishSingleFile=false \
             -p:PublishTrimmed=false \
             -p:PublishReadyToRun=false \
-            -o ./publish/${{ matrix.runtime }}
+            -o ./publish/avalonia/${{ matrix.runtime }}
 
       - name: Create App Bundle
         run: |
           RUNTIME="${{ matrix.runtime }}"
-          PUBLISH_DIR="./publish/$RUNTIME"
+          PUBLISH_DIR="./publish/avalonia/$RUNTIME"
           APP_BUNDLE="$PUBLISH_DIR/${{ env.APP_NAME }}.app"
           CONTENTS_DIR="$APP_BUNDLE/Contents"
           MACOS_DIR="$CONTENTS_DIR/MacOS"
@@ -172,7 +172,7 @@ jobs:
 
       - name: Code sign app
         run: |
-          APP_BUNDLE="./publish/${{ matrix.runtime }}/${{ env.APP_NAME }}.app"
+          APP_BUNDLE="./publish/avalonia/${{ matrix.runtime }}/${{ env.APP_NAME }}.app"
 
           # Sign ALL files in MacOS directory (binaries, dylibs, pdb, etc.)
           find "$APP_BUNDLE/Contents/MacOS" -type f -exec \
@@ -194,7 +194,7 @@ jobs:
           APPLE_ID_PWD: ${{ secrets.APPLE_ID_PWD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
-          APP_BUNDLE="./publish/${{ matrix.runtime }}/${{ env.APP_NAME }}.app"
+          APP_BUNDLE="./publish/avalonia/${{ matrix.runtime }}/${{ env.APP_NAME }}.app"
 
           # Create ZIP for notarization
           ditto -c -k --keepParent "$APP_BUNDLE" "notarize.zip"
@@ -213,73 +213,300 @@ jobs:
 
       - name: Create ZIP archive
         run: |
-          cd ./publish/${{ matrix.runtime }}
-          zip -r ../../${{ env.APP_NAME }}-Dev-${{ matrix.platform_name }}.zip ${{ env.APP_NAME }}.app
-          cd ../..
+          cd ./publish/avalonia/${{ matrix.runtime }}
+          zip -r ../../../${{ env.APP_NAME }}-Avalonia-${{ matrix.platform_name }}.zip ${{ env.APP_NAME }}.app
+          cd ../../..
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.APP_NAME }}-Dev-${{ matrix.platform_name }}
-          path: ${{ env.APP_NAME }}-Dev-${{ matrix.platform_name }}.zip
+          name: ${{ env.APP_NAME }}-Avalonia-${{ matrix.platform_name }}
+          path: ${{ env.APP_NAME }}-Avalonia-${{ matrix.platform_name }}.zip
 
       - name: Cleanup keychain
         if: always()
         run: |
           security delete-keychain $RUNNER_TEMP/app-signing.keychain-db || true
 
-  create-release:
-    needs: [build-windows, build-macos]
+  build-uno-windows:
+    runs-on: windows-latest
+
+    strategy:
+      matrix:
+        include:
+          - runtime: win-x64
+            platform_name: 'Windows-Intel-x64'
+          - runtime: win-arm64
+            platform_name: 'Windows-ARM64'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+          dotnet-quality: 'ga'
+
+      - name: Restore dependencies
+        run: dotnet restore src/Uno/Sundy.Uno/Sundy.Uno.csproj
+
+      - name: Build and Publish
+        run: |
+          dotnet publish src/Uno/Sundy.Uno/Sundy.Uno.csproj `
+            -c Release `
+            -r ${{ matrix.runtime }} `
+            --self-contained true `
+            -p:PublishSingleFile=false `
+            -p:PublishTrimmed=false `
+            -p:PublishReadyToRun=false `
+            -o ./publish/uno/${{ matrix.runtime }}
+
+      - name: Create ZIP archive
+        run: |
+          Compress-Archive -Path "./publish/uno/${{ matrix.runtime }}/*" -DestinationPath "./${{ env.APP_NAME }}-Uno-${{ matrix.platform_name }}.zip"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.APP_NAME }}-Uno-${{ matrix.platform_name }}
+          path: ${{ env.APP_NAME }}-Uno-${{ matrix.platform_name }}.zip
+
+  build-uno-macos:
+    runs-on: macos-latest
+
+    strategy:
+      matrix:
+        include:
+          - runtime: osx-x64
+            platform_name: 'macOS-Intel-x64'
+          - runtime: osx-arm64
+            platform_name: 'macOS-AppleSilicon-ARM64'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+          dotnet-quality: 'ga'
+
+      - name: Install certificate
+        env:
+          MACOS_CERTIFICATE: ${{ secrets.MACOS_CERTIFICATE }}
+          MACOS_CERTIFICATE_PWD: ${{ secrets.MACOS_CERTIFICATE_PWD }}
+          MACOS_KEYCHAIN_PWD: ${{ secrets.MACOS_KEYCHAIN_PWD }}
+        run: |
+          # Create variables
+          CERTIFICATE_PATH=$RUNNER_TEMP/build_certificate.p12
+          KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
+
+          # Decode certificate
+          echo -n "$MACOS_CERTIFICATE" | base64 --decode -o $CERTIFICATE_PATH
+
+          # Create temporary keychain
+          security create-keychain -p "$MACOS_KEYCHAIN_PWD" $KEYCHAIN_PATH
+          security set-keychain-settings -lut 21600 $KEYCHAIN_PATH
+          security unlock-keychain -p "$MACOS_KEYCHAIN_PWD" $KEYCHAIN_PATH
+
+          # Import certificate to keychain
+          security import $CERTIFICATE_PATH -P "$MACOS_CERTIFICATE_PWD" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
+          security set-key-partition-list -S apple-tool:,apple: -k "$MACOS_KEYCHAIN_PWD" $KEYCHAIN_PATH
+          security list-keychain -d user -s $KEYCHAIN_PATH
+
+      - name: Restore dependencies
+        run: dotnet restore src/Uno/Sundy.Uno/Sundy.Uno.csproj
+
+      - name: Build and Publish
+        run: |
+          dotnet publish src/Uno/Sundy.Uno/Sundy.Uno.csproj \
+            -c Release \
+            -r ${{ matrix.runtime }} \
+            --self-contained true \
+            -p:PublishSingleFile=false \
+            -p:PublishTrimmed=false \
+            -p:PublishReadyToRun=false \
+            -o ./publish/uno/${{ matrix.runtime }}
+
+      - name: Create App Bundle
+        run: |
+          RUNTIME="${{ matrix.runtime }}"
+          PUBLISH_DIR="./publish/uno/$RUNTIME"
+          APP_BUNDLE="$PUBLISH_DIR/${{ env.APP_NAME }}.app"
+          CONTENTS_DIR="$APP_BUNDLE/Contents"
+          MACOS_DIR="$CONTENTS_DIR/MacOS"
+          RESOURCES_DIR="$CONTENTS_DIR/Resources"
+
+          mkdir -p "$MACOS_DIR"
+          mkdir -p "$RESOURCES_DIR"
+
+          for item in "$PUBLISH_DIR"/*; do
+            if [[ "$(basename "$item")" != "${{ env.APP_NAME }}.app" ]]; then
+              cp -r "$item" "$MACOS_DIR/"
+            fi
+          done
+
+          # Try Uno-specific icon path first, fall back to Avalonia path
+          ICON_SOURCE="src/Uno/Sundy.Uno/Assets/AppIcon.icns"
+          if [ ! -f "$ICON_SOURCE" ]; then
+            ICON_SOURCE="src/Avalonia/Sundy/Assets/AppIcon.icns"
+          fi
+          if [ -f "$ICON_SOURCE" ]; then
+            cp "$ICON_SOURCE" "$RESOURCES_DIR/"
+          fi
+
+          cat > "$CONTENTS_DIR/Info.plist" <<EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+              <key>CFBundleName</key>
+              <string>Sundy</string>
+              <key>CFBundleDisplayName</key>
+              <string>Sundy</string>
+              <key>CFBundleIdentifier</key>
+              <string>com.codymullins.sundy.uno</string>
+              <key>CFBundleVersion</key>
+              <string>1.0.0-dev</string>
+              <key>CFBundleShortVersionString</key>
+              <string>1.0.0</string>
+              <key>CFBundlePackageType</key>
+              <string>APPL</string>
+              <key>CFBundleSignature</key>
+              <string>????</string>
+              <key>CFBundleExecutable</key>
+              <string>Sundy.Uno</string>
+              <key>CFBundleIconFile</key>
+              <string>AppIcon.icns</string>
+              <key>NSHighResolutionCapable</key>
+              <true/>
+              <key>NSHumanReadableCopyright</key>
+              <string>Copyright © 2025 Cody Mullins</string>
+          </dict>
+          </plist>
+          EOF
+
+          chmod +x "$MACOS_DIR/Sundy.Uno"
+
+      - name: Code sign app
+        run: |
+          APP_BUNDLE="./publish/uno/${{ matrix.runtime }}/${{ env.APP_NAME }}.app"
+
+          # Sign ALL files in MacOS directory (binaries, dylibs, pdb, etc.)
+          find "$APP_BUNDLE/Contents/MacOS" -type f -exec \
+            codesign --force --options runtime --timestamp --sign "Developer ID Application" {} \;
+
+          # Sign any dylibs in other locations (Resources, Frameworks, etc.)
+          find "$APP_BUNDLE" -type f -name "*.dylib" -exec \
+            codesign --force --options runtime --timestamp --sign "Developer ID Application" {} \;
+
+          # Sign the main app bundle
+          codesign --force --options runtime --timestamp --sign "Developer ID Application" "$APP_BUNDLE"
+
+          # Verify with strict checking
+          codesign --verify --deep --strict "$APP_BUNDLE"
+
+      - name: Notarize app
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_ID_PWD: ${{ secrets.APPLE_ID_PWD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          APP_BUNDLE="./publish/uno/${{ matrix.runtime }}/${{ env.APP_NAME }}.app"
+
+          # Create ZIP for notarization
+          ditto -c -k --keepParent "$APP_BUNDLE" "notarize.zip"
+
+          # Submit for notarization
+          xcrun notarytool submit "notarize.zip" \
+            --apple-id "$APPLE_ID" \
+            --password "$APPLE_ID_PWD" \
+            --team-id "$APPLE_TEAM_ID" \
+            --wait
+
+          # Staple the notarization ticket
+          xcrun stapler staple "$APP_BUNDLE"
+
+          rm notarize.zip
+
+      - name: Create ZIP archive
+        run: |
+          cd ./publish/uno/${{ matrix.runtime }}
+          zip -r ../../../${{ env.APP_NAME }}-Uno-${{ matrix.platform_name }}.zip ${{ env.APP_NAME }}.app
+          cd ../../..
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.APP_NAME }}-Uno-${{ matrix.platform_name }}
+          path: ${{ env.APP_NAME }}-Uno-${{ matrix.platform_name }}.zip
+
+      - name: Cleanup keychain
+        if: always()
+        run: |
+          security delete-keychain $RUNNER_TEMP/app-signing.keychain-db || true
+
+  release-avalonia:
+    needs: [build-avalonia-windows, build-avalonia-macos]
     runs-on: ubuntu-latest
     permissions:
       contents: write
 
     steps:
-      - name: Download all artifacts
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download all Avalonia artifacts
         uses: actions/download-artifact@v4
         with:
+          pattern: ${{ env.APP_NAME }}-Avalonia-*
           path: artifacts
 
       - name: Generate release info
         id: release_info
         run: |
-          # Generate a short commit hash
           COMMIT_SHORT="${{ github.sha }}"
           COMMIT_SHORT="${COMMIT_SHORT:0:7}"
-
-          # Generate timestamp in friendly format
           TIMESTAMP=$(date +'%Y-%m-%d %H:%M UTC')
 
-          # Generate tag with date
-          TAG="dev-$(date +'%Y.%m.%d')-$COMMIT_SHORT"
-
-          echo "tag=$TAG" >> $GITHUB_OUTPUT
           echo "commit_short=$COMMIT_SHORT" >> $GITHUB_OUTPUT
           echo "timestamp=$TIMESTAMP" >> $GITHUB_OUTPUT
 
-      - name: Create Release
+      - name: Delete previous nightly-avalonia release
+        run: |
+          gh release delete nightly-avalonia --yes || true
+          git push --delete origin nightly-avalonia || true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        continue-on-error: true
+
+      - name: Create Avalonia Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ steps.release_info.outputs.tag }}
-          name: Development Build (${{ steps.release_info.outputs.commit_short }})
+          tag_name: nightly-avalonia
+          name: 'Nightly Build - Avalonia (${{ steps.release_info.outputs.timestamp }})'
           body: |
-            ## 🚧 Development Build
+            ## 🌙 Nightly Build - Avalonia Framework
 
-            This is an automated development build from the latest commit on the main branch.
+            This is an automated nightly build of Sundy using the **Avalonia** UI framework.
 
             **Commit:** `${{ steps.release_info.outputs.commit_short }}`
             **Built:** ${{ steps.release_info.outputs.timestamp }}
             **Branch:** ${{ github.ref_name }}
+            **Framework:** Avalonia 11.x
 
             ### 📦 Downloads
 
             #### Windows
-            - **Sundy-Dev-Windows-Intel-x64.zip** - For Windows PCs with Intel/AMD processors
-            - **Sundy-Dev-Windows-ARM64.zip** - For Windows PCs with ARM processors (e.g., Surface Pro X)
+            - **Sundy-Avalonia-Windows-Intel-x64.zip** - For Windows PCs with Intel/AMD processors
+            - **Sundy-Avalonia-Windows-ARM64.zip** - For Windows PCs with ARM processors (e.g., Surface Pro X)
 
             #### macOS
-            - **Sundy-Dev-macOS-Intel-x64.zip** - For Intel-based Macs
-            - **Sundy-Dev-macOS-AppleSilicon-ARM64.zip** - For Apple Silicon Macs (M1, M2, M3, M4)
+            - **Sundy-Avalonia-macOS-Intel-x64.zip** - For Intel-based Macs
+            - **Sundy-Avalonia-macOS-AppleSilicon-ARM64.zip** - For Apple Silicon Macs (M1, M2, M3, M4)
 
             ### 📝 Installation Instructions
 
@@ -294,7 +521,88 @@ jobs:
             3. Move `Sundy.app` to your Applications folder
             4. Right-click and select "Open" the first time to bypass Gatekeeper
 
-            > ⚠️ **Warning:** This is a development build and may be unstable. Use at your own risk.
+            > ⚠️ **Warning:** This is a nightly development build and may be unstable. Use at your own risk.
+
+            > 📊 **Note:** We're currently evaluating both Avalonia and Uno Platform frameworks. Try both nightly builds to see which works best for you!
+          prerelease: true
+          files: |
+            artifacts/**/*.zip
+
+  release-uno:
+    needs: [build-uno-windows, build-uno-macos]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download all Uno artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: ${{ env.APP_NAME }}-Uno-*
+          path: artifacts
+
+      - name: Generate release info
+        id: release_info
+        run: |
+          COMMIT_SHORT="${{ github.sha }}"
+          COMMIT_SHORT="${COMMIT_SHORT:0:7}"
+          TIMESTAMP=$(date +'%Y-%m-%d %H:%M UTC')
+
+          echo "commit_short=$COMMIT_SHORT" >> $GITHUB_OUTPUT
+          echo "timestamp=$TIMESTAMP" >> $GITHUB_OUTPUT
+
+      - name: Delete previous nightly-uno release
+        run: |
+          gh release delete nightly-uno --yes || true
+          git push --delete origin nightly-uno || true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        continue-on-error: true
+
+      - name: Create Uno Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: nightly-uno
+          name: 'Nightly Build - Uno Platform (${{ steps.release_info.outputs.timestamp }})'
+          body: |
+            ## 🌙 Nightly Build - Uno Platform
+
+            This is an automated nightly build of Sundy using the **Uno Platform** UI framework.
+
+            **Commit:** `${{ steps.release_info.outputs.commit_short }}`
+            **Built:** ${{ steps.release_info.outputs.timestamp }}
+            **Branch:** ${{ github.ref_name }}
+            **Framework:** Uno Platform
+
+            ### 📦 Downloads
+
+            #### Windows
+            - **Sundy-Uno-Windows-Intel-x64.zip** - For Windows PCs with Intel/AMD processors
+            - **Sundy-Uno-Windows-ARM64.zip** - For Windows PCs with ARM processors (e.g., Surface Pro X)
+
+            #### macOS
+            - **Sundy-Uno-macOS-Intel-x64.zip** - For Intel-based Macs
+            - **Sundy-Uno-macOS-AppleSilicon-ARM64.zip** - For Apple Silicon Macs (M1, M2, M3, M4)
+
+            ### 📝 Installation Instructions
+
+            **Windows:**
+            1. Download the appropriate ZIP file for your processor
+            2. Extract the ZIP file
+            3. Run `Sundy.Uno.exe`
+
+            **macOS:**
+            1. Download the appropriate ZIP file for your Mac
+            2. Extract the ZIP file
+            3. Move `Sundy.app` to your Applications folder
+            4. Right-click and select "Open" the first time to bypass Gatekeeper
+
+            > ⚠️ **Warning:** This is a nightly development build and may be unstable. Use at your own risk.
+
+            > 📊 **Note:** We're currently evaluating both Avalonia and Uno Platform frameworks. Try both nightly builds to see which works best for you!
           prerelease: true
           files: |
             artifacts/**/*.zip
