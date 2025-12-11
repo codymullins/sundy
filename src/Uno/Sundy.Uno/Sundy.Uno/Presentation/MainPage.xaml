@@ -16,112 +16,138 @@
         <conv:IndexEqualsConverter x:Key="IndexEqualsConverter" />
     </Page.Resources>
 
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
+    <Grid ColumnDefinitions="292,*">
+        <Border Grid.Column="0"
+                Margin="12"
+                Padding="16,16,16,12"
+                Background="{StaticResource BackgroundTertiary}"
+                BorderBrush="{StaticResource AccentSubtle}"
+                BorderThickness="1"
+                CornerRadius="12">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
 
-        <!-- Top toolbar -->
-        <Border Grid.Row="0"
-                Background="{StaticResource BackgroundSecondary}"
-                Padding="16,12"
-                BorderBrush="{StaticResource BorderBrush}"
-                BorderThickness="0,0,0,1">
-            <Grid ColumnSpacing="16">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Row="0"
+                           Text="My Calendars"
+                           FontSize="14"
+                           FontWeight="SemiBold"
+                           Foreground="{StaticResource ForegroundPrimary}"
+                           Margin="0,0,0,12" />
 
-                <StackPanel Orientation="Horizontal" Spacing="8" Grid.Column="0">
-                    <Button Content="Today"
-                            Command="{Binding GoToTodayCommand}"
-                            Style="{StaticResource ModernButtonStyle}" />
-                    <StackPanel Orientation="Horizontal" Spacing="4">
-                        <Button Command="{Binding PreviousPeriodCommand}"
-                                Width="40"
-                                Style="{StaticResource ModernButtonStyle}">
-                            <SymbolIcon Symbol="Previous" Foreground="{StaticResource ForegroundPrimary}" />
-                        </Button>
-                        <Button Command="{Binding NextPeriodCommand}"
-                                Width="40"
-                                Style="{StaticResource ModernButtonStyle}">
-                            <SymbolIcon Symbol="Next" Foreground="{StaticResource ForegroundPrimary}" />
-                        </Button>
+                <ScrollViewer Grid.Row="1"
+                              VerticalScrollBarVisibility="Auto">
+                    <StackPanel Spacing="12">
+                        <ItemsControl ItemsSource="{Binding Calendars}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="vm:CalendarListItemViewModel">
+                                    <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,2">
+                                        <CheckBox IsChecked="{Binding IsVisible, Mode=TwoWay}"
+                                                  Style="{StaticResource CircularCheckBoxStyle}">
+                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                                <Ellipse Width="12" Height="12"
+                                                         Fill="{Binding Color, Converter={StaticResource ColorConverter}}"
+                                                         VerticalAlignment="Center" />
+                                                <TextBlock Text="{Binding Name}"
+                                                           Foreground="{StaticResource ForegroundPrimary}"
+                                                           VerticalAlignment="Center" />
+                                            </StackPanel>
+                                        </CheckBox>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <Button Content="New Local Calendar"
+                                Command="{Binding CreateNewCalendarCommand}"
+                                Style="{StaticResource LinkButtonStyle}"
+                                Visibility="{Binding HasNoCalendars, Converter={StaticResource BoolToVisibility}}" />
                     </StackPanel>
-                    <TextBlock Text="{Binding CurrentPeriodDisplay}"
-                               VerticalAlignment="Center"
-                               Margin="12,0,0,0"
-                               FontSize="18"
-                               FontWeight="SemiBold"
-                               Foreground="{StaticResource ForegroundPrimary}" />
-                </StackPanel>
+                </ScrollViewer>
 
-                <controls:SegmentedControl Grid.Column="1"
-                                           SelectedIndex="{Binding ViewModeIndex, Mode=TwoWay}"
-                                           VerticalAlignment="Center">
-                    <x:String>Day</x:String>
-                    <x:String>Week</x:String>
-                    <x:String>Month</x:String>
-                </controls:SegmentedControl>
+                <Button Grid.Row="2"
+                        Margin="0,12,0,0"
+                        Command="{Binding OpenSettingsCommand}"
+                        Style="{StaticResource SidebarButtonStyle}">
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <SymbolIcon Symbol="Setting"
+                                    Foreground="{StaticResource ForegroundSecondary}" />
+                        <TextBlock Text="Settings"
+                                   Foreground="{StaticResource ForegroundSecondary}"
+                                   FontSize="14"
+                                   VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
+            </Grid>
+        </Border>
 
-                <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
-                    <Button Command="{Binding OpenSettingsCommand}"
-                            Style="{StaticResource ModernButtonStyle}">
-                        <StackPanel Orientation="Horizontal" Spacing="6">
-                            <SymbolIcon Symbol="Setting" Foreground="{StaticResource ForegroundPrimary}" />
-                            <TextBlock Text="Settings" Foreground="{StaticResource ForegroundPrimary}" />
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <!-- Top toolbar -->
+            <Border Grid.Row="0"
+                    Background="{StaticResource BackgroundSecondary}"
+                    Padding="16,12"
+                    BorderBrush="{StaticResource BorderBrush}"
+                    BorderThickness="0,0,0,1">
+                <Grid ColumnSpacing="16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Orientation="Horizontal" Spacing="8" Grid.Column="0">
+                        <Button Content="Today"
+                                Command="{Binding GoToTodayCommand}"
+                                Style="{StaticResource ModernButtonStyle}" />
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <Button Command="{Binding PreviousPeriodCommand}"
+                                    Width="40"
+                                    Style="{StaticResource ModernButtonStyle}">
+                                <SymbolIcon Symbol="Previous" Foreground="{StaticResource ForegroundPrimary}" />
+                            </Button>
+                            <Button Command="{Binding NextPeriodCommand}"
+                                    Width="40"
+                                    Style="{StaticResource ModernButtonStyle}">
+                                <SymbolIcon Symbol="Next" Foreground="{StaticResource ForegroundPrimary}" />
+                            </Button>
                         </StackPanel>
-                    </Button>
-                    <Button Command="{Binding CreateEventCommand}"
+                        <TextBlock Text="{Binding CurrentPeriodDisplay}"
+                                   VerticalAlignment="Center"
+                                   Margin="12,0,0,0"
+                                   FontSize="18"
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource ForegroundPrimary}" />
+                    </StackPanel>
+
+                    <controls:SegmentedControl Grid.Column="1"
+                                               SelectedIndex="{Binding ViewModeIndex, Mode=TwoWay}"
+                                               VerticalAlignment="Center">
+                        <x:String>Day</x:String>
+                        <x:String>Week</x:String>
+                        <x:String>Month</x:String>
+                    </controls:SegmentedControl>
+
+                    <Button Grid.Column="2"
+                            Command="{Binding CreateEventCommand}"
                             Style="{StaticResource AccentButtonStyle}">
                         <StackPanel Orientation="Horizontal" Spacing="6">
                             <SymbolIcon Symbol="Add" Foreground="{StaticResource ForegroundOnAccent}" />
                             <TextBlock Text="New Event" Foreground="{StaticResource ForegroundOnAccent}" />
                         </StackPanel>
                     </Button>
-                </StackPanel>
-            </Grid>
-        </Border>
-
-        <!-- Main content -->
-        <Grid Grid.Row="1" ColumnDefinitions="280,*">
-            <!-- Sidebar -->
-            <Border Grid.Column="0"
-                    Padding="16"
-                    Background="{StaticResource BackgroundTertiary}"
-                    BorderBrush="{StaticResource AccentSubtle}"
-                    BorderThickness="0,0,1,0">
-                <StackPanel Spacing="12">
-                    <TextBlock Text="My Calendars"
-                               FontSize="14"
-                               FontWeight="SemiBold"
-                               Foreground="{StaticResource ForegroundPrimary}" />
-                    <ItemsControl ItemsSource="{Binding Calendars}">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate x:DataType="vm:CalendarListItemViewModel">
-                                <StackPanel Orientation="Horizontal" Spacing="8">
-                                    <Ellipse Width="12" Height="12"
-                                             Fill="{Binding Color, Converter={StaticResource ColorConverter}}" />
-                                    <CheckBox IsChecked="{Binding IsVisible, Mode=TwoWay}">
-                                        <TextBlock Text="{Binding Name}" Foreground="{StaticResource ForegroundPrimary}" />
-                                    </CheckBox>
-                                </StackPanel>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-
-                    <Button Content="New Local Calendar"
-                            Command="{Binding CreateNewCalendarCommand}"
-                            Style="{StaticResource LinkButtonStyle}"
-                            Visibility="{Binding HasNoCalendars, Converter={StaticResource BoolToVisibility}}" />
-                </StackPanel>
+                </Grid>
             </Border>
 
             <!-- Calendar view -->
-            <Border Grid.Column="1"
+            <Border Grid.Row="1"
                     Background="{StaticResource BackgroundPrimary}"
                     BorderBrush="{StaticResource BorderBrush}"
                     BorderThickness="1">
@@ -132,7 +158,7 @@
         <!-- Event dialog overlay -->
         <Grid Background="{StaticResource ModalOverlay}"
               Visibility="{Binding IsEventDialogOpen, Converter={StaticResource BoolToVisibility}}"
-              Grid.RowSpan="2">
+              Grid.ColumnSpan="2">
             <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Width="640" MaxHeight="700">
                 <Border Background="{StaticResource ModalBackground}"
                         CornerRadius="12"
@@ -147,7 +173,7 @@
         <!-- Settings dialog overlay -->
         <Grid Background="{StaticResource ModalOverlay}"
               Visibility="{Binding IsSettingsDialogOpen, Converter={StaticResource BoolToVisibility}}"
-              Grid.RowSpan="2">
+              Grid.ColumnSpan="2">
             <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Width="720" MaxHeight="720">
                 <Border Background="{StaticResource ModalBackground}"
                         CornerRadius="12"
