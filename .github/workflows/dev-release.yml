@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 env:
-  DOTNET_VERSION: '10.0.x'
+  DOTNET_VERSION: '10.0.101'
   APP_NAME: 'Sundy'
   PROJECT_PATH: 'src/Avalonia/Sundy.Desktop/Sundy.Desktop.csproj'
 
