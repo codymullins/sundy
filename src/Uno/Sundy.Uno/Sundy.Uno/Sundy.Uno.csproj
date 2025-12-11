@@ -6,16 +6,16 @@
         <UnoSingleProject>true</UnoSingleProject>
 
         <!-- Display name -->
-        <ApplicationTitle>Sundy.Uno</ApplicationTitle>
+        <ApplicationTitle>Sundy Calendar (Uno)</ApplicationTitle>
         <!-- App Identifier -->
-        <ApplicationId>com.companyname.Sundy.Uno</ApplicationId>
+        <ApplicationId>com.codymullins.sundy-uno</ApplicationId>
         <!-- Versions -->
         <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
         <ApplicationVersion>1</ApplicationVersion>
         <!-- Package Publisher -->
-        <ApplicationPublisher>O=Sundy.Uno</ApplicationPublisher>
+        <ApplicationPublisher>O=Cody Mullins</ApplicationPublisher>
         <!-- Package Description -->
-        <Description>Sundy.Uno powered by Uno Platform.</Description>
+        <Description>Sundy Calendar (Uno)</Description>
 
         <!--
           UnoFeatures are used to quickly add and manage features enabled for your app.
@@ -50,11 +50,11 @@
       <PackageReference Include="Serilog.Extensions.Logging" />
       <PackageReference Include="Serilog.Sinks.Console" />
     </ItemGroup>
-    
+
     <ItemGroup>
         <!-- App Icon for all platforms -->
         <UnoIcon Include="Assets\Icons\icon.svg" />
-        
+
         <!-- Other images, excluding the .icns file -->
         <UnoImage Include="Assets\Images\*.png" />
     </ItemGroup>
