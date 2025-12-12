@@ -136,6 +136,7 @@
 
                         <!-- All Day Checkbox -->
                         <CheckBox Content="All day event"
+                                  Margin="4,0,0,0"
                                   IsChecked="{Binding IsAllDay}"
                                   IsEnabled="{Binding !IsBlockingEvent}" />
                     </StackPanel>
