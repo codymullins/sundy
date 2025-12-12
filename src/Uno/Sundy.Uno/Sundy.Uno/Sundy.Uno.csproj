@@ -35,9 +35,6 @@
             SkiaRenderer;
         </UnoFeatures>
     </PropertyGroup>
-    <ItemGroup>
-      <ProjectReference Include="..\..\..\Sundy.Core\Sundy.Core.csproj" />
-    </ItemGroup>
 
     <ItemGroup>
       <PackageReference Include="CommunityToolkit.Mvvm" />
@@ -57,5 +54,9 @@
 
         <!-- Other images, excluding the .icns file -->
         <UnoImage Include="Assets\Images\*.png" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Sundy.Core\Sundy.Core.csproj" />
     </ItemGroup>
 </Project>

@@ -123,9 +123,11 @@ public partial class MainViewModel : ViewModelBase
 
     private async Task LoadCalendarListAsync()
     {
-        var calendars = await _mediator.Send(new GetAllCalendarsQuery()).ConfigureAwait(false);
-        Calendars = new ObservableCollection<CalendarListItemViewModel>(
-            calendars.Select(c => new CalendarListItemViewModel(c, OnCalendarVisibilityChanged)));
+        var calendars = await _mediator.Send(new GetAllCalendarsQuery());
+
+        Calendars.Clear();
+        Calendars.AddRange(calendars.Select(c => new CalendarListItemViewModel(c, OnCalendarVisibilityChanged)));
+        OnPropertyChanged(nameof(Calendars));
         OnPropertyChanged(nameof(HasNoCalendars));
     }
 

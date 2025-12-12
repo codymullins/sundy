@@ -83,7 +83,7 @@ public partial class CalendarViewModel : ObservableObject
 
     public async Task LoadCalendarsAsync()
     {
-        var cals = await _mediator.Send(new GetAllCalendarsQuery()).ConfigureAwait(false);
+        var cals = await _mediator.Send(new GetAllCalendarsQuery());
         Calendars = new ObservableCollection<Calendar>(cals);
     }
 
@@ -150,11 +150,12 @@ public partial class CalendarViewModel : ObservableObject
         var events = await _mediator.Send(new GetEventsInRangeQuery(
             startRange,
             endRange,
-            SelectedCalendar?.Id)).ConfigureAwait(false);
+            SelectedCalendar?.Id));
 
-        var calendarLookup = await _mediator.Send(new GetCalendarLookupQuery()).ConfigureAwait(false);
+        var calendarLookup = await _mediator.Send(new GetCalendarLookupQuery());
 
         var days = new ObservableCollection<MonthDayViewModel>();
+        var dayIndex = 0;
         for (var date = startDate; date < endDate; date = date.AddDays(1))
         {
             var dayEvents = events
@@ -170,7 +171,8 @@ public partial class CalendarViewModel : ObservableObject
             var isCurrentMonth = date.Month == SelectedDate.Month;
             var isToday = date.Date == DateTime.Today;
 
-            days.Add(new MonthDayViewModel(date, isCurrentMonth, isToday, dayEvents, OnMonthDayEventSelected));
+            days.Add(new MonthDayViewModel(date, isCurrentMonth, isToday, dayEvents, dayIndex, OnMonthDayEventSelected));
+            dayIndex++;
         }
 
         MonthDays = days;
@@ -206,9 +208,9 @@ public partial class CalendarViewModel : ObservableObject
         var events = await _mediator.Send(new GetEventsInRangeQuery(
             startRange,
             endRange,
-            SelectedCalendar?.Id)).ConfigureAwait(false);
+            SelectedCalendar?.Id));
 
-        var calendarLookup = await _mediator.Send(new GetCalendarLookupQuery()).ConfigureAwait(false);
+        var calendarLookup = await _mediator.Send(new GetCalendarLookupQuery());
 
         var weekDays = new ObservableCollection<WeekDayViewModel>();
         for (int i = 0; i < 7; i++)
@@ -244,9 +246,9 @@ public partial class CalendarViewModel : ObservableObject
         var events = await _mediator.Send(new GetEventsInRangeQuery(
             startRange,
             endRange,
-            SelectedCalendar?.Id)).ConfigureAwait(false);
+            SelectedCalendar?.Id));
 
-        var calendarLookup = await _mediator.Send(new GetCalendarLookupQuery()).ConfigureAwait(false);
+        var calendarLookup = await _mediator.Send(new GetCalendarLookupQuery());
 
         var visibleEvents = events
             .Select(e =>

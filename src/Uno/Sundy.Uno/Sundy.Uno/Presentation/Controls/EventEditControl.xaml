@@ -8,7 +8,8 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     d:DesignHeight="600"
-    d:DesignWidth="600">
+    d:DesignWidth="600"
+    UseLayoutRounding="True">
 
     <UserControl.Resources>
         <conv:BoolToVisibilityConverter x:Key="BoolToVisibility" />
@@ -65,11 +66,6 @@
                 </StackPanel>
 
                 <CheckBox Content="All day event" IsChecked="{Binding IsAllDay, Mode=TwoWay}" Foreground="{StaticResource ForegroundPrimary}" />
-
-                <StackPanel>
-                    <TextBlock Text="Location" Foreground="{StaticResource ForegroundPrimary}" />
-                    <TextBox Text="{Binding Location, Mode=TwoWay}" PlaceholderText="Add location" />
-                </StackPanel>
 
                 <StackPanel>
                     <TextBlock Text="Description" Foreground="{StaticResource ForegroundPrimary}" />

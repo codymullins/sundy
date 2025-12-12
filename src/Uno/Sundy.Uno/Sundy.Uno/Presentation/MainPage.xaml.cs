@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.UI.Xaml;
+﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Sundy.Uno.ViewModels;
 
@@ -13,24 +12,32 @@ public sealed partial class MainPage : Page
     public MainPage()
     {
         this.InitializeComponent();
-        var app = (App?)Application.Current;
-        var services = app?.Host?.Services;
-        if (services != null && DataContext == null)
-        {
-            var vm = services.GetRequiredService<MainViewModel>();
-            DataContext = vm;
-        }
-
+        DataContextChanged += OnDataContextChanged;
         Loaded += OnLoaded;
+    }
+
+    private void OnDataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
+    {
+        // ViewModel is set by Uno Navigation framework after construction
+        if (ViewModel != null && !_initialized)
+        {
+            _ = InitializeViewModelAsync();
+        }
     }
 
     private async void OnLoaded(object sender, RoutedEventArgs e)
     {
-        if (_initialized) return;
-        if (ViewModel != null)
+        // Fallback: initialize if DataContextChanged fired before Loaded
+        if (!_initialized && ViewModel != null)
         {
-            _initialized = true;
-            await ViewModel.InitializeAsync();
+            await InitializeViewModelAsync();
         }
+    }
+
+    private async Task InitializeViewModelAsync()
+    {
+        if (_initialized) return;
+        _initialized = true;
+        await ViewModel!.InitializeAsync();
     }
 }

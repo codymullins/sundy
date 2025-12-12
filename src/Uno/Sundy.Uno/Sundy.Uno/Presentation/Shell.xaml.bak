@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="Sundy.Uno.Presentation.Shell"
+﻿﻿<UserControl x:Class="Sundy.Uno.Presentation.Shell"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:local="using:Sundy.Uno.Presentation"
@@ -35,4 +35,3 @@
     </utu:ExtendedSplashScreen>
   </Border>
 </UserControl>
-

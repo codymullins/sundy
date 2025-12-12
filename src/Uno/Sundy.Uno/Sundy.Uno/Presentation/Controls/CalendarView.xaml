@@ -6,22 +6,25 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vm="using:Sundy.Uno.ViewModels"
     xmlns:conv="using:Sundy.Uno.Presentation.Converters"
+    xmlns:controls="using:Sundy.Uno.Controls"
     mc:Ignorable="d"
     d:DesignHeight="450"
-    d:DesignWidth="800">
+    d:DesignWidth="800"
+    UseLayoutRounding="True">
 
     <UserControl.Resources>
         <conv:BoolToVisibilityConverter x:Key="BoolToVisibility" />
         <conv:StringToBrushConverter x:Key="ColorConverter" />
         <conv:DateFormatConverter x:Key="DayNameFormat" Format="dddd" />
         <conv:DateFormatConverter x:Key="FullDateFormat" Format="MMMM d, yyyy" />
+        <conv:RoundToPixelConverter x:Key="RoundToPixel" />
     </UserControl.Resources>
 
-    <Grid Background="{StaticResource BackgroundPrimary}">
+    <Grid Background="{StaticResource BackgroundPrimary}" UseLayoutRounding="True">
         <!-- Month View -->
-        <Grid Visibility="{Binding IsMonthView, Converter={StaticResource BoolToVisibility}}">
-            <Grid RowDefinitions="Auto,*">
-                <Grid Grid.Row="0" ColumnDefinitions="*,*,*,*,*,*,*" Height="40" Background="{StaticResource BackgroundHover}">
+        <Grid Visibility="{Binding IsMonthView, Converter={StaticResource BoolToVisibility}}" UseLayoutRounding="True">
+            <Grid RowDefinitions="Auto,*" UseLayoutRounding="True">
+                <Grid Grid.Row="0" ColumnDefinitions="*,*,*,*,*,*,*" Height="40" Background="{StaticResource BackgroundHover}" UseLayoutRounding="True">
                     <TextBlock Grid.Column="0" Text="Sunday" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{StaticResource ForegroundPrimary}" FontWeight="SemiBold" />
                     <TextBlock Grid.Column="1" Text="Monday" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{StaticResource ForegroundPrimary}" FontWeight="SemiBold" />
                     <TextBlock Grid.Column="2" Text="Tuesday" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{StaticResource ForegroundPrimary}" FontWeight="SemiBold" />
@@ -31,20 +34,41 @@
                     <TextBlock Grid.Column="6" Text="Saturday" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{StaticResource ForegroundPrimary}" FontWeight="SemiBold" />
                 </Grid>
 
-                <ScrollViewer Grid.Row="1">
-                    <ItemsControl ItemsSource="{Binding MonthDays}">
-                        <ItemsControl.ItemsPanel>
+                <controls:GridItemsControl Grid.Row="1" ItemsSource="{Binding MonthDays}">
+                        <controls:GridItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
-                                <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="7" />
+                                <Grid UseLayoutRounding="True">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
+                                </Grid>
                             </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                        <ItemsControl.ItemTemplate>
+                        </controls:GridItemsControl.ItemsPanel>
+                        <controls:GridItemsControl.ItemContainerStyle>
+                            <Style TargetType="ContentPresenter">
+                                <Setter Property="HorizontalAlignment" Value="Stretch" />
+                                <Setter Property="VerticalAlignment" Value="Stretch" />
+                            </Style>
+                        </controls:GridItemsControl.ItemContainerStyle>
+                        <controls:GridItemsControl.ItemTemplate>
                             <DataTemplate x:DataType="vm:MonthDayViewModel">
                                 <Border BorderBrush="{StaticResource BorderBrush}"
                                         BorderThickness="0,0,1,1"
                                         Padding="10"
-                                        MinHeight="100"
-                                        MinWidth="120"
                                         Background="{StaticResource BackgroundPrimary}"
                                         DoubleTapped="DayCell_DoubleTapped">
                                     <Grid>
@@ -79,24 +103,21 @@
                                     </Grid>
                                 </Border>
                             </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </ScrollViewer>
+                        </controls:GridItemsControl.ItemTemplate>
+                    </controls:GridItemsControl>
             </Grid>
         </Grid>
 
         <!-- Week View -->
-        <Grid Visibility="{Binding IsWeekView, Converter={StaticResource BoolToVisibility}}">
-            <Grid RowDefinitions="Auto,*">
-                <Grid Grid.Row="0" ColumnDefinitions="60,*">
+        <Grid Visibility="{Binding IsWeekView, Converter={StaticResource BoolToVisibility}}" UseLayoutRounding="True">
+            <Grid RowDefinitions="Auto,*" UseLayoutRounding="True">
+                <Grid Grid.Row="0" ColumnDefinitions="60,*" UseLayoutRounding="True">
                     <Border Grid.Column="0" Background="{StaticResource BackgroundSecondary}" />
-                    <ItemsControl Grid.Column="1" ItemsSource="{Binding WeekDays}">
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <ItemsWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="7" />
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                        <ItemsControl.ItemTemplate>
+                    <ItemsRepeater Grid.Column="1" ItemsSource="{Binding WeekDays}">
+                        <ItemsRepeater.Layout>
+                            <StackLayout Orientation="Horizontal" Spacing="0" />
+                        </ItemsRepeater.Layout>
+                        <ItemsRepeater.ItemTemplate>
                             <DataTemplate x:DataType="vm:WeekDayViewModel">
                                 <StackPanel HorizontalAlignment="Center" Padding="8">
                                     <TextBlock Text="{Binding DayName}" Foreground="{StaticResource ForegroundMuted}" />
@@ -112,12 +133,12 @@
                                     </Border>
                                 </StackPanel>
                             </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
+                        </ItemsRepeater.ItemTemplate>
+                    </ItemsRepeater>
                 </Grid>
 
                 <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-                    <Grid ColumnDefinitions="60,*" Height="1440">
+                    <Grid ColumnDefinitions="60,*" Height="1440" UseLayoutRounding="True">
                         <ItemsControl Grid.Column="0" ItemsSource="{Binding TimeSlots}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate x:DataType="vm:TimeSlotViewModel">
@@ -135,7 +156,7 @@
                             <ItemsControl ItemsSource="{Binding TimeSlots}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate x:DataType="vm:TimeSlotViewModel">
-                                        <Grid Height="60" ColumnDefinitions="*,*,*,*,*,*,*">
+                                        <Grid Height="60" ColumnDefinitions="*,*,*,*,*,*,*" UseLayoutRounding="True">
                                             <Border Grid.Column="0" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,1,1" Background="{StaticResource BackgroundPrimary}" />
                                             <Border Grid.Column="1" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,1,1" Background="{StaticResource BackgroundPrimary}" />
                                             <Border Grid.Column="2" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,1,1" Background="{StaticResource BackgroundPrimary}" />
@@ -184,8 +205,8 @@
         </Grid>
 
         <!-- Day View -->
-        <Grid Visibility="{Binding IsDayView, Converter={StaticResource BoolToVisibility}}">
-            <Grid RowDefinitions="Auto,*">
+        <Grid Visibility="{Binding IsDayView, Converter={StaticResource BoolToVisibility}}" UseLayoutRounding="True">
+            <Grid RowDefinitions="Auto,*" UseLayoutRounding="True">
                 <Border Grid.Row="0" Padding="12" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,0,1" Background="{StaticResource BackgroundSecondary}">
                     <StackPanel HorizontalAlignment="Center">
                         <TextBlock Text="{Binding SelectedDate, Converter={StaticResource DayNameFormat}}" Foreground="{StaticResource ForegroundMuted}" />
@@ -194,7 +215,7 @@
                 </Border>
 
                 <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-                    <Grid ColumnDefinitions="60,*" Height="1440">
+                    <Grid ColumnDefinitions="60,*" Height="1440" UseLayoutRounding="True">
                         <ItemsControl Grid.Column="0" ItemsSource="{Binding TimeSlots}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate x:DataType="vm:TimeSlotViewModel">

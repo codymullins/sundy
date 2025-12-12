@@ -58,8 +58,8 @@ public partial class EventViewModel : ObservableObject
 
     public void UpdateCanvasPosition(double left, double width)
     {
-        CanvasLeft = left;
-        CanvasWidth = width;
+        CanvasLeft = Math.Round(left);
+        CanvasWidth = Math.Round(width);
     }
 
     private void CalculatePosition(CalendarEvent evt, DateTime viewStart, CalendarViewMode viewMode)
@@ -76,8 +76,8 @@ public partial class EventViewModel : ObservableObject
             endMinutes = 24 * 60;
         }
 
-        CanvasTop = (startMinutes / 60.0) * HourHeight;
-        CanvasHeight = Math.Max(((endMinutes - startMinutes) / 60.0) * HourHeight, 30);
+        CanvasTop = Math.Round((startMinutes / 60.0) * HourHeight);
+        CanvasHeight = Math.Round(Math.Max(((endMinutes - startMinutes) / 60.0) * HourHeight, 30));
 
         if (viewMode == CalendarViewMode.Week)
         {
@@ -92,7 +92,7 @@ public partial class EventViewModel : ObservableObject
         {
             DayIndex = 0;
             CanvasLeft = 4;
-            CanvasWidth = double.NaN;
+            CanvasWidth = double.NaN; // NaN triggers auto-sizing
         }
     }
 

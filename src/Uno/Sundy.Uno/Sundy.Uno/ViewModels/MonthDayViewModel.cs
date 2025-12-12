@@ -9,7 +9,7 @@ public partial class MonthDayViewModel : ObservableObject
 {
     private readonly Action<MonthDayViewModel, EventViewModel>? _onEventSelected;
 
-    public MonthDayViewModel(DateTime date, bool isCurrentMonth, bool isToday, List<EventViewModel> events, Action<MonthDayViewModel, EventViewModel>? onEventSelected = null)
+    public MonthDayViewModel(DateTime date, bool isCurrentMonth, bool isToday, List<EventViewModel> events, int dayIndex, Action<MonthDayViewModel, EventViewModel>? onEventSelected = null)
     {
         Date = date;
         Day = date.Day.ToString();
@@ -17,6 +17,10 @@ public partial class MonthDayViewModel : ObservableObject
         IsToday = isToday;
         Events = new ObservableCollection<EventViewModel>(events);
         _onEventSelected = onEventSelected;
+
+        // Calculate grid position (7 columns, 6 rows)
+        GridColumn = dayIndex % 7;
+        GridRow = dayIndex / 7;
     }
 
     public DateTime Date { get; }
@@ -24,6 +28,8 @@ public partial class MonthDayViewModel : ObservableObject
     public bool IsCurrentMonth { get; }
     public bool IsToday { get; }
     public ObservableCollection<EventViewModel> Events { get; }
+    public int GridRow { get; }
+    public int GridColumn { get; }
 
     [ObservableProperty]
     private EventViewModel? _selectedEvent;

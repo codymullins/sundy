@@ -8,6 +8,7 @@
     xmlns:controls="using:Sundy.Uno.Presentation.Controls"
     xmlns:conv="using:Sundy.Uno.Presentation.Converters"
     mc:Ignorable="d"
+    UseLayoutRounding="True"
     Background="{StaticResource BackgroundPrimary}">
 
     <Page.Resources>
@@ -106,17 +107,19 @@
                     <StackPanel Orientation="Horizontal" Spacing="8" Grid.Column="0">
                         <Button Content="Today"
                                 Command="{Binding GoToTodayCommand}"
-                                Style="{StaticResource ModernButtonStyle}" />
+                                Style="{StaticResource AccentButtonStyle}" />
                         <StackPanel Orientation="Horizontal" Spacing="4">
                             <Button Command="{Binding PreviousPeriodCommand}"
-                                    Width="40"
                                     Style="{StaticResource ModernButtonStyle}">
-                                <SymbolIcon Symbol="Previous" Foreground="{StaticResource ForegroundPrimary}" />
+                                <SymbolIcon Symbol="Previous"
+                                            Foreground="{StaticResource ForegroundPrimary}"
+                                            />
                             </Button>
                             <Button Command="{Binding NextPeriodCommand}"
-                                    Width="40"
                                     Style="{StaticResource ModernButtonStyle}">
-                                <SymbolIcon Symbol="Next" Foreground="{StaticResource ForegroundPrimary}" />
+                                <SymbolIcon Symbol="Next"
+                                            Foreground="{StaticResource ForegroundPrimary}"
+                                             />
                             </Button>
                         </StackPanel>
                         <TextBlock Text="{Binding CurrentPeriodDisplay}"
@@ -146,13 +149,15 @@
                 </Grid>
             </Border>
 
-            <!-- Calendar view -->
-            <Border Grid.Row="1"
+            <!-- Calendar view - PixelSnappingBorder ensures width is multiple of 7 to prevent jitter -->
+            <controls:PixelSnappingBorder Grid.Row="1"
+                    SnapMultiple="7"
                     Background="{StaticResource BackgroundPrimary}"
                     BorderBrush="{StaticResource BorderBrush}"
-                    BorderThickness="1">
+                    BorderThickness="1"
+                    UseLayoutRounding="True">
                 <controls:CalendarView DataContext="{Binding CalendarViewModel}" />
-            </Border>
+            </controls:PixelSnappingBorder>
         </Grid>
 
         <!-- Event dialog overlay -->
