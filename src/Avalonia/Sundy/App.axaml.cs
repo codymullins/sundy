@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Sundy.Core;
+using Sundy.Core.System;
 using Sundy.ViewModels;
 using Sundy.Views;
 
@@ -55,6 +56,8 @@ public partial class App : Application
 
         // Register Services
         services.AddSingleton<ICalendarProvider, LocalCalendarProvider>();
+        services.AddSingleton<ITimeZoneProvider, SystemTimeZoneProvider>();
+        services.AddSingleton<EventTimeService>();
 
         // Register ViewModels
         services.AddTransient<MainViewModel>();

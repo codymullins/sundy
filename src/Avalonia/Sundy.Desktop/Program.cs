@@ -32,7 +32,7 @@ sealed class Program
         try
         {
             Log.Information("Starting Sundy application");
-            BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
+            BuildAvaloniaApp().WithDeveloperTools().StartWithClassicDesktopLifetime(args);
         }
         catch (Exception ex)
         {

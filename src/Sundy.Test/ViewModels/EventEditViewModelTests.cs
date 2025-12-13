@@ -2,6 +2,7 @@ using Mediator;
 using Moq;
 using Sundy.Core;
 using Sundy.Core.Queries;
+using Sundy.Core.System;
 using Sundy.Test.TestHelpers;
 using Sundy.ViewModels;
 
@@ -18,13 +19,18 @@ public class EventEditViewModelTests
         return mediatorMock;
     }
 
+    private static EventTimeService CreateEventTimeService()
+    {
+        return new EventTimeService(new SystemTimeZoneProvider());
+    }
+
     [Fact]
     public async Task InitializeAsync_CreateMode_SetsDefaultTimes()
     {
         // Arrange
         var calendars = new List<Calendar> { TestDataBuilder.CreateTestCalendar() };
         var mediatorMock = CreateMediatorMock(calendars);
-        var viewModel = new EventEditViewModel(mediatorMock.Object);
+        var viewModel = new EventEditViewModel(mediatorMock.Object, CreateEventTimeService());
 
         // Act
         await viewModel.InitializeAsync();
@@ -42,7 +48,7 @@ public class EventEditViewModelTests
         // Arrange
         var calendars = new List<Calendar> { TestDataBuilder.CreateTestCalendar() };
         var mediatorMock = CreateMediatorMock(calendars);
-        var viewModel = new EventEditViewModel(mediatorMock.Object);
+        var viewModel = new EventEditViewModel(mediatorMock.Object, CreateEventTimeService());
         var defaultDate = new DateOnly(2024, 5, 15);
 
         // Act
@@ -64,7 +70,7 @@ public class EventEditViewModelTests
         var calendar2 = TestDataBuilder.CreateTestCalendar(name: "Calendar 2");
         var calendars = new List<Calendar> { calendar1, calendar2 };
         var mediatorMock = CreateMediatorMock(calendars);
-        var viewModel = new EventEditViewModel(mediatorMock.Object);
+        var viewModel = new EventEditViewModel(mediatorMock.Object, CreateEventTimeService());
 
         // Act
         await viewModel.InitializeAsync(defaultCalendarId: calendar2.Id);
@@ -89,7 +95,7 @@ public class EventEditViewModelTests
             location: "Conference Room",
             description: "Important meeting");
 
-        var viewModel = new EventEditViewModel(mediatorMock.Object);
+        var viewModel = new EventEditViewModel(mediatorMock.Object, CreateEventTimeService());
 
         // Act
         await viewModel.InitializeAsync(existingEvent: existingEvent);
@@ -120,7 +126,7 @@ public class EventEditViewModelTests
             new DateTime(2024, 6, 10, 17, 0, 0),
             isBlockingEvent: true);
 
-        var viewModel = new EventEditViewModel(mediatorMock.Object);
+        var viewModel = new EventEditViewModel(mediatorMock.Object, CreateEventTimeService());
 
         // Act
         await viewModel.InitializeAsync(existingEvent: existingEvent);
@@ -135,7 +141,7 @@ public class EventEditViewModelTests
     {
         // Arrange
         var mediatorMock = new Mock<IMediator>();
-        var viewModel = new EventEditViewModel(mediatorMock.Object);
+        var viewModel = new EventEditViewModel(mediatorMock.Object, CreateEventTimeService());
         viewModel.StartDate = new DateTime(2024, 6, 10);
         viewModel.StartTime = TimeSpan.FromHours(10);
         viewModel.EndTime = TimeSpan.FromHours(11);
@@ -153,7 +159,7 @@ public class EventEditViewModelTests
     {
         // Arrange
         var mediatorMock = new Mock<IMediator>();
-        var viewModel = new EventEditViewModel(mediatorMock.Object);
+        var viewModel = new EventEditViewModel(mediatorMock.Object, CreateEventTimeService());
         var startDate = new DateTime(2024, 6, 10);
         viewModel.StartDate = startDate;
         viewModel.EndDate = startDate;
@@ -170,7 +176,7 @@ public class EventEditViewModelTests
     {
         // Arrange
         var mediatorMock = new Mock<IMediator>();
-        var viewModel = new EventEditViewModel(mediatorMock.Object);
+        var viewModel = new EventEditViewModel(mediatorMock.Object, CreateEventTimeService());
         viewModel.StartDate = new DateTime(2024, 6, 10);
         viewModel.EndDate = new DateTime(2024, 6, 11);
         viewModel.StartTime = TimeSpan.Zero;
@@ -193,7 +199,7 @@ public class EventEditViewModelTests
     {
         // Arrange
         var mediatorMock = new Mock<IMediator>();
-        var viewModel = new EventEditViewModel(mediatorMock.Object);
+        var viewModel = new EventEditViewModel(mediatorMock.Object, CreateEventTimeService());
         viewModel.StartTime = TimeSpan.FromHours(14);
         viewModel.EndTime = TimeSpan.FromHours(15);
 
@@ -210,7 +216,7 @@ public class EventEditViewModelTests
     {
         // Arrange
         var mediatorMock = new Mock<IMediator>();
-        var viewModel = new EventEditViewModel(mediatorMock.Object);
+        var viewModel = new EventEditViewModel(mediatorMock.Object, CreateEventTimeService());
         viewModel.StartDate = new DateTime(2024, 6, 10);
         viewModel.EndDate = new DateTime(2024, 6, 8);
 
@@ -226,7 +232,7 @@ public class EventEditViewModelTests
     {
         // Arrange
         var mediatorMock = new Mock<IMediator>();
-        var viewModel = new EventEditViewModel(mediatorMock.Object);
+        var viewModel = new EventEditViewModel(mediatorMock.Object, CreateEventTimeService());
         var date = new DateTime(2024, 6, 10);
         viewModel.StartDate = date;
         viewModel.EndDate = date;
@@ -245,7 +251,7 @@ public class EventEditViewModelTests
     {
         // Arrange
         var mediatorMock = new Mock<IMediator>();
-        var viewModel = new EventEditViewModel(mediatorMock.Object);
+        var viewModel = new EventEditViewModel(mediatorMock.Object, CreateEventTimeService());
         var date = new DateTime(2024, 6, 10);
         viewModel.StartDate = date;
         viewModel.EndDate = date;
@@ -264,7 +270,7 @@ public class EventEditViewModelTests
     {
         // Arrange
         var mediatorMock = new Mock<IMediator>();
-        var viewModel = new EventEditViewModel(mediatorMock.Object);
+        var viewModel = new EventEditViewModel(mediatorMock.Object, CreateEventTimeService());
         var date = new DateTime(2024, 6, 10);
         viewModel.StartDate = date;
         viewModel.EndDate = date;
@@ -283,7 +289,7 @@ public class EventEditViewModelTests
     {
         // We can't test the private method directly, but we can test its effects through OnStartTimeChanged
         var mediatorMock = new Mock<IMediator>();
-        var viewModel = new EventEditViewModel(mediatorMock.Object);
+        var viewModel = new EventEditViewModel(mediatorMock.Object, CreateEventTimeService());
 
         // Act - Set a valid time
         viewModel.StartTime = TimeSpan.FromHours(14).Add(TimeSpan.FromMinutes(30));
@@ -297,7 +303,7 @@ public class EventEditViewModelTests
     {
         // Arrange
         var mediatorMock = new Mock<IMediator>();
-        var viewModel = new EventEditViewModel(mediatorMock.Object);
+        var viewModel = new EventEditViewModel(mediatorMock.Object, CreateEventTimeService());
 
         // Act - Set a time >= 24 hours (tests line 322-323)
         viewModel.StartTime = TimeSpan.FromHours(25);
@@ -315,7 +321,7 @@ public class EventEditViewModelTests
     {
         // Arrange
         var mediatorMock = new Mock<IMediator>();
-        var viewModel = new EventEditViewModel(mediatorMock.Object);
+        var viewModel = new EventEditViewModel(mediatorMock.Object, CreateEventTimeService());
 
         // Act
         viewModel.StartTime = TimeSpan.FromHours(hours).Add(TimeSpan.FromMinutes(minutes));
@@ -330,7 +336,7 @@ public class EventEditViewModelTests
     {
         // Arrange
         var mediatorMock = new Mock<IMediator>();
-        var viewModel = new EventEditViewModel(mediatorMock.Object);
+        var viewModel = new EventEditViewModel(mediatorMock.Object, CreateEventTimeService());
 
         viewModel.Scheduler.SelectedDate = new DateOnly(2024, 6, 10);
         viewModel.Scheduler.TimeBlock.StartTime = new TimeOnly(10, 30);
@@ -340,8 +346,8 @@ public class EventEditViewModelTests
         viewModel.ApplySchedulerSelection();
 
         // Assert
-        Assert.Equal(new DateTime(2024, 6, 10).Date, viewModel.StartDate.DateTime.Date);
-        Assert.Equal(new DateTime(2024, 6, 10).Date, viewModel.EndDate.DateTime.Date);
+        Assert.Equal(new DateTime(2024, 6, 10).Date, viewModel.StartDate.Date);
+        Assert.Equal(new DateTime(2024, 6, 10).Date, viewModel.EndDate.Date);
         Assert.Equal(new TimeSpan(10, 30, 0), viewModel.StartTime);
         Assert.Equal(new TimeSpan(12, 0, 0), viewModel.EndTime);
     }
@@ -351,7 +357,7 @@ public class EventEditViewModelTests
     {
         // Arrange
         var mediatorMock = new Mock<IMediator>();
-        var viewModel = new EventEditViewModel(mediatorMock.Object);
+        var viewModel = new EventEditViewModel(mediatorMock.Object, CreateEventTimeService());
 
         viewModel.Scheduler.SelectedDate = new DateOnly(2024, 6, 10);
         viewModel.Scheduler.TimeBlock.StartTime = new TimeOnly(23, 0);
@@ -361,8 +367,8 @@ public class EventEditViewModelTests
         viewModel.ApplySchedulerSelection();
 
         // Assert
-        Assert.Equal(new DateTime(2024, 6, 10).Date, viewModel.StartDate.DateTime.Date);
-        Assert.Equal(new DateTime(2024, 6, 11).Date, viewModel.EndDate.DateTime.Date);
+        Assert.Equal(new DateTime(2024, 6, 10).Date, viewModel.StartDate.Date);
+        Assert.Equal(new DateTime(2024, 6, 11).Date, viewModel.EndDate.Date);
     }
 
     [Theory]
@@ -382,7 +388,7 @@ public class EventEditViewModelTests
             new DateTime(2024, 6, 10, startHour, startMinute, 0),
             new DateTime(2024, 6, 10, endHour, endMinute, 0));
 
-        var viewModel = new EventEditViewModel(mediatorMock.Object);
+        var viewModel = new EventEditViewModel(mediatorMock.Object, CreateEventTimeService());
 
         // Act
         viewModel.InitializeAsync(existingEvent: evt).Wait();

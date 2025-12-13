@@ -27,18 +27,18 @@ public class SundyDbContext(DbContextOptions<SundyDbContext> options) : DbContex
             entity.Property(e => e.CalendarId).IsRequired();
             entity.Property(e => e.IsBlockingEvent).IsRequired();
 
-            // Store DateTimeOffset as ticks for SQLite compatibility
+            // Store DateTimeOffset as ISO8601 string to preserve offset
             entity.Property(e => e.StartTime)
                 .IsRequired()
                 .HasConversion(
-                    v => v.UtcTicks,
-                    v => new DateTimeOffset(v, TimeSpan.Zero));
+                    v => v.ToString("o"),
+                    v => DateTimeOffset.Parse(v));
 
             entity.Property(e => e.EndTime)
                 .IsRequired()
                 .HasConversion(
-                    v => v.UtcTicks,
-                    v => new DateTimeOffset(v, TimeSpan.Zero));
+                    v => v.ToString("o"),
+                    v => DateTimeOffset.Parse(v));
 
             entity.HasOne<Calendar>()
                 .WithMany()

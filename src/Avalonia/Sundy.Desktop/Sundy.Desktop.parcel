@@ -1,0 +1,41 @@
+{
+    "GeneralSettings": {
+        "NetProjectPath": "Sundy.Desktop.csproj",
+        "ApplicationName": "Sundy.Desktop",
+        "Version": "0.1.0",
+        "PackageName": {
+            "$type": "msbuild",
+            "property": "Sundy"
+        },
+        "AssemblyName": {
+            "$type": "msbuild",
+            "property": "AssemblyName"
+        }
+    },
+    "LinuxSettings": {
+        "CreateBinSymlink": "True"
+    },
+    "Win32Settings": {
+        "IncludeUninstaller": "True"
+    },
+    "MacOsSettings": {
+        "CreateBundle": true,
+        "BundleIdentifier": "com.voltern.sundy-desktop",
+        "TeamId": "X4ZMW7Q7MK",
+        "Permissions": {
+            "Location": "This application uses location services to provide location-based features.",
+            "Contacts": "This application accesses your contacts to provide contact-related features.",
+            "Calendars": "This application accesses your calendar to manage events and appointments.",
+            "Network": "This application uses network access to connect to online services."
+        },
+        "AppIcon": "../Sundy/Assets/logo.png",
+        "SigningCredentialsType": "AdHoc"
+    },
+    "PublishSettings": {
+        "PublishSingleFile": "True",
+        "PublishTrimmed": "True",
+        "PublishAot": "True",
+        "PublishReadyToRun": "True",
+        "ExtraBuildProperties": {}
+    }
+}

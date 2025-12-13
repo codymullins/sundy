@@ -5,12 +5,14 @@ using Mediator;
 using Sundy.Core;
 using Sundy.Core.Commands;
 using Sundy.Core.Queries;
+using Sundy.Core.System;
 using Sundy.ViewModels.Scheduler;
 
 namespace Sundy.ViewModels;
 
 public partial class EventEditViewModel(
     IMediator mediator,
+    EventTimeService eventTimeService,
     Action? onSaved = null,
     Action? onCancelled = null)
     : ObservableObject
@@ -70,10 +72,12 @@ public partial class EventEditViewModel(
             Description = existingEvent.Description ?? string.Empty;
             IsBlockingEvent = existingEvent.IsBlockingEvent;
 
-            StartDate = existingEvent.StartTime.DateTime;
-            StartTime = existingEvent.StartTime.TimeOfDay;
-            EndDate = existingEvent.EndTime.DateTime;
-            EndTime = existingEvent.EndTime.TimeOfDay;
+            var (startDate, startTime) = eventTimeService.GetLocalDateTime(existingEvent.StartTime);
+            var (endDate, endTime) = eventTimeService.GetLocalDateTime(existingEvent.EndTime);
+            StartDate = startDate;
+            StartTime = startTime;
+            EndDate = endDate;
+            EndTime = endTime;
 
             // Set selected calendar
             SelectedCalendar = AvailableCalendars
@@ -138,8 +142,8 @@ public partial class EventEditViewModel(
             return;
         }
 
-        var startDateTime = CombineDateAndTime(StartDate, StartTime);
-        var endDateTime = CombineDateAndTime(EndDate, EndTime);
+        var startDateTime = eventTimeService.CreateEventTime(StartDate, StartTime);
+        var endDateTime = eventTimeService.CreateEventTime(EndDate, EndTime);
 
         if (endDateTime <= startDateTime)
         {
@@ -242,18 +246,6 @@ public partial class EventEditViewModel(
     }
 
     public Func<EventEditViewModel, Task>? OnSchedulerOpenRequested { get; set; }
-
-    private static DateTime CombineDateAndTime(DateTime date, TimeSpan time)
-    {
-        return new DateTime(
-            date.Year,
-            date.Month,
-            date.Day,
-            time.Hours,
-            time.Minutes,
-            0,
-            DateTimeKind.Local);
-    }
 
     partial void OnIsAllDayChanged(bool value)
     {

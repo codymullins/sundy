@@ -9,6 +9,7 @@ using Sundy.Controls;
 using Sundy.Core;
 using Sundy.Core.Commands;
 using Sundy.Core.Queries;
+using Sundy.Core.System;
 using Sundy.Test.TestHelpers;
 using Sundy.ViewModels;
 using Sundy.Views;
@@ -17,12 +18,13 @@ namespace Sundy.Avalonia.Test.Views;
 
 public class EventEditViewTests : HeadlessViewTestBase
 {
+    private static EventTimeService CreateEventTimeService() => new(new SystemTimeZoneProvider());
     [AvaloniaFact]
     public async Task EventEditView_CreateMode_ShowsNewEventDialog()
     {
         // Arrange
         var mediatorMock = CreateMediatorMock();
-        var viewModel = new EventEditViewModel(mediatorMock.Object);
+        var viewModel = new EventEditViewModel(mediatorMock.Object, CreateEventTimeService());
         await viewModel.InitializeAsync();
 
         // Act
@@ -42,7 +44,7 @@ public class EventEditViewTests : HeadlessViewTestBase
         var calendar = TestDataBuilder.CreateTestCalendar();
         var existingEvent = TestDataBuilder.CreateTestEvent(calendar.Id, title: "Existing Event");
         var mediatorMock = CreateMediatorMock(new List<Core.Calendar> { calendar });
-        var viewModel = new EventEditViewModel(mediatorMock.Object);
+        var viewModel = new EventEditViewModel(mediatorMock.Object, CreateEventTimeService());
         await viewModel.InitializeAsync(existingEvent);
 
         // Act
@@ -61,7 +63,7 @@ public class EventEditViewTests : HeadlessViewTestBase
     {
         // Arrange
         var mediatorMock = CreateMediatorMock();
-        var viewModel = new EventEditViewModel(mediatorMock.Object);
+        var viewModel = new EventEditViewModel(mediatorMock.Object, CreateEventTimeService());
         await viewModel.InitializeAsync();
         var eventEditView = new EventEditView { DataContext = viewModel };
         var window = CreateTestWindow(eventEditView);
@@ -89,7 +91,7 @@ public class EventEditViewTests : HeadlessViewTestBase
         // Arrange
         var calendar = TestDataBuilder.CreateTestCalendar();
         var mediatorMock = CreateMediatorMock(new List<Core.Calendar> { calendar });
-        var viewModel = new EventEditViewModel(mediatorMock.Object);
+        var viewModel = new EventEditViewModel(mediatorMock.Object, CreateEventTimeService());
         await viewModel.InitializeAsync();
         var eventEditView = new EventEditView { DataContext = viewModel };
         var window = CreateTestWindow(eventEditView);
@@ -109,7 +111,7 @@ public class EventEditViewTests : HeadlessViewTestBase
         var calendar1 = TestDataBuilder.CreateTestCalendar(name: "Work");
         var calendar2 = TestDataBuilder.CreateTestCalendar(name: "Personal");
         var mediatorMock = CreateMediatorMock(new List<Core.Calendar> { calendar1, calendar2 });
-        var viewModel = new EventEditViewModel(mediatorMock.Object);
+        var viewModel = new EventEditViewModel(mediatorMock.Object, CreateEventTimeService());
         await viewModel.InitializeAsync();
         var eventEditView = new EventEditView { DataContext = viewModel };
         var window = CreateTestWindow(eventEditView);
@@ -130,7 +132,7 @@ public class EventEditViewTests : HeadlessViewTestBase
         var calendar1 = TestDataBuilder.CreateTestCalendar(name: "Work");
         var calendar2 = TestDataBuilder.CreateTestCalendar(name: "Personal");
         var mediatorMock = CreateMediatorMock(new List<Core.Calendar> { calendar1, calendar2 });
-        var viewModel = new EventEditViewModel(mediatorMock.Object);
+        var viewModel = new EventEditViewModel(mediatorMock.Object, CreateEventTimeService());
         await viewModel.InitializeAsync();
         var eventEditView = new EventEditView { DataContext = viewModel };
         var window = CreateTestWindow(eventEditView);
@@ -149,7 +151,7 @@ public class EventEditViewTests : HeadlessViewTestBase
     {
         // Arrange
         var mediatorMock = CreateMediatorMock();
-        var viewModel = new EventEditViewModel(mediatorMock.Object);
+        var viewModel = new EventEditViewModel(mediatorMock.Object, CreateEventTimeService());
         await viewModel.InitializeAsync();
         var eventEditView = new EventEditView { DataContext = viewModel };
         var window = CreateTestWindow(eventEditView);
@@ -173,7 +175,7 @@ public class EventEditViewTests : HeadlessViewTestBase
     {
         // Arrange
         var mediatorMock = CreateMediatorMock();
-        var viewModel = new EventEditViewModel(mediatorMock.Object);
+        var viewModel = new EventEditViewModel(mediatorMock.Object, CreateEventTimeService());
         await viewModel.InitializeAsync();
         var eventEditView = new EventEditView { DataContext = viewModel };
         var window = CreateTestWindow(eventEditView);
@@ -196,7 +198,7 @@ public class EventEditViewTests : HeadlessViewTestBase
         var calendar = TestDataBuilder.CreateTestCalendar();
         var blockingEvent = TestDataBuilder.CreateTestEvent(calendar.Id, isBlockingEvent: true);
         var mediatorMock = CreateMediatorMock(new List<Core.Calendar> { calendar });
-        var viewModel = new EventEditViewModel(mediatorMock.Object);
+        var viewModel = new EventEditViewModel(mediatorMock.Object, CreateEventTimeService());
         await viewModel.InitializeAsync(blockingEvent);
         var eventEditView = new EventEditView { DataContext = viewModel };
         var window = CreateTestWindow(eventEditView);
@@ -222,7 +224,7 @@ public class EventEditViewTests : HeadlessViewTestBase
         var calendar = TestDataBuilder.CreateTestCalendar();
         var existingEvent = TestDataBuilder.CreateTestEvent(calendar.Id);
         var mediatorMock = CreateMediatorMock(new List<Core.Calendar> { calendar });
-        var viewModel = new EventEditViewModel(mediatorMock.Object);
+        var viewModel = new EventEditViewModel(mediatorMock.Object, CreateEventTimeService());
         await viewModel.InitializeAsync(existingEvent);
         var eventEditView = new EventEditView { DataContext = viewModel };
         var window = CreateTestWindow(eventEditView);
@@ -242,7 +244,7 @@ public class EventEditViewTests : HeadlessViewTestBase
     {
         // Arrange
         var mediatorMock = CreateMediatorMock();
-        var viewModel = new EventEditViewModel(mediatorMock.Object);
+        var viewModel = new EventEditViewModel(mediatorMock.Object, CreateEventTimeService());
         await viewModel.InitializeAsync();
         var eventEditView = new EventEditView { DataContext = viewModel };
         var window = CreateTestWindow(eventEditView);
@@ -261,7 +263,7 @@ public class EventEditViewTests : HeadlessViewTestBase
     {
         // Arrange
         var mediatorMock = CreateMediatorMock();
-        var viewModel = new EventEditViewModel(mediatorMock.Object);
+        var viewModel = new EventEditViewModel(mediatorMock.Object, CreateEventTimeService());
         await viewModel.InitializeAsync();
 
         // Act - Set up scheduler with specific date/time
