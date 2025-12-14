@@ -32,6 +32,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "github", "github", "{DC377E
 		..\.github\workflows\dev-release.yml = ..\.github\workflows\dev-release.yml
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sundy.Formats.JSCalendar", "Sundy.Formats.JSCalendar\Sundy.Formats.JSCalendar.csproj", "{270470D0-1CB4-4344-A62B-CFC798178228}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sundy.Formats.iCalendar", "Sundy.Formats.iCalendar\Sundy.Formats.iCalendar.csproj", "{E47598DD-76AC-4960-A6ED-8AAA60AFDB57}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sundy.Formats.iCalendar.Tests", "Sundy.Formats.iCalendar.Tests\Sundy.Formats.iCalendar.Tests.csproj", "{26DC8E43-E637-4D6C-93D8-A45045310714}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -66,6 +72,18 @@ Global
 		{A5E8F3D2-1C4B-4F9E-9A7C-8D3E5F1B2A9D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A5E8F3D2-1C4B-4F9E-9A7C-8D3E5F1B2A9D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A5E8F3D2-1C4B-4F9E-9A7C-8D3E5F1B2A9D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{270470D0-1CB4-4344-A62B-CFC798178228}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{270470D0-1CB4-4344-A62B-CFC798178228}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{270470D0-1CB4-4344-A62B-CFC798178228}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{270470D0-1CB4-4344-A62B-CFC798178228}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E47598DD-76AC-4960-A6ED-8AAA60AFDB57}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E47598DD-76AC-4960-A6ED-8AAA60AFDB57}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E47598DD-76AC-4960-A6ED-8AAA60AFDB57}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E47598DD-76AC-4960-A6ED-8AAA60AFDB57}.Release|Any CPU.Build.0 = Release|Any CPU
+		{26DC8E43-E637-4D6C-93D8-A45045310714}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{26DC8E43-E637-4D6C-93D8-A45045310714}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{26DC8E43-E637-4D6C-93D8-A45045310714}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{26DC8E43-E637-4D6C-93D8-A45045310714}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

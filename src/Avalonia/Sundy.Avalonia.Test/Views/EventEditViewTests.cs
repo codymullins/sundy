@@ -273,7 +273,7 @@ public class EventEditViewTests : HeadlessViewTestBase
         viewModel.ApplySchedulerSelection();
 
         // Assert - Verify event times updated from scheduler
-        Assert.Equal(new DateTime(2024, 6, 15).Date, viewModel.StartDate.DateTime.Date);
+        Assert.Equal(new DateTime(2024, 6, 15).Date, viewModel.StartDate.Date);
         Assert.Equal(new TimeSpan(14, 30, 0), viewModel.StartTime);
         Assert.Equal(new TimeSpan(16, 0, 0), viewModel.EndTime);
     }

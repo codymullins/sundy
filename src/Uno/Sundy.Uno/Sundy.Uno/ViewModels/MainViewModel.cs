@@ -6,18 +6,22 @@ using Mediator;
 using Sundy.Core;
 using Sundy.Core.Commands;
 using Sundy.Core.Queries;
+using Sundy.Core.System;
 
 namespace Sundy.Uno.ViewModels;
 
 public partial class MainViewModel : ViewModelBase
 {
     private readonly IMediator _mediator;
+    private readonly EventTimeService _eventTimeService;
 
     public MainViewModel(
         IMediator mediator,
-        CalendarViewModel calendarViewModel)
+        CalendarViewModel calendarViewModel,
+        EventTimeService eventTimeService)
     {
         _mediator = mediator;
+        _eventTimeService = eventTimeService;
 
         CalendarViewModel = calendarViewModel;
         CalendarViewModel.PropertyChanged += (_, e) =>
@@ -178,6 +182,7 @@ public partial class MainViewModel : ViewModelBase
     {
         var editVm = new EventEditViewModel(
             _mediator,
+            _eventTimeService,
             onSaved: OnEventSaved,
             onCancelled: () =>
             {
@@ -197,6 +202,7 @@ public partial class MainViewModel : ViewModelBase
     {
         var editVm = new EventEditViewModel(
             _mediator,
+            _eventTimeService,
             onSaved: OnEventSaved,
             onCancelled: () =>
             {
@@ -217,6 +223,7 @@ public partial class MainViewModel : ViewModelBase
     {
         var editVm = new EventEditViewModel(
             _mediator,
+            _eventTimeService,
             onSaved: OnEventSaved,
             onCancelled: () =>
             {

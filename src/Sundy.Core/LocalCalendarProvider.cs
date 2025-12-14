@@ -1,4 +1,6 @@
 
+using System.Diagnostics;
+
 namespace Sundy.Core;
 
 public class LocalCalendarProvider(EventStore eventStore) : ICalendarProvider
@@ -13,6 +15,8 @@ public class LocalCalendarProvider(EventStore eventStore) : ICalendarProvider
 
     public async Task<CalendarEvent> UpdateEventAsync(string calendarId, CalendarEvent evt, CancellationToken ct = default)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(evt.Id);
+        
         var existing = await eventStore.GetEventByIdAsync(evt.Id, ct).ConfigureAwait(false);
         if (existing == null)
         {
