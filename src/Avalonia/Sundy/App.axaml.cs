@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Sundy.Core;
+using Sundy.Core.Calendars.Outlook;
 using Sundy.Core.System;
 using Sundy.ViewModels;
 using Sundy.Views;
@@ -58,6 +59,18 @@ public partial class App : Application
         services.AddSingleton<ICalendarProvider, LocalCalendarProvider>();
         services.AddSingleton<ITimeZoneProvider, SystemTimeZoneProvider>();
         services.AddSingleton<EventTimeService>();
+
+        // Register Outlook/Microsoft Graph services
+        services.AddSingleton(new OutlookGraphOptions
+        {
+            UseDevelopmentCredential = true,
+            UseDeviceCodeFlow = true  // Enable device code flow
+        });
+        services.AddSingleton<MicrosoftGraphAuthService>();
+        services.AddSingleton<OutlookCalendarProvider>();
+
+        // enable copying to clipboard
+        services.AddSingleton<Services.IClipboardService, Services.ClipboardService>();
 
         // Register ViewModels
         services.AddTransient<MainViewModel>();

@@ -49,6 +49,10 @@
     <SolidColorBrush x:Key="AccentGlow" Color="{StaticResource AccentGlowColor}"/>
     <SolidColorBrush x:Key="AccentSubtle" Color="{StaticResource AccentSubtleColor}"/>
 
+    <!-- Accent Background for Selected States -->
+    <Color x:Key="AccentBackgroundColor">#E8E4F3</Color>
+    <SolidColorBrush x:Key="AccentBackground" Color="{StaticResource AccentBackgroundColor}"/>
+
     <!-- Danger/Error Colors -->
     <Color x:Key="DangerPrimaryColor">#E0204A</Color>
     <Color x:Key="DangerBackgroundColor">#FFF0F2</Color>

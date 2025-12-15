@@ -14,7 +14,7 @@ public class CalendarStore(SundyDbContext dbContext)
         }
     }
 
-    public async Task<List<Calendar>> GetAllCalendarsAsync(CancellationToken ct = default)
+    public async Task<List<Calendar>> GetAllAsync(CancellationToken ct = default)
     {
         return await dbContext.Calendars
             .AsNoTracking()
@@ -27,6 +27,12 @@ public class CalendarStore(SundyDbContext dbContext)
         dbContext.Calendars.Add(calendar);
         await dbContext.SaveChangesAsync(ct).ConfigureAwait(false);
     }
+
+    /// <summary>
+    /// Alias for CreateCalendarAsync for convenience.
+    /// </summary>
+    public Task AddAsync(Calendar calendar, CancellationToken ct = default)
+        => CreateCalendarAsync(calendar, ct);
 
     public async Task<Dictionary<string, Calendar>> GetCalendarLookupAsync(CancellationToken ct = default)
     {

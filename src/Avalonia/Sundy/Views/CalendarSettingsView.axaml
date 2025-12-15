@@ -3,8 +3,9 @@
              xmlns:vm="using:Sundy.ViewModels"
              x:Class="Sundy.Views.CalendarSettingsView"
              x:DataType="vm:CalendarSettingsViewModel"
-             MaxWidth="700"
-             MinWidth="320"
+             MaxWidth="900"
+             MinWidth="600"
+             Height="650"
              HorizontalAlignment="Stretch"
              Margin="16,24">
     <Grid>
@@ -12,134 +13,546 @@
                 BorderBrush="{DynamicResource ModalBorder}"
                 BorderThickness="1"
                 CornerRadius="8"
-                Padding="24"
                 BoxShadow="0 4 16 0 #80000000">
-            <Grid RowDefinitions="Auto,*,Auto,Auto,Auto">
-                <!-- Header -->
-                <TextBlock Grid.Row="0"
-                           Text="Calendar Settings"
-                           FontSize="24"
-                           FontWeight="SemiBold"
-                           Foreground="{DynamicResource ForegroundPrimary}"
-                           Margin="0,0,0,24" />
-
-                <!-- Calendar List -->
-                <ScrollViewer Grid.Row="1" MaxHeight="400">
-                    <StackPanel Spacing="12">
-                        <TextBlock Text="Calendars"
+            <Grid ColumnDefinitions="200,*">
+                <!-- Left Sidebar -->
+                <Border Grid.Column="0"
+                        Background="{DynamicResource BackgroundSecondary}"
+                        CornerRadius="8,0,0,8"
+                        BorderBrush="{DynamicResource BorderBrush}"
+                        BorderThickness="0,0,1,0">
+                    <Grid RowDefinitions="Auto,*">
+                        <!-- Sidebar Header -->
+                        <TextBlock Grid.Row="0"
+                                   Text="Settings"
+                                   FontSize="20"
                                    FontWeight="SemiBold"
-                                   FontSize="16"
                                    Foreground="{DynamicResource ForegroundPrimary}"
-                                   Margin="0,0,0,8" />
+                                   Margin="16,20,16,16" />
 
-                        <!-- Empty state -->
-                        <TextBlock Text="No calendars yet. Create one below."
-                                   Foreground="{DynamicResource ForegroundDisabled}"
-                                   FontStyle="Italic"
-                                   IsVisible="{Binding !Calendars.Count}" />
+                        <!-- Sidebar Navigation -->
+                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                            <StackPanel Spacing="4" Margin="8,0,8,16">
+                                <!-- General Section Button -->
+                                <Button Command="{Binding SetSectionCommand}"
+                                        CommandParameter="General"
+                                        HorizontalAlignment="Stretch"
+                                        HorizontalContentAlignment="Left"
+                                        Padding="12,10"
+                                        Tag="{Binding SelectedSection, Converter={StaticResource EqualityConverter}, ConverterParameter=General}">
+                                    <Button.Styles>
+                                        <Style Selector="Button">
+                                            <Setter Property="Background" Value="Transparent" />
+                                            <Setter Property="CornerRadius" Value="8" />
+                                            <Setter Property="BorderThickness" Value="0" />
+                                        </Style>
+                                        <Style Selector="Button:pointerover /template/ ContentPresenter">
+                                            <Setter Property="Background" Value="{DynamicResource BackgroundHover}" />
+                                        </Style>
+                                        <Style Selector="Button[Tag=True]">
+                                            <Setter Property="Background" Value="{DynamicResource AccentBackground}" />
+                                            <Setter Property="BorderThickness" Value="3,0,0,0" />
+                                            <Setter Property="BorderBrush" Value="{DynamicResource AccentPrimary}" />
+                                            <Setter Property="Padding" Value="9,10" />
+                                        </Style>
+                                        <Style Selector="Button[Tag=True]:pointerover /template/ ContentPresenter">
+                                            <Setter Property="Background" Value="#352060" />
+                                        </Style>
+                                    </Button.Styles>
+                                    <StackPanel Orientation="Horizontal" Spacing="10">
+                                        <PathIcon Width="16" Height="16"
+                                                  Data="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"
+                                                  Foreground="{DynamicResource ForegroundPrimary}" />
+                                        <TextBlock Text="General"
+                                                   FontSize="14"
+                                                   Foreground="{DynamicResource ForegroundPrimary}" />
+                                    </StackPanel>
+                                </Button>
 
-                        <!-- Calendar items -->
-                        <ItemsControl ItemsSource="{Binding Calendars}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <Border BorderBrush="{DynamicResource BorderBrush}"
-                                            BorderThickness="1"
+                                <!-- Integrations Section Button -->
+                                <Button Command="{Binding SetSectionCommand}"
+                                        CommandParameter="Integrations"
+                                        HorizontalAlignment="Stretch"
+                                        HorizontalContentAlignment="Left"
+                                        Padding="12,10"
+                                        Tag="{Binding SelectedSection, Converter={StaticResource EqualityConverter}, ConverterParameter=Integrations}">
+                                    <Button.Styles>
+                                        <Style Selector="Button">
+                                            <Setter Property="Background" Value="Transparent" />
+                                            <Setter Property="CornerRadius" Value="8" />
+                                            <Setter Property="BorderThickness" Value="0" />
+                                        </Style>
+                                        <Style Selector="Button:pointerover /template/ ContentPresenter">
+                                            <Setter Property="Background" Value="{DynamicResource BackgroundHover}" />
+                                        </Style>
+                                        <Style Selector="Button[Tag=True]">
+                                            <Setter Property="Background" Value="{DynamicResource AccentBackground}" />
+                                            <Setter Property="BorderThickness" Value="3,0,0,0" />
+                                            <Setter Property="BorderBrush" Value="{DynamicResource AccentPrimary}" />
+                                            <Setter Property="Padding" Value="9,10" />
+                                        </Style>
+                                        <Style Selector="Button[Tag=True]:pointerover /template/ ContentPresenter">
+                                            <Setter Property="Background" Value="#352060" />
+                                        </Style>
+                                    </Button.Styles>
+                                    <StackPanel Orientation="Horizontal" Spacing="10">
+                                        <PathIcon Width="16" Height="16"
+                                                  Data="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"
+                                                  Foreground="{DynamicResource ForegroundPrimary}" />
+                                        <TextBlock Text="Integrations"
+                                                   FontSize="14"
+                                                   Foreground="{DynamicResource ForegroundPrimary}" />
+                                    </StackPanel>
+                                </Button>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </Grid>
+                </Border>
+
+                <!-- Right Content Area -->
+                <Grid Grid.Column="1" Margin="24" RowDefinitions="*,Auto">
+                    <!-- General Section Content -->
+                    <ScrollViewer Grid.Row="0"
+                                  IsVisible="{Binding SelectedSection, Converter={StaticResource EqualityConverter}, ConverterParameter=General}"
+                                  MaxHeight="500">
+                        <StackPanel Spacing="20">
+                            <!-- Header -->
+                            <TextBlock Text="General Settings"
+                                       FontSize="24"
+                                       FontWeight="SemiBold"
+                                       Foreground="{DynamicResource ForegroundPrimary}" />
+
+                            <!-- Calendar List -->
+                            <StackPanel Spacing="12">
+                                <TextBlock Text="Calendars"
+                                           FontWeight="SemiBold"
+                                           FontSize="16"
+                                           Foreground="{DynamicResource ForegroundPrimary}"
+                                           Margin="0,0,0,8" />
+
+                                <!-- Empty state -->
+                                <TextBlock Text="No calendars yet. Create one below."
+                                           Foreground="{DynamicResource ForegroundDisabled}"
+                                           FontStyle="Italic"
+                                           IsVisible="{Binding !Calendars.Count}" />
+
+                                <!-- Calendar items -->
+                                <ItemsControl ItemsSource="{Binding Calendars}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border BorderBrush="{DynamicResource BorderBrush}"
+                                                    BorderThickness="1"
+                                                    CornerRadius="8"
+                                                    Padding="16"
+                                                    Margin="0,0,0,8"
+                                                    Background="{DynamicResource BackgroundSecondary}">
+                                                <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,*,Auto">
+                                                    <!-- Calendar Color and Name -->
+                                                    <Border Grid.Row="0" Grid.Column="0"
+                                                            Width="24"
+                                                            Height="24"
+                                                            Background="{Binding Color}"
+                                                            CornerRadius="6"
+                                                            VerticalAlignment="Center"
+                                                            Margin="0,0,12,0" />
+
+                                                    <TextBlock Grid.Row="0" Grid.Column="1"
+                                                               Text="{Binding Name}"
+                                                               FontSize="16"
+                                                               FontWeight="SemiBold"
+                                                               Foreground="{DynamicResource ForegroundPrimary}"
+                                                               VerticalAlignment="Center" />
+
+                                                    <!-- Delete Button -->
+                                                    <Button Grid.Row="0" Grid.Column="2"
+                                                            Content="Delete"
+                                                            Command="{Binding DeleteCommand}"
+                                                            CommandParameter="{Binding}"
+                                                            Classes="danger"
+                                                            VerticalAlignment="Center" />
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+
+                            <!-- New Calendar Section -->
+                            <Border BorderBrush="{DynamicResource BorderBrush}"
+                                    BorderThickness="0,1,0,0"
+                                    Padding="0,20,0,0">
+                                <StackPanel Spacing="12">
+                                    <TextBlock Text="Create New Calendar"
+                                               FontWeight="SemiBold"
+                                               FontSize="16"
+                                               Foreground="{DynamicResource ForegroundPrimary}" />
+
+                                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                                        <TextBox Grid.Column="0"
+                                                 Text="{Binding NewCalendarName}"
+                                                 Watermark="Calendar name"
+                                                 Height="36" />
+                                        <Button Grid.Column="1"
+                                                Content="Create"
+                                                Command="{Binding CreateCalendarCommand}"
+                                                Classes="accent"
+                                                MinWidth="100" />
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Database Management Section -->
+                            <Border BorderBrush="{DynamicResource BorderBrush}"
+                                    BorderThickness="0,1,0,0"
+                                    Padding="0,20,0,0">
+                                <StackPanel Spacing="12">
+                                    <TextBlock Text="Database Management"
+                                               FontWeight="SemiBold"
+                                               FontSize="16"
+                                               Foreground="{DynamicResource ForegroundPrimary}" />
+
+                                    <TextBlock TextWrapping="Wrap"
+                                               Foreground="{DynamicResource ForegroundSecondary}"
+                                               FontSize="13"
+                                               Text="Warning: This will permanently delete all local data. This action cannot be undone." />
+
+                                    <Button Content="Reset Database"
+                                            Command="{Binding ResetDatabaseCommand}"
+                                            Classes="danger"
+                                            HorizontalAlignment="Left"
+                                            MinWidth="150"
+                                            IsEnabled="{Binding !IsResettingDatabase}" />
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </ScrollViewer>
+
+                    <!-- Integrations Section Content -->
+                    <ScrollViewer Grid.Row="0"
+                                  IsVisible="{Binding SelectedSection, Converter={StaticResource EqualityConverter}, ConverterParameter=Integrations}"
+                                  MaxHeight="500">
+                        <StackPanel Spacing="20">
+                            <!-- Header -->
+                            <TextBlock Text="Integrations"
+                                       FontSize="24"
+                                       FontWeight="SemiBold"
+                                       Foreground="{DynamicResource ForegroundPrimary}" />
+
+                            <TextBlock Text="Connect your external calendars to sync events across all your services."
+                                       Foreground="{DynamicResource ForegroundSecondary}"
+                                       TextWrapping="Wrap"
+                                       FontSize="14" />
+
+                            <!-- Microsoft Outlook Integration -->
+                            <Border BorderBrush="{DynamicResource BorderBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="8"
+                                    Padding="20"
+                                    Background="{DynamicResource BackgroundSecondary}">
+                                <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="Auto,*,Auto">
+                                    <Border Grid.Row="0" Grid.Column="0"
+                                            Width="48"
+                                            Height="48"
+                                            Background="#0078D4"
                                             CornerRadius="8"
-                                            Padding="16"
-                                            Margin="0,0,0,8"
-                                            Background="{DynamicResource BackgroundSecondary}">
-                                        <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,*,Auto">
-                                            <!-- Calendar Color and Name -->
-                                            <Border Grid.Row="0" Grid.Column="0"
-                                                    Width="24"
-                                                    Height="24"
-                                                    Background="{Binding Color}"
-                                                    CornerRadius="6"
-                                                    VerticalAlignment="Center"
-                                                    Margin="0,0,12,0" />
-
-                                            <TextBlock Grid.Row="0" Grid.Column="1"
-                                                       Text="{Binding Name}"
-                                                       FontSize="16"
-                                                       FontWeight="SemiBold"
-                                                       Foreground="{DynamicResource ForegroundPrimary}"
-                                                       VerticalAlignment="Center" />
-
-                                            <!-- Delete Button -->
-                                            <Button Grid.Row="0" Grid.Column="2"
-                                                    Content="Delete"
-                                                    Command="{Binding DeleteCommand}"
-                                                    CommandParameter="{Binding}"
-                                                    Classes="danger"
-                                                    VerticalAlignment="Center" />
-                                        </Grid>
+                                            VerticalAlignment="Center"
+                                            Margin="0,0,16,0">
+                                        <TextBlock Text="O"
+                                                   FontSize="24"
+                                                   FontWeight="Bold"
+                                                   Foreground="White"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center" />
                                     </Border>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                    </StackPanel>
-                </ScrollViewer>
 
-                <!-- New Calendar Section -->
-                <Border Grid.Row="2"
-                        BorderBrush="{DynamicResource BorderBrush}"
-                        BorderThickness="0,1,0,0"
-                        Padding="0,20,0,0"
-                        Margin="0,20,0,0">
-                    <StackPanel Spacing="12">
-                        <TextBlock Text="Create New Calendar"
-                                   FontWeight="SemiBold"
-                                   FontSize="16"
-                                   Foreground="{DynamicResource ForegroundPrimary}" />
+                                    <StackPanel Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" Spacing="4">
+                                        <TextBlock Text="Microsoft Outlook"
+                                                   FontSize="16"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource ForegroundPrimary}" />
+                                        <!-- Show different text based on connection status -->
+                                        <TextBlock Text="Connect your Outlook calendar to sync events"
+                                                   FontSize="13"
+                                                   Foreground="{DynamicResource ForegroundSecondary}"
+                                                   IsVisible="{Binding !IsOutlookConnected}" />
+                                        <StackPanel Orientation="Horizontal" Spacing="4" IsVisible="{Binding IsOutlookConnected}">
+                                            <TextBlock Text="Connected as"
+                                                       FontSize="13"
+                                                       Foreground="{DynamicResource ForegroundSecondary}" />
+                                            <TextBlock Text="{Binding OutlookUserName}"
+                                                       FontSize="13"
+                                                       FontWeight="SemiBold"
+                                                       Foreground="{DynamicResource AccentPrimary}" />
+                                        </StackPanel>
+                                    </StackPanel>
 
-                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
-                            <TextBox Grid.Column="0"
-                                     Text="{Binding NewCalendarName}"
-                                     Watermark="Calendar name"
-                                     Height="36" />
-                            <Button Grid.Column="1"
-                                    Content="Create"
-                                    Command="{Binding CreateCalendarCommand}"
-                                    Classes="accent"
-                                    MinWidth="100" />
-                        </Grid>
-                    </StackPanel>
-                </Border>
+                                    <!-- Connect Button (shown when not connected) -->
+                                    <Button Grid.Row="0" Grid.Column="2"
+                                            Content="Connect"
+                                            Command="{Binding ConnectOutlookCommand}"
+                                            Classes="accent"
+                                            MinWidth="100"
+                                            VerticalAlignment="Center"
+                                            IsVisible="{Binding !IsOutlookConnected}"
+                                            IsEnabled="{Binding !IsOutlookConnecting}" />
 
-                <!-- Database Management Section -->
-                <Border Grid.Row="3"
-                        BorderBrush="{DynamicResource BorderBrush}"
-                        BorderThickness="0,1,0,0"
-                        Padding="0,20,0,0"
-                        Margin="0,20,0,0">
-                    <StackPanel Spacing="12">
-                        <TextBlock Text="Database Management"
-                                   FontWeight="SemiBold"
-                                   FontSize="16"
-                                   Foreground="{DynamicResource ForegroundPrimary}" />
+                                    <!-- Connecting indicator -->
+                                    <StackPanel Grid.Row="0" Grid.Column="2"
+                                                Orientation="Horizontal"
+                                                Spacing="8"
+                                                VerticalAlignment="Center"
+                                                IsVisible="{Binding IsOutlookConnecting}">
+                                        <!-- Simple connecting text when NOT using device code -->
+                                        <TextBlock Text="Connecting..."
+                                                   FontSize="13"
+                                                   Foreground="{DynamicResource ForegroundSecondary}"
+                                                   IsVisible="{Binding !IsDeviceCodeFlowActive}" />
 
-                        <TextBlock TextWrapping="Wrap"
-                                   Foreground="{DynamicResource ForegroundSecondary}"
-                                   FontSize="13"
-                                   Text="Warning: This will permanently delete all local data. This action cannot be undone." />
+                                        <!-- Device code flow UI -->
+                                        <StackPanel Spacing="4" IsVisible="{Binding IsDeviceCodeFlowActive}">
+                                            <TextBlock Text="Sign in on another device"
+                                                       FontSize="13"
+                                                       FontWeight="SemiBold"
+                                                       Foreground="{DynamicResource ForegroundPrimary}" />
+                                        </StackPanel>
+                                    </StackPanel>
 
-                        <Button Content="Reset Database"
-                                Command="{Binding ResetDatabaseCommand}"
-                                Classes="danger"
-                                HorizontalAlignment="Left"
-                                MinWidth="150"
-                                IsEnabled="{Binding !IsResettingDatabase}" />
-                    </StackPanel>
-                </Border>
+                                    <!-- Disconnect Button (shown when connected) -->
+                                    <Button Grid.Row="0" Grid.Column="2"
+                                            Content="Disconnect"
+                                            Command="{Binding DisconnectOutlookCommand}"
+                                            Classes="danger"
+                                            MinWidth="100"
+                                            VerticalAlignment="Center"
+                                            IsVisible="{Binding IsOutlookConnected}" />
 
-                <!-- Close Button -->
-                <Button Grid.Row="4"
-                        Content="Close"
-                        Command="{Binding CloseCommand}"
-                        Classes="modern"
-                        HorizontalAlignment="Right"
-                        MinWidth="100"
-                        Margin="0,20,0,0" />
+                                    <!-- Device Code Information Panel -->
+                                    <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3"
+                                                Spacing="12"
+                                                Margin="0,12,0,0"
+                                                IsVisible="{Binding IsDeviceCodeFlowActive}">
+
+                                        <Border Background="{DynamicResource BackgroundTertiary}"
+                                                BorderBrush="{DynamicResource AccentPrimary}"
+                                                BorderThickness="1"
+                                                CornerRadius="6"
+                                                Padding="16">
+                                            <StackPanel Spacing="12">
+                                                <TextBlock Text="Complete sign-in on another device"
+                                                           FontSize="14"
+                                                           FontWeight="SemiBold"
+                                                           Foreground="{DynamicResource ForegroundPrimary}" />
+
+                                                <TextBlock Text="Open this URL in a web browser on any device:"
+                                                           FontSize="12"
+                                                           Foreground="{DynamicResource ForegroundSecondary}" />
+
+                                                <!-- URL with Copy Button -->
+                                                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                                    <Border Grid.Column="0"
+                                                            Background="{DynamicResource BackgroundPrimary}"
+                                                            BorderBrush="{DynamicResource BorderBrush}"
+                                                            BorderThickness="1"
+                                                            CornerRadius="4"
+                                                            Padding="10,8">
+                                                        <TextBlock Text="{Binding DeviceCodeUrl}"
+                                                                   FontFamily="Consolas,Menlo,Monaco,monospace"
+                                                                   FontSize="13"
+                                                                   Foreground="{DynamicResource AccentPrimary}"
+                                                                   VerticalAlignment="Center" />
+                                                    </Border>
+
+                                                    <Button Grid.Column="1"
+                                                            Content="Copy"
+                                                            Command="{Binding CopyDeviceCodeUrlCommand}"
+                                                            Classes="accent"
+                                                            MinWidth="70"
+                                                            Height="36" />
+                                                </Grid>
+
+                                                <TextBlock Text="Then enter this code:"
+                                                           FontSize="12"
+                                                           Foreground="{DynamicResource ForegroundSecondary}"
+                                                           Margin="0,8,0,0" />
+
+                                                <!-- Code with Copy Button -->
+                                                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                                    <Border Grid.Column="0"
+                                                            Background="{DynamicResource BackgroundPrimary}"
+                                                            BorderBrush="{DynamicResource BorderBrush}"
+                                                            BorderThickness="1"
+                                                            CornerRadius="4"
+                                                            Padding="10,8">
+                                                        <TextBlock Text="{Binding DeviceCodeUserCode}"
+                                                                   FontFamily="Consolas,Menlo,Monaco,monospace"
+                                                                   FontSize="20"
+                                                                   FontWeight="Bold"
+                                                                   Foreground="{DynamicResource AccentPrimary}"
+                                                                   LetterSpacing="2"
+                                                                   VerticalAlignment="Center"
+                                                                   HorizontalAlignment="Center" />
+                                                    </Border>
+
+                                                    <Button Grid.Column="1"
+                                                            Content="Copy"
+                                                            Command="{Binding CopyDeviceCodeCommand}"
+                                                            Classes="accent"
+                                                            MinWidth="70"
+                                                            Height="36" />
+                                                </Grid>
+
+                                                <TextBlock Text="Waiting for sign-in..."
+                                                           FontSize="12"
+                                                           FontStyle="Italic"
+                                                           Foreground="{DynamicResource ForegroundDisabled}"
+                                                           HorizontalAlignment="Center"
+                                                           Margin="0,4,0,0" />
+                                            </StackPanel>
+                                        </Border>
+                                    </StackPanel>
+
+                                    <!-- Error message -->
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3"
+                                               Text="{Binding OutlookConnectionError}"
+                                               Foreground="{DynamicResource DangerPrimary}"
+                                               FontSize="12"
+                                               TextWrapping="Wrap"
+                                               Margin="0,8,0,0"
+                                               IsVisible="{Binding OutlookConnectionError, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+                                </Grid>
+                            </Border>
+
+                            <!-- Google Calendar Integration -->
+                            <Border BorderBrush="{DynamicResource BorderBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="8"
+                                    Padding="20"
+                                    Background="{DynamicResource BackgroundSecondary}">
+                                <Grid ColumnDefinitions="Auto,*,Auto">
+                                    <Border Grid.Column="0"
+                                            Width="48"
+                                            Height="48"
+                                            Background="#4285F4"
+                                            CornerRadius="8"
+                                            VerticalAlignment="Center"
+                                            Margin="0,0,16,0">
+                                        <TextBlock Text="G"
+                                                   FontSize="24"
+                                                   FontWeight="Bold"
+                                                   Foreground="White"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center" />
+                                    </Border>
+
+                                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="4">
+                                        <TextBlock Text="Google Calendar"
+                                                   FontSize="16"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource ForegroundPrimary}" />
+                                        <TextBlock Text="Connect your Google calendar to sync events"
+                                                   FontSize="13"
+                                                   Foreground="{DynamicResource ForegroundSecondary}" />
+                                    </StackPanel>
+
+                                    <Button Grid.Column="2"
+                                            Content="Connect"
+                                            Classes="accent"
+                                            MinWidth="100"
+                                            VerticalAlignment="Center" />
+                                </Grid>
+                            </Border>
+
+                            <!-- Apple Calendar Integration -->
+                            <Border BorderBrush="{DynamicResource BorderBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="8"
+                                    Padding="20"
+                                    Background="{DynamicResource BackgroundSecondary}">
+                                <Grid ColumnDefinitions="Auto,*,Auto">
+                                    <Border Grid.Column="0"
+                                            Width="48"
+                                            Height="48"
+                                            Background="#FF3B30"
+                                            CornerRadius="8"
+                                            VerticalAlignment="Center"
+                                            Margin="0,0,16,0">
+                                        <TextBlock Text="A"
+                                                   FontSize="24"
+                                                   FontWeight="Bold"
+                                                   Foreground="White"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center" />
+                                    </Border>
+
+                                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="4">
+                                        <TextBlock Text="Apple Calendar"
+                                                   FontSize="16"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource ForegroundPrimary}" />
+                                        <TextBlock Text="Connect your Apple calendar via CalDAV"
+                                                   FontSize="13"
+                                                   Foreground="{DynamicResource ForegroundSecondary}" />
+                                    </StackPanel>
+
+                                    <Button Grid.Column="2"
+                                            Content="Connect"
+                                            Classes="accent"
+                                            MinWidth="100"
+                                            VerticalAlignment="Center" />
+                                </Grid>
+                            </Border>
+
+                            <!-- CalDAV/iCal Integration -->
+                            <Border BorderBrush="{DynamicResource BorderBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="8"
+                                    Padding="20"
+                                    Background="{DynamicResource BackgroundSecondary}">
+                                <Grid ColumnDefinitions="Auto,*,Auto">
+                                    <Border Grid.Column="0"
+                                            Width="48"
+                                            Height="48"
+                                            Background="#6B7280"
+                                            CornerRadius="8"
+                                            VerticalAlignment="Center"
+                                            Margin="0,0,16,0">
+                                        <TextBlock Text="C"
+                                                   FontSize="24"
+                                                   FontWeight="Bold"
+                                                   Foreground="White"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center" />
+                                    </Border>
+
+                                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="4">
+                                        <TextBlock Text="CalDAV / iCal"
+                                                   FontSize="16"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource ForegroundPrimary}" />
+                                        <TextBlock Text="Connect any CalDAV or iCal compatible calendar"
+                                                   FontSize="13"
+                                                   Foreground="{DynamicResource ForegroundSecondary}" />
+                                    </StackPanel>
+
+                                    <Button Grid.Column="2"
+                                            Content="Add"
+                                            Classes="accent"
+                                            MinWidth="100"
+                                            VerticalAlignment="Center" />
+                                </Grid>
+                            </Border>
+                        </StackPanel>
+                    </ScrollViewer>
+
+                    <!-- Close Button -->
+                    <Button Grid.Row="1"
+                            Content="Close"
+                            Command="{Binding CloseCommand}"
+                            Classes="accent"
+                            HorizontalAlignment="Right"
+                            MinWidth="100"
+                            Margin="0,20,0,0" />
+                </Grid>
             </Grid>
         </Border>
 

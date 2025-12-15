@@ -9,6 +9,6 @@ public class GetAllCalendarsQueryHandler(CalendarStore store)
 
     public async ValueTask<List<Calendar>> Handle(GetAllCalendarsQuery request, CancellationToken cancellationToken)
     {
-        return await store.GetAllCalendarsAsync(cancellationToken);
+        return await store.GetAllAsync(cancellationToken);
     }
 }

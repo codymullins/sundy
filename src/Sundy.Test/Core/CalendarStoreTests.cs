@@ -14,7 +14,7 @@ public class CalendarStoreTests
 
         // Act
         await calendarStore.CreateCalendarAsync(calendar);
-        var retrieved = await calendarStore.GetAllCalendarsAsync();
+        var retrieved = await calendarStore.GetAllAsync();
 
         // Assert
         Assert.Contains(retrieved, c => c.Id == calendar.Id);
@@ -33,7 +33,7 @@ public class CalendarStoreTests
         await calendarStore.CreateCalendarAsync(calendar3);
 
         // Act
-        var results = await calendarStore.GetAllCalendarsAsync();
+        var results = await calendarStore.GetAllAsync();
 
         // Assert
         Assert.Equal(3, results.Count);
@@ -46,7 +46,7 @@ public class CalendarStoreTests
     public async Task GetAllCalendarsAsync_ReturnsEmptyWhenNoCalendars(IMediator mediator, CalendarStore calendarStore)
     {
         // Act
-        var results = await calendarStore.GetAllCalendarsAsync();
+        var results = await calendarStore.GetAllAsync();
 
         // Assert
         Assert.Empty(results);
@@ -61,7 +61,7 @@ public class CalendarStoreTests
 
         // Act
         await calendarStore.DeleteCalendarAsync(calendar.Id);
-        var remaining = await calendarStore.GetAllCalendarsAsync();
+        var remaining = await calendarStore.GetAllAsync();
 
         // Assert
         Assert.DoesNotContain(remaining, c => c.Id == calendar.Id);
@@ -121,7 +121,7 @@ public class CalendarStoreTests
 
         // Act
         await calendarStore.CreateCalendarAsync(calendar);
-        var retrieved = (await calendarStore.GetAllCalendarsAsync())
+        var retrieved = (await calendarStore.GetAllAsync())
             .First(c => c.Id == calendar.Id);
 
         // Assert

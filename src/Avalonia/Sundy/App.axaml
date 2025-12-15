@@ -1,6 +1,7 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="using:Sundy"
+             xmlns:converters="using:Sundy.Converters"
              x:Class="Sundy.App"
              xmlns:styling="using:Avalonia.Styling"
              RequestedThemeVariant="Dark">
@@ -12,6 +13,7 @@
 
     <Application.Resources>
         <ResourceDictionary>
+            <converters:EqualityConverter x:Key="EqualityConverter" />
             <ResourceDictionary.ThemeDictionaries>
                 <ResourceDictionary x:Key="Light">
                     <ResourceDictionary.MergedDictionaries>

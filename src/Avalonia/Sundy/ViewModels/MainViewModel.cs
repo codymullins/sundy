@@ -2,7 +2,9 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mediator;
+using Serilog;
 using Sundy.Core;
+using Sundy.Core.Calendars.Outlook;
 using Sundy.Core.Commands;
 using Sundy.Core.Queries;
 using Sundy.Core.System;
@@ -11,16 +13,25 @@ namespace Sundy.ViewModels;
 
 public partial class MainViewModel : ViewModelBase
 {
-private readonly IMediator _mediator;
-private readonly EventTimeService _eventTimeService;
+    private readonly IMediator _mediator;
+    private readonly EventTimeService _eventTimeService;
+    private readonly OutlookCalendarProvider _outlookProvider;
+    private readonly MicrosoftGraphAuthService _authService;
+    private readonly Services.IClipboardService _clipboardService;
 
-public MainViewModel(
-IMediator mediator,
-CalendarViewModel calendarViewModel,
-EventTimeService eventTimeService)
+    public MainViewModel(
+        IMediator mediator,
+        CalendarViewModel calendarViewModel,
+        EventTimeService eventTimeService,
+        OutlookCalendarProvider outlookProvider,
+        MicrosoftGraphAuthService authService,
+        Services.IClipboardService clipboardService)
     {
         _mediator = mediator;
         _eventTimeService = eventTimeService;
+        _outlookProvider = outlookProvider;
+        _authService = authService;
+        _clipboardService = clipboardService;
 
         CalendarViewModel = calendarViewModel;
         CalendarViewModel.PropertyChanged += (_, e) =>
@@ -35,23 +46,32 @@ EventTimeService eventTimeService)
         CalendarViewModel.NewEventForDateRequested += async (_, date) => await CreateEventForDate(date);
     }
 
-    [ObservableProperty] private CalendarViewModel _calendarViewModel = null!;
+    [ObservableProperty]
+    public partial CalendarViewModel CalendarViewModel { get; set; }
 
-    [ObservableProperty] private ObservableCollection<CalendarListItemViewModel> _calendars = new();
+    [ObservableProperty]
+    public partial ObservableCollection<CalendarListItemViewModel> Calendars { get; set; } = [];
 
-    [ObservableProperty] private bool _isEventDialogOpen;
+    [ObservableProperty]
+    public partial bool IsEventDialogOpen { get; set; }
 
-    [ObservableProperty] private EventEditViewModel? _eventEditViewModel;
+    [ObservableProperty]
+    public partial EventEditViewModel? EventEditViewModel { get; set; }
 
-    [ObservableProperty] private bool _isSettingsDialogOpen;
+    [ObservableProperty]
+    public partial bool IsSettingsDialogOpen { get; set; }
 
-    [ObservableProperty] private CalendarSettingsViewModel? _calendarSettingsViewModel;
+    [ObservableProperty]
+    public partial CalendarSettingsViewModel? CalendarSettingsViewModel { get; set; }
 
-    [ObservableProperty] private bool _isMobileLayout;
+    [ObservableProperty]
+    public partial bool IsMobileLayout { get; set; }
 
-    [ObservableProperty] private bool _isSidebarOpen = true;
+    [ObservableProperty]
+    public partial bool IsSidebarOpen { get; set; } = true;
 
-    [ObservableProperty] private double _currentWindowWidth;
+    [ObservableProperty]
+    public partial double CurrentWindowWidth { get; set; }
 
     public bool HasNoCalendars => Calendars.Count == 0;
 
@@ -205,6 +225,9 @@ EventTimeService eventTimeService)
     {
         var settingsVm = new CalendarSettingsViewModel(
             _mediator,
+            _outlookProvider,
+            _authService,
+            _clipboardService,
             onClosed: async () =>
             {
                 IsSettingsDialogOpen = false;
@@ -213,6 +236,14 @@ EventTimeService eventTimeService)
                 await CalendarViewModel.LoadCalendarsAsync().ConfigureAwait(false);
                 await CalendarViewModel.RefreshViewAsync().ConfigureAwait(false);
             });
+
+        // Subscribe to OutlookConnected to refresh the calendar view when connected
+        settingsVm.OutlookConnected += async (_, _) =>
+        {
+            await LoadCalendarListAsync().ConfigureAwait(false);
+            await CalendarViewModel.LoadCalendarsAsync().ConfigureAwait(false);
+            await CalendarViewModel.RefreshViewAsync().ConfigureAwait(false);
+        };
 
         await settingsVm.LoadCalendarsAsync().ConfigureAwait(false);
         CalendarSettingsViewModel = settingsVm;
@@ -308,7 +339,7 @@ EventTimeService eventTimeService)
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"Error closing settings: {ex.Message}");
+            Log.Error(ex, "Error closing settings");
         }
     }
 
@@ -344,7 +375,8 @@ EventTimeService eventTimeService)
     }
 
     // Embedded sidebar panel management (desktop)
-    [ObservableProperty] private bool _isSidebarPanelVisible;
+    [ObservableProperty]
+    public partial bool IsSidebarPanelVisible { get; set; }
 
     partial void OnIsSidebarPanelVisibleChanged(bool value)
     {
@@ -357,24 +389,4 @@ EventTimeService eventTimeService)
     {
         IsSidebarPanelVisible = !IsSidebarPanelVisible;
     }
-}
-
-// ViewModel for calendar items in the sidebar list
-public partial class CalendarListItemViewModel(Calendar calendar, Action? onVisibilityChanged = null) : ObservableObject
-{
-    public string Id => calendar.Id;
-    public string Name => calendar.Name;
-    public string Color => calendar.Color;
-
-    public bool IsVisible
-    {
-        get;
-        set
-        {
-            if (SetProperty(ref field, value))
-            {
-                onVisibilityChanged?.Invoke();
-            }
-        }
-    } = true;
 }
