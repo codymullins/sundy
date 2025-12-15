@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Runtime.InteropServices;
 using Avalonia.Data.Converters;
 using Avalonia.Media;
 
@@ -247,15 +248,19 @@ public class ContainerWidthToEventWidthConverter : IValueConverter
 public class SidebarMarginConverter : IValueConverter
 {
     public static readonly SidebarMarginConverter Instance = new();
+    private static readonly bool IsMacOS = RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
 
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         var isSidebarVisible = value is true;
-        // When sidebar is visible, no extra left margin needed (sidebar covers traffic lights)
-        // When sidebar is hidden, need 80px left margin to clear macOS traffic lights
-        return isSidebarVisible
-            ? new Avalonia.Thickness(10, 10, 16, 6)
-            : new Avalonia.Thickness(80, 10, 16, 6);
+        
+        // Only macOS needs extra left margin to clear traffic lights when sidebar is hidden
+        if (!IsMacOS || isSidebarVisible)
+        {
+            return new Avalonia.Thickness(10, 10, 16, 6);
+        }
+        
+        return new Avalonia.Thickness(80, 10, 16, 6);
     }
 
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
