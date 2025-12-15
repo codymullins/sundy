@@ -46,32 +46,23 @@ public partial class MainViewModel : ViewModelBase
         CalendarViewModel.NewEventForDateRequested += async (_, date) => await CreateEventForDate(date);
     }
 
-    [ObservableProperty]
-    public partial CalendarViewModel CalendarViewModel { get; set; }
+    [ObservableProperty] public partial CalendarViewModel CalendarViewModel { get; set; }
 
-    [ObservableProperty]
-    public partial ObservableCollection<CalendarListItemViewModel> Calendars { get; set; } = [];
+    [ObservableProperty] public partial ObservableCollection<CalendarListItemViewModel> Calendars { get; set; } = [];
 
-    [ObservableProperty]
-    public partial bool IsEventDialogOpen { get; set; }
+    [ObservableProperty] public partial bool IsEventDialogOpen { get; set; }
 
-    [ObservableProperty]
-    public partial EventEditViewModel? EventEditViewModel { get; set; }
+    [ObservableProperty] public partial EventEditViewModel? EventEditViewModel { get; set; }
 
-    [ObservableProperty]
-    public partial bool IsSettingsDialogOpen { get; set; }
+    [ObservableProperty] public partial bool IsSettingsDialogOpen { get; set; }
 
-    [ObservableProperty]
-    public partial CalendarSettingsViewModel? CalendarSettingsViewModel { get; set; }
+    [ObservableProperty] public partial CalendarSettingsViewModel? CalendarSettingsViewModel { get; set; }
 
-    [ObservableProperty]
-    public partial bool IsMobileLayout { get; set; }
+    [ObservableProperty] public partial bool IsMobileLayout { get; set; }
 
-    [ObservableProperty]
-    public partial bool IsSidebarOpen { get; set; } = true;
+    [ObservableProperty] public partial bool IsSidebarOpen { get; set; } = true;
 
-    [ObservableProperty]
-    public partial double CurrentWindowWidth { get; set; }
+    [ObservableProperty] public partial double CurrentWindowWidth { get; set; }
 
     public bool HasNoCalendars => Calendars.Count == 0;
 
@@ -177,6 +168,12 @@ public partial class MainViewModel : ViewModelBase
     {
         await CalendarViewModel.LoadCalendarsAsync().ConfigureAwait(false);
         await LoadCalendarListAsync().ConfigureAwait(false);
+
+        if (HasNoCalendars)
+        {
+            await CreateNewCalendar().ConfigureAwait(false);
+        }
+
         await CalendarViewModel.RefreshViewAsync().ConfigureAwait(false);
     }
 
@@ -346,20 +343,28 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand]
     private async Task CreateNewCalendar()
     {
-        var calendar = new Calendar
+        try
         {
-            Id = Guid.NewGuid().ToString(),
-            Name = "My Calendar",
-            Color = "#4A90E2", // Default blue
-            Type = CalendarType.Local,
-            EnableBlocking = true,
-            ReceiveBlocks = true
-        };
-        await _mediator.Send(new CreateCalendarCommand(calendar)).ConfigureAwait(false);
+            var calendar = new Calendar
+            {
+                Id = Guid.NewGuid().ToString(),
+                Name = "My Calendar",
+                Color = "#4A90E2", // Default blue
+                Type = CalendarType.Local,
+                EnableBlocking = true,
+                ReceiveBlocks = true
+            };
+            await _mediator.Send(new CreateCalendarCommand(calendar)).ConfigureAwait(false);
 
-        await LoadCalendarListAsync().ConfigureAwait(false);
-        await CalendarViewModel.LoadCalendarsAsync().ConfigureAwait(false);
-        await CalendarViewModel.RefreshViewAsync().ConfigureAwait(false);
+            await LoadCalendarListAsync().ConfigureAwait(false);
+            await CalendarViewModel.LoadCalendarsAsync().ConfigureAwait(false);
+            await CalendarViewModel.RefreshViewAsync().ConfigureAwait(false);
+        }
+        catch (Exception e)
+        {
+            // todo: add user notification
+            Log.Error(e, "Error creating calendar");
+        }
     }
 
     [RelayCommand]
@@ -375,8 +380,7 @@ public partial class MainViewModel : ViewModelBase
     }
 
     // Embedded sidebar panel management (desktop)
-    [ObservableProperty]
-    public partial bool IsSidebarPanelVisible { get; set; }
+    [ObservableProperty] public partial bool IsSidebarPanelVisible { get; set; }
 
     partial void OnIsSidebarPanelVisibleChanged(bool value)
     {
