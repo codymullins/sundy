@@ -70,8 +70,9 @@
         <Setter Property="FontWeight" Value="Medium"/>
         <Setter Property="HorizontalContentAlignment" Value="Center"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
-        <Setter Property="Padding" Value="20,8"/>
+        <Setter Property="Padding" Value="20,0"/>
         <Setter Property="MinWidth" Value="60"/>
+        <Setter Property="MinHeight" Value="32"/>
         <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="Transitions">
             <Transitions>
@@ -80,11 +81,13 @@
         </Setter>
         <Setter Property="Template">
             <ControlTemplate>
-                <Border Background="{TemplateBinding Background}"
-                        Padding="{TemplateBinding Padding}">
+                <Border Background="Transparent"
+                        MinHeight="{TemplateBinding MinHeight}"
+                        MinWidth="{TemplateBinding MinWidth}">
                     <ContentPresenter Content="{TemplateBinding Content}"
                                       HorizontalAlignment="Center"
-                                      VerticalAlignment="Center"/>
+                                      VerticalAlignment="Center"
+                                      Margin="{TemplateBinding Padding}"/>
                 </Border>
             </ControlTemplate>
         </Setter>
