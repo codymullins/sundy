@@ -8,7 +8,6 @@
     xmlns:controls="using:Sundy.Uno.Presentation.Controls"
     xmlns:conv="using:Sundy.Uno.Presentation.Converters"
     mc:Ignorable="d"
-    UseLayoutRounding="True"
     Background="{StaticResource BackgroundPrimary}">
 
     <Page.Resources>
@@ -18,6 +17,15 @@
     </Page.Resources>
 
     <Grid ColumnDefinitions="292,*">
+        <!-- DEBUG: Remove after testing -->
+        <TextBlock Text="MainPage Loaded!"
+                   Foreground="Red"
+                   FontSize="24"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Top"
+                   Margin="0,50,0,0"
+                   Grid.ColumnSpan="2" />
+
         <Border Grid.Column="0"
                 Margin="12"
                 Padding="16,16,16,12"
@@ -154,15 +162,15 @@
                     SnapMultiple="7"
                     Background="{StaticResource BackgroundPrimary}"
                     BorderBrush="{StaticResource BorderBrush}"
-                    BorderThickness="1"
-                    UseLayoutRounding="True">
+                    BorderThickness="1">
                 <controls:CalendarView DataContext="{Binding CalendarViewModel}" />
             </controls:PixelSnappingBorder>
         </Grid>
 
         <!-- Event dialog overlay -->
-        <Grid Background="{StaticResource ModalOverlay}"
-              Visibility="{Binding IsEventDialogOpen, Converter={StaticResource BoolToVisibility}}"
+        <Grid x:Name="EventDialogOverlay"
+              Background="{StaticResource ModalOverlay}"
+              Visibility="Collapsed"
               Grid.ColumnSpan="2">
             <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Width="640" MaxHeight="700">
                 <Border Background="{StaticResource ModalBackground}"
@@ -176,8 +184,9 @@
         </Grid>
 
         <!-- Settings dialog overlay -->
-        <Grid Background="{StaticResource ModalOverlay}"
-              Visibility="{Binding IsSettingsDialogOpen, Converter={StaticResource BoolToVisibility}}"
+        <Grid x:Name="SettingsDialogOverlay"
+              Background="{StaticResource ModalOverlay}"
+              Visibility="Collapsed"
               Grid.ColumnSpan="2">
             <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Width="720" MaxHeight="720">
                 <Border Background="{StaticResource ModalBackground}"

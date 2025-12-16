@@ -210,7 +210,7 @@ public partial class CalendarViewModel : ObservableObject
             endRange,
             SelectedCalendar?.Id));
 
-        var calendarLookup = await _mediator.Send(new GetCalendarLookupQuery());
+        IReadOnlyDictionary<string, Calendar> calendarLookup = await _mediator.Send(new GetCalendarLookupQuery());
 
         var weekDays = new ObservableCollection<WeekDayViewModel>();
         for (int i = 0; i < 7; i++)

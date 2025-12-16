@@ -167,12 +167,12 @@ public partial class MainViewModel : ViewModelBase
             {
                 IsSettingsDialogOpen = false;
                 CalendarSettingsViewModel = null;
-                await LoadCalendarListAsync().ConfigureAwait(false);
-                await CalendarViewModel.LoadCalendarsAsync().ConfigureAwait(false);
-                await CalendarViewModel.RefreshViewAsync().ConfigureAwait(false);
+                await LoadCalendarListAsync();
+                await CalendarViewModel.LoadCalendarsAsync();
+                await CalendarViewModel.RefreshViewAsync();
             });
 
-        await settingsVm.LoadCalendarsAsync().ConfigureAwait(false);
+        await settingsVm.LoadCalendarsAsync();
         CalendarSettingsViewModel = settingsVm;
         IsSettingsDialogOpen = true;
     }
@@ -182,7 +182,6 @@ public partial class MainViewModel : ViewModelBase
     {
         var editVm = new EventEditViewModel(
             _mediator,
-            _eventTimeService,
             onSaved: OnEventSaved,
             onCancelled: () =>
             {
@@ -192,7 +191,7 @@ public partial class MainViewModel : ViewModelBase
 
         await editVm.InitializeAsync(
             existingEvent: null,
-            defaultCalendarId: CalendarViewModel.SelectedCalendar?.Id).ConfigureAwait(false);
+            defaultCalendarId: CalendarViewModel.SelectedCalendar?.Id);
 
         EventEditViewModel = editVm;
         IsEventDialogOpen = true;
@@ -202,7 +201,6 @@ public partial class MainViewModel : ViewModelBase
     {
         var editVm = new EventEditViewModel(
             _mediator,
-            _eventTimeService,
             onSaved: OnEventSaved,
             onCancelled: () =>
             {
@@ -213,7 +211,7 @@ public partial class MainViewModel : ViewModelBase
         await editVm.InitializeAsync(
             existingEvent: null,
             defaultCalendarId: CalendarViewModel.SelectedCalendar?.Id,
-            defaultDate: DateOnly.FromDateTime(date)).ConfigureAwait(false);
+            defaultDate: DateOnly.FromDateTime(date));
 
         EventEditViewModel = editVm;
         IsEventDialogOpen = true;
@@ -223,7 +221,6 @@ public partial class MainViewModel : ViewModelBase
     {
         var editVm = new EventEditViewModel(
             _mediator,
-            _eventTimeService,
             onSaved: OnEventSaved,
             onCancelled: () =>
             {
@@ -233,7 +230,7 @@ public partial class MainViewModel : ViewModelBase
 
         await editVm.InitializeAsync(
             existingEvent: evt,
-            defaultCalendarId: evt.CalendarId).ConfigureAwait(false);
+            defaultCalendarId: evt.CalendarId);
 
         EventEditViewModel = editVm;
         IsEventDialogOpen = true;

@@ -3,6 +3,8 @@ using System.IO;
 using Microsoft.EntityFrameworkCore;
 using Mediator;
 using Sundy.Core;
+using Sundy.Core.Calendars.Outlook;
+using Sundy.Core.System;
 using Sundy.Uno.ViewModels;
 using Uno.Resizetizer;
 
@@ -81,6 +83,22 @@ public partial class App : Application
 
                     services.AddSingleton<ICalendarProvider, LocalCalendarProvider>();
 
+                    // Time zone provider (required by EventTimeService)
+                    services.AddSingleton<ITimeZoneProvider, SystemTimeZoneProvider>();
+
+                    // Event time service (required by MainViewModel)
+                    services.AddSingleton<EventTimeService>();
+
+                    // Outlook integration services
+                    services.AddSingleton<OutlookGraphOptions>(sp => new OutlookGraphOptions
+                    {
+                        // MacOS 25.1+ doesn't support InteractiveBrowserCredential
+                        UseDevelopmentCredential = OperatingSystem.IsMacOS()
+                    });
+                    services.AddSingleton<MicrosoftGraphAuthService>();
+                    services.AddSingleton<OutlookCalendarProvider>();
+
+                    services.AddTransient<Presentation.ShellViewModel>();
                     services.AddTransient<MainViewModel>();
                     services.AddTransient<CalendarViewModel>();
                     services.AddTransient<CalendarSettingsViewModel>();
@@ -121,12 +139,12 @@ public partial class App : Application
     private static void RegisterRoutes(IViewRegistry views, IRouteRegistry routes)
     {
         views.Register(
-            new ViewMap(ViewModel: typeof(ShellViewModel)),
+            new ViewMap(ViewModel: typeof(Presentation.ShellViewModel)),
             new ViewMap<MainPage, ViewModels.MainViewModel>()
         );
 
         routes.Register(
-            new RouteMap("", View: views.FindByViewModel<ShellViewModel>(),
+            new RouteMap("", View: views.FindByViewModel<Presentation.ShellViewModel>(),
                 Nested:
                 [
                     new("Main", View: views.FindByViewModel<ViewModels.MainViewModel>(), IsDefault: true)
