@@ -8,6 +8,7 @@ using Serilog;
 using Sundy.Core;
 using Sundy.Core.Calendars.Outlook;
 using Sundy.Core.System;
+using Sundy.Services;
 using Sundy.ViewModels;
 using Sundy.Views;
 
@@ -63,10 +64,14 @@ public partial class App : Application
         // Register Outlook/Microsoft Graph services
         services.AddSingleton(new OutlookGraphOptions
         {
-            UseDevelopmentCredential = true,
-            UseDeviceCodeFlow = true  // Enable device code flow
+            UseDevelopmentCredential = false,
+            UseDeviceCodeFlow = false  // Enable device code flow
         });
+        
+        // Register auth service - browser platform will override this registration
+        // in the Sundy.Browser project with BrowserMicrosoftGraphAuthService
         services.AddSingleton<MicrosoftGraphAuthService>();
+        services.AddSingleton<IMicrosoftGraphAuthService>(sp => sp.GetRequiredService<MicrosoftGraphAuthService>());
         services.AddSingleton<OutlookCalendarProvider>();
 
         // enable copying to clipboard

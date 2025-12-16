@@ -11,6 +11,7 @@ namespace Sundy.Core.Calendars.Outlook;
 /// This flow is suitable for desktop/console apps where a browser can be launched.
 /// </summary>
 public class MicrosoftGraphAuthService(ILogger<MicrosoftGraphAuthService> log, OutlookGraphOptions? options = null)
+    : IMicrosoftGraphAuthService
 {
     private readonly OutlookGraphOptions _options = options ?? new OutlookGraphOptions();
     private GraphServiceClient? _graphClient;
