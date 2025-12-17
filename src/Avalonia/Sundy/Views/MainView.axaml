@@ -11,6 +11,9 @@
     <UserControl.Resources>
         <scheduler:SidebarMarginConverter x:Key="SidebarMarginConverter" />
         <scheduler:SidebarWidthConverter x:Key="SidebarWidthConverter" />
+        <scheduler:MobileMarginConverter x:Key="MobileMarginConverter" />
+        <scheduler:MobileCornerRadiusConverter x:Key="MobileCornerRadiusConverter" />
+        <scheduler:MobileBorderThicknessConverter x:Key="MobileBorderThicknessConverter" />
     </UserControl.Resources>
 
     <!-- Root Grid with Dialog Overlay -->
@@ -20,7 +23,7 @@
             <Border Grid.Column="0"
                     Width="{Binding IsSidebarPanelVisible, Converter={StaticResource SidebarWidthConverter}}"
                     ClipToBounds="True"
-                    IsVisible="{Binding !IsMobileLayout}">
+                    IsVisible="{Binding IsDesktopSidebarVisible}">
                 <Border.Transitions>
                     <Transitions>
                         <DoubleTransition Property="Width" Duration="0:0:0.2" Easing="CubicEaseOut" />
@@ -184,13 +187,15 @@
                         </StackPanel>
 
                         <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="10">
-                            <controls:SegmentedControl SelectedIndex="{Binding ViewModeIndex}">
+                            <controls:SegmentedControl SelectedIndex="{Binding ViewModeIndex}"
+                                                       IsVisible="{Binding !IsMobileLayout}">
                                 <x:String>Day</x:String>
                                 <x:String>Week</x:String>
                                 <x:String>Month</x:String>
                             </controls:SegmentedControl>
                             <Button Command="{Binding CreateEventCommand}"
-                                    Classes="accent">
+                                    Classes="accent"
+                                    IsVisible="{Binding !IsMobileLayout}">
                                 <StackPanel Orientation="Horizontal" Spacing="7">
                                     <PathIcon
                                         Data="M12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2Zm0 5a.75.75 0 0 0-.743.648l-.007.102v3.5h-3.5a.75.75 0 0 0-.102 1.493l.102.007h3.5v3.5a.75.75 0 0 0 1.493.102l.007-.102v-3.5h3.5a.75.75 0 0 0 .102-1.493l-.102-.007h-3.5v-3.5A.75.75 0 0 0 12 7Z"
@@ -205,11 +210,11 @@
                 </Panel>
 
                 <Border Grid.Row="1"
-                        Margin="6,0,6,6"
+                        Margin="{Binding IsMobileLayout, Converter={StaticResource MobileMarginConverter}}"
                         Background="{DynamicResource BackgroundPrimary}"
                         BorderBrush="{DynamicResource BorderBrush}"
-                        BorderThickness="1"
-                        CornerRadius="12"
+                        BorderThickness="{Binding IsMobileLayout, Converter={StaticResource MobileBorderThicknessConverter}}"
+                        CornerRadius="{Binding IsMobileLayout, Converter={StaticResource MobileCornerRadiusConverter}}"
                         ClipToBounds="True">
                     <ContentControl Content="{Binding CalendarViewModel}">
                         <ContentControl.ContentTemplate>
@@ -219,6 +224,170 @@
                         </ContentControl.ContentTemplate>
                     </ContentControl>
                 </Border>
+
+                <!-- Mobile FAB Menu -->
+                <Panel Grid.Row="1"
+                       IsVisible="{Binding IsMobileLayout}"
+                       HorizontalAlignment="Right"
+                       VerticalAlignment="Bottom"
+                       Margin="0,0,16,16">
+
+                    <!-- Radial Menu Options - arc from top of toggle button, fanning up and left -->
+                    <!-- Day option - top of arc (directly above toggle) -->
+                    <Border HorizontalAlignment="Right"
+                            VerticalAlignment="Bottom"
+                            Margin="0,0,4,72"
+                            CornerRadius="20"
+                            BoxShadow="0 2 8 0 #30000000"
+                            RenderTransformOrigin="0.5,1"
+                            Classes.menu-open="{Binding IsViewModeMenuOpen}">
+                        <Border.Styles>
+                            <Style Selector="Border">
+                                <Setter Property="Opacity" Value="0" />
+                                <Setter Property="RenderTransform">
+                                    <TranslateTransform X="0" Y="0" />
+                                </Setter>
+                                <Setter Property="Transitions">
+                                    <Transitions>
+                                        <DoubleTransition Property="Opacity" Duration="0:0:0.15" Easing="CubicEaseOut" />
+                                        <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.2" Easing="CubicEaseOut" />
+                                    </Transitions>
+                                </Setter>
+                            </Style>
+                            <Style Selector="Border.menu-open">
+                                <Setter Property="Opacity" Value="1" />
+                                <Setter Property="RenderTransform">
+                                    <TranslateTransform X="0" Y="-55" />
+                                </Setter>
+                            </Style>
+                        </Border.Styles>
+                        <Button Command="{Binding SetViewModeDayCommand}"
+                                Width="40"
+                                Height="40"
+                                CornerRadius="20"
+                                Padding="0"
+                                Background="{DynamicResource BackgroundSecondary}">
+                            <TextBlock Text="D" FontWeight="SemiBold" FontSize="14"
+                                       Foreground="{DynamicResource ForegroundPrimary}" />
+                        </Button>
+                    </Border>
+
+                    <!-- Week option - upper-left in arc -->
+                    <Border HorizontalAlignment="Right"
+                            VerticalAlignment="Bottom"
+                            Margin="0,0,4,72"
+                            CornerRadius="20"
+                            BoxShadow="0 2 8 0 #30000000"
+                            RenderTransformOrigin="0.5,1"
+                            Classes.menu-open="{Binding IsViewModeMenuOpen}">
+                        <Border.Styles>
+                            <Style Selector="Border">
+                                <Setter Property="Opacity" Value="0" />
+                                <Setter Property="RenderTransform">
+                                    <TranslateTransform X="0" Y="0" />
+                                </Setter>
+                                <Setter Property="Transitions">
+                                    <Transitions>
+                                        <DoubleTransition Property="Opacity" Duration="0:0:0.15" Easing="CubicEaseOut" Delay="0:0:0.04" />
+                                        <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.2" Easing="CubicEaseOut" Delay="0:0:0.04" />
+                                    </Transitions>
+                                </Setter>
+                            </Style>
+                            <Style Selector="Border.menu-open">
+                                <Setter Property="Opacity" Value="1" />
+                                <Setter Property="RenderTransform">
+                                    <TranslateTransform X="-50" Y="-40" />
+                                </Setter>
+                            </Style>
+                        </Border.Styles>
+                        <Button Command="{Binding SetViewModeWeekCommand}"
+                                Width="40"
+                                Height="40"
+                                CornerRadius="20"
+                                Padding="0"
+                                Background="{DynamicResource BackgroundSecondary}">
+                            <TextBlock Text="W" FontWeight="SemiBold" FontSize="14"
+                                       Foreground="{DynamicResource ForegroundPrimary}" />
+                        </Button>
+                    </Border>
+
+                    <!-- Month option - left in arc -->
+                    <Border HorizontalAlignment="Right"
+                            VerticalAlignment="Bottom"
+                            Margin="0,0,4,72"
+                            CornerRadius="20"
+                            BoxShadow="0 2 8 0 #30000000"
+                            RenderTransformOrigin="0.5,1"
+                            Classes.menu-open="{Binding IsViewModeMenuOpen}">
+                        <Border.Styles>
+                            <Style Selector="Border">
+                                <Setter Property="Opacity" Value="0" />
+                                <Setter Property="RenderTransform">
+                                    <TranslateTransform X="0" Y="0" />
+                                </Setter>
+                                <Setter Property="Transitions">
+                                    <Transitions>
+                                        <DoubleTransition Property="Opacity" Duration="0:0:0.15" Easing="CubicEaseOut" Delay="0:0:0.08" />
+                                        <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.2" Easing="CubicEaseOut" Delay="0:0:0.08" />
+                                    </Transitions>
+                                </Setter>
+                            </Style>
+                            <Style Selector="Border.menu-open">
+                                <Setter Property="Opacity" Value="1" />
+                                <Setter Property="RenderTransform">
+                                    <TranslateTransform X="-70" Y="-10" />
+                                </Setter>
+                            </Style>
+                        </Border.Styles>
+                        <Button Command="{Binding SetViewModeMonthCommand}"
+                                Width="40"
+                                Height="40"
+                                CornerRadius="20"
+                                Padding="0"
+                                Background="{DynamicResource BackgroundSecondary}">
+                            <TextBlock Text="M" FontWeight="SemiBold" FontSize="14"
+                                       Foreground="{DynamicResource ForegroundPrimary}" />
+                        </Button>
+                    </Border>
+
+                    <!-- View Mode Toggle FAB (secondary) -->
+                    <Border HorizontalAlignment="Right"
+                            VerticalAlignment="Bottom"
+                            Margin="0,0,4,72"
+                            CornerRadius="22"
+                            BoxShadow="0 2 8 0 #30000000">
+                        <Button Command="{Binding ToggleViewModeMenuCommand}"
+                                Width="44"
+                                Height="44"
+                                CornerRadius="22"
+                                Padding="0"
+                                Background="{DynamicResource BackgroundSecondary}">
+                            <!-- Calendar/grid icon -->
+                            <PathIcon Data="M6 2a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H6zm0 2h12v2H6V4zm0 4h4v4H6V8zm6 0h4v4h-4V8zm-6 6h4v2H6v-2zm6 0h4v2h-4v-2z"
+                                      Foreground="{DynamicResource ForegroundPrimary}"
+                                      Width="18"
+                                      Height="18" />
+                        </Button>
+                    </Border>
+
+                    <!-- New Event FAB (primary) -->
+                    <Border HorizontalAlignment="Right"
+                            VerticalAlignment="Bottom"
+                            CornerRadius="28"
+                            BoxShadow="0 4 12 0 #40000000">
+                        <Button Command="{Binding CreateEventCommand}"
+                                Width="56"
+                                Height="56"
+                                CornerRadius="28"
+                                Padding="0"
+                                Classes="accent">
+                            <PathIcon Data="M12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2Zm0 5a.75.75 0 0 0-.743.648l-.007.102v3.5h-3.5a.75.75 0 0 0-.102 1.493l.102.007h3.5v3.5a.75.75 0 0 0 1.493.102l.007-.102v-3.5h3.5a.75.75 0 0 0 .102-1.493l-.102-.007h-3.5v-3.5A.75.75 0 0 0 12 7Z"
+                                      Foreground="{DynamicResource ForegroundPrimary}"
+                                      Width="24"
+                                      Height="24" />
+                        </Button>
+                    </Border>
+                </Panel>
             </Grid>
         </Grid>
 

@@ -1,5 +1,4 @@
 using Microsoft.Graph.Models;
-using Serilog;
 
 namespace Sundy.Core.Calendars.Outlook;
 
@@ -41,7 +40,7 @@ public class OutlookCalendarProvider(MicrosoftGraphAuthService authService, Outl
         var client = authService.GetClient();
         if (client == null)
         {
-            Log.Warning("Cannot get calendars - not authenticated");
+            // Log.Warning("Cannot get calendars - not authenticated");
             return [];
         }
 
@@ -62,12 +61,12 @@ public class OutlookCalendarProvider(MicrosoftGraphAuthService authService, Outl
             // Log more details about the error for better diagnostics
             if (ex is Microsoft.Graph.Models.ODataErrors.ODataError odataError)
             {
-                Log.Error(ex, "Failed to get calendars - OData error: {Code} - {Message}",
-                    odataError.Error?.Code, odataError.Error?.Message);
+                // Log.Error(ex, "Failed to get calendars - OData error: {Code} - {Message}",
+                //     odataError.Error?.Code, odataError.Error?.Message);
             }
             else
             {
-                Log.Error(ex, "Failed to get Outlook calendars");
+                // Log.Error(ex, "Failed to get Outlook calendars");
             }
             return [];
         }
@@ -79,7 +78,7 @@ public class OutlookCalendarProvider(MicrosoftGraphAuthService authService, Outl
         var client = authService.GetClient();
         if (client == null)
         {
-            Log.Warning("Cannot get events - not authenticated");
+            // Log.Warning("Cannot get events - not authenticated");
             return [];
         }
 
@@ -103,12 +102,12 @@ public class OutlookCalendarProvider(MicrosoftGraphAuthService authService, Outl
             // Log more details about the error for better diagnostics
             if (ex is Microsoft.Graph.Models.ODataErrors.ODataError odataError)
             {
-                Log.Error(ex, "Failed to get events for calendar {CalendarId} - OData error: {Code} - {Message}",
-                    calendarId, odataError.Error?.Code, odataError.Error?.Message);
+                // Log.Error(ex, "Failed to get events for calendar {CalendarId} - OData error: {Code} - {Message}",
+                //     calendarId, odataError.Error?.Code, odataError.Error?.Message);
             }
             else
             {
-                Log.Error(ex, "Failed to get Outlook events for calendar {CalendarId}", calendarId);
+                // Log.Error(ex, "Failed to get Outlook events for calendar {CalendarId}", calendarId);
             }
             return [];
         }

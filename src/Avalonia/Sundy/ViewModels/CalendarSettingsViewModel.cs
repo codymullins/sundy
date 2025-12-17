@@ -2,10 +2,11 @@ using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mediator;
-using Serilog;
+using Microsoft.Extensions.Logging;
 using Sundy.Core;
 using Sundy.Core.Calendars.Outlook;
 using Sundy.Core.Commands;
+using Sundy.Core.Meta;
 using Sundy.Core.Queries;
 using Sundy.Services;
 
@@ -18,19 +19,20 @@ public partial class CalendarSettingsViewModel : ObservableObject, IDisposable
     private readonly MicrosoftGraphAuthService authService;
     private readonly IClipboardService clipboardService;
     private readonly Func<Task>? onClosed;
-
+    private readonly ILogger<CalendarSettingsViewModel>? logger;
     public CalendarSettingsViewModel(
         IMediator mediator,
         OutlookCalendarProvider outlookProvider,
         MicrosoftGraphAuthService authService,
         IClipboardService clipboardService,
-        Func<Task>? onClosed = null)
+        Func<Task>? onClosed = null, ILoggerFactory? loggerFactory = null)
     {
         this.mediator = mediator;
         this.outlookProvider = outlookProvider;
         this.authService = authService;
         this.clipboardService = clipboardService;
         this.onClosed = onClosed;
+        logger = loggerFactory?.CreateLogger<CalendarSettingsViewModel>();
 
         // Subscribe to device code events
         authService.DeviceCodeReceived += OnDeviceCodeReceived;
@@ -120,7 +122,7 @@ public partial class CalendarSettingsViewModel : ObservableObject, IDisposable
         }
         catch (Exception ex)
         {
-            Log.Error(ex, "Error deleting calendar {CalendarId}", CalendarToDelete?.Id);
+            logger?.LogError(ex, "Error deleting calendar {CalendarId}", CalendarToDelete?.Id);
         }
         finally
         {
@@ -168,7 +170,7 @@ public partial class CalendarSettingsViewModel : ObservableObject, IDisposable
         }
         catch (Exception ex)
         {
-            Log.Error(ex, "Error resetting database");
+            logger?.LogError(ex, "Error resetting database");
         }
         finally
         {
@@ -204,14 +206,14 @@ public partial class CalendarSettingsViewModel : ObservableObject, IDisposable
 
         try
         {
-            Log.Information("Starting Outlook connection...");
+            logger?.LogInformation("Starting Outlook connection...");
             var result = await mediator.Send(new ConnectOutlookCommand());
 
             if (result.Success)
             {
                 IsOutlookConnected = true;
                 OutlookUserName = result.UserDisplayName;
-                Log.Information("Successfully connected to Outlook as {UserName}", result.UserDisplayName);
+                logger?.LogInformation("Successfully connected to Outlook as {UserName}", result.UserDisplayName);
 
                 // Reload calendars to show the new Outlook calendars
                 await LoadCalendarsAsync();
@@ -222,13 +224,13 @@ public partial class CalendarSettingsViewModel : ObservableObject, IDisposable
             else
             {
                 OutlookConnectionError = result.ErrorMessage ?? "Failed to connect to Outlook";
-                Log.Warning("Failed to connect to Outlook: {Error}", result.ErrorMessage);
+                logger?.LogWarning("Failed to connect to Outlook: {Error}", result.ErrorMessage);
             }
         }
         catch (Exception ex)
         {
             OutlookConnectionError = ex.Message;
-            Log.Error(ex, "Error connecting to Outlook");
+            logger?.LogError(ex, "Error connecting to Outlook");
         }
         finally
         {
@@ -245,7 +247,7 @@ public partial class CalendarSettingsViewModel : ObservableObject, IDisposable
         IsOutlookConnected = false;
         OutlookUserName = null;
         OutlookConnectionError = null;
-        Log.Information("Disconnected from Outlook");
+        logger?.LogInformation("Disconnected from Outlook");
     }
 
     private void OnDeviceCodeReceived(object? sender, DeviceCodeInfo e)
@@ -257,7 +259,7 @@ public partial class CalendarSettingsViewModel : ObservableObject, IDisposable
             DeviceCodeUrl = e.VerificationUrl;
             DeviceCodeUserCode = e.UserCode;
 
-            Log.Information("Device code received: URL={Url}, Code={Code}",
+            logger?.LogInformation("Device code received: URL={Url}, Code={Code}",
                 e.VerificationUrl, e.UserCode);
         });
     }
@@ -268,7 +270,7 @@ public partial class CalendarSettingsViewModel : ObservableObject, IDisposable
         if (!string.IsNullOrEmpty(DeviceCodeUrl))
         {
             await clipboardService.SetTextAsync(DeviceCodeUrl);
-            Log.Information("Copied device code URL to clipboard");
+            logger?.LogInformation("Copied device code URL to clipboard");
         }
     }
 
@@ -278,7 +280,7 @@ public partial class CalendarSettingsViewModel : ObservableObject, IDisposable
         if (!string.IsNullOrEmpty(DeviceCodeUserCode))
         {
             await clipboardService.SetTextAsync(DeviceCodeUserCode);
-            Log.Information("Copied device code to clipboard");
+            logger?.LogInformation("Copied device code to clipboard");
         }
     }
 

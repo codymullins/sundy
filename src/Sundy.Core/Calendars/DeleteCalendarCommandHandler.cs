@@ -3,7 +3,7 @@ using Sundy.Core.Commands;
 
 namespace Sundy.Core.Handlers;
 
-public class DeleteCalendarCommandHandler(CalendarStore store) : IRequestHandler<DeleteCalendarCommand>
+public class DeleteCalendarCommandHandler(ICalendarStore store) : IRequestHandler<DeleteCalendarCommand>
 {
 
     public async ValueTask<Unit> Handle(DeleteCalendarCommand request, CancellationToken cancellationToken)

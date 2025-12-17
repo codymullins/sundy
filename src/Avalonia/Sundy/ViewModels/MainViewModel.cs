@@ -2,12 +2,12 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mediator;
-using Serilog;
+using Microsoft.Extensions.Logging;
 using Sundy.Core;
 using Sundy.Core.Calendars.Outlook;
 using Sundy.Core.Commands;
+using Sundy.Core.Meta;
 using Sundy.Core.Queries;
-using Sundy.Core.System;
 
 namespace Sundy.ViewModels;
 
@@ -18,7 +18,7 @@ public partial class MainViewModel : ViewModelBase
     private readonly OutlookCalendarProvider _outlookProvider;
     private readonly MicrosoftGraphAuthService _authService;
     private readonly Services.IClipboardService _clipboardService;
-
+    private readonly ILogger<MainViewModel>? logger;
     public MainViewModel(
         IMediator mediator,
         CalendarViewModel calendarViewModel,
@@ -62,13 +62,16 @@ public partial class MainViewModel : ViewModelBase
 
     [ObservableProperty] public partial bool IsSidebarOpen { get; set; } = true;
 
+    [ObservableProperty] public partial bool IsViewModeMenuOpen { get; set; }
+
     [ObservableProperty] public partial double CurrentWindowWidth { get; set; }
 
     public bool HasNoCalendars => Calendars.Count == 0;
 
     public bool IsSidebarVisible => !IsMobileLayout || IsSidebarOpen;
 
-    public double SidebarTranslateX => !IsSidebarOpen ? -280 : 0;
+    // Mobile sidebar: -292 to fully hide (280 width + 6 margin each side)
+    public double SidebarTranslateX => !IsSidebarOpen ? -292 : 0;
 
     // Desktop embedded sidebar - only visible when not mobile AND toggled on
     public bool IsDesktopSidebarVisible => !IsMobileLayout && IsSidebarPanelVisible;
@@ -143,6 +146,7 @@ public partial class MainViewModel : ViewModelBase
         OnPropertyChanged(nameof(IsSidebarVisible));
         OnPropertyChanged(nameof(SidebarTranslateX));
         OnPropertyChanged(nameof(IsDesktopSidebarVisible));
+        CalendarViewModel.IsMobileLayout = value;
     }
 
     partial void OnIsSidebarOpenChanged(bool value)
@@ -166,6 +170,9 @@ public partial class MainViewModel : ViewModelBase
 
     public async Task InitializeAsync()
     {
+        // Initialize database schema
+        await _mediator.Send(new InitializeDatabaseCommand()).ConfigureAwait(false);
+
         await CalendarViewModel.LoadCalendarsAsync().ConfigureAwait(false);
         await LoadCalendarListAsync().ConfigureAwait(false);
 
@@ -336,7 +343,7 @@ public partial class MainViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
-            Log.Error(ex, "Error closing settings");
+            logger?.LogError(ex, "Error closing settings");
         }
     }
 
@@ -363,7 +370,7 @@ public partial class MainViewModel : ViewModelBase
         catch (Exception e)
         {
             // todo: add user notification
-            Log.Error(e, "Error creating calendar");
+            logger?.LogError(e, "Error creating calendar");
         }
     }
 
@@ -371,6 +378,33 @@ public partial class MainViewModel : ViewModelBase
     private void ToggleSidebar()
     {
         IsSidebarOpen = !IsSidebarOpen;
+    }
+
+    [RelayCommand]
+    private void ToggleViewModeMenu()
+    {
+        IsViewModeMenuOpen = !IsViewModeMenuOpen;
+    }
+
+    [RelayCommand]
+    private void SetViewModeDay()
+    {
+        ViewModeIndex = 0;
+        IsViewModeMenuOpen = false;
+    }
+
+    [RelayCommand]
+    private void SetViewModeWeek()
+    {
+        ViewModeIndex = 1;
+        IsViewModeMenuOpen = false;
+    }
+
+    [RelayCommand]
+    private void SetViewModeMonth()
+    {
+        ViewModeIndex = 2;
+        IsViewModeMenuOpen = false;
     }
 
     [RelayCommand]

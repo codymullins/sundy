@@ -1,4 +1,4 @@
-namespace Sundy.Core.System;
+namespace Sundy.Core.Meta;
 
 public interface ITimeZoneProvider
 {

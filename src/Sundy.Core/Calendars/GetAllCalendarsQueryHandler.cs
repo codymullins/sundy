@@ -3,7 +3,7 @@ using Sundy.Core.Queries;
 
 namespace Sundy.Core.Handlers;
 
-public class GetAllCalendarsQueryHandler(CalendarStore store)
+public class GetAllCalendarsQueryHandler(ICalendarStore store)
     : IRequestHandler<GetAllCalendarsQuery, List<Calendar>>
 {
 

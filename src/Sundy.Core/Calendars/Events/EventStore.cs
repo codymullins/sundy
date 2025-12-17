@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Sundy.Core;
 
-public class EventStore(SundyDbContext dbContext)
+public class SQLiteEventStore(SundyDbContext dbContext) : IEventStore
 {
     public async Task<List<CalendarEvent>> GetEventsInRangeAsync(
         DateTimeOffset startTime,

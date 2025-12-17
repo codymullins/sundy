@@ -1,6 +1,6 @@
 using Mediator;
 
-namespace Sundy.Core.Commands;
+namespace Sundy.Core.Meta;
 
 public record ResetDatabaseCommand : IRequest;
 public record InitializeDatabaseCommand : IRequest;

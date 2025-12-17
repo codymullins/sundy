@@ -1,7 +1,17 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Design;
 
 namespace Sundy.Core;
+public class SundyDbContextFactory : IDesignTimeDbContextFactory<SundyDbContext>
+{
+    public SundyDbContext CreateDbContext(string[] args)
+    {
+        var optionsBuilder = new DbContextOptionsBuilder<SundyDbContext>();
+        optionsBuilder.UseSqlite("Data Source=sundy.db");
 
+        return new SundyDbContext(optionsBuilder.Options);
+    }
+}
 public class SundyDbContext(DbContextOptions<SundyDbContext> options) : DbContext(options)
 {
     public DbSet<Calendar> Calendars => Set<Calendar>();

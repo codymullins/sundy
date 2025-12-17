@@ -249,18 +249,27 @@ public class SidebarMarginConverter : IValueConverter
 {
     public static readonly SidebarMarginConverter Instance = new();
     private static readonly bool IsMacOS = RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
+    private static readonly bool IsIOS = RuntimeInformation.IsOSPlatform(OSPlatform.Create("IOS"));
+    private static readonly bool IsAndroid = RuntimeInformation.IsOSPlatform(OSPlatform.Create("ANDROID"));
+    private static readonly bool IsMobile = IsIOS || IsAndroid;
 
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         var isSidebarVisible = value is true;
-        
-        // Only macOS needs extra left margin to clear traffic lights when sidebar is hidden
-        if (!IsMacOS || isSidebarVisible)
+
+        // Mobile: minimal margins to maximize screen real estate
+        if (IsMobile)
         {
-            return new Avalonia.Thickness(10, 10, 16, 6);
+            return new Avalonia.Thickness(0, 10, 0, 6);
         }
-        
-        return new Avalonia.Thickness(80, 10, 16, 6);
+
+        // macOS needs extra left margin to clear traffic lights when sidebar is hidden
+        if (IsMacOS && !isSidebarVisible)
+        {
+            return new Avalonia.Thickness(80, 10, 16, 6);
+        }
+
+        return new Avalonia.Thickness(10, 10, 16, 6);
     }
 
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
@@ -281,6 +290,118 @@ public class SidebarWidthConverter : IValueConverter
         var isSidebarVisible = value is true;
         // 266 = 260 (sidebar width) + 6 (left margin)
         return isSidebarVisible ? 266.0 : 0.0;
+    }
+
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        throw new NotSupportedException();
+    }
+}
+
+/// <summary>
+/// Converts mobile layout flag to calendar content margin - removes left/right margin on mobile
+/// </summary>
+public class MobileMarginConverter : IValueConverter
+{
+    public static readonly MobileMarginConverter Instance = new();
+
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        var isMobileLayout = value is true;
+        // Mobile: no left/right margin to maximize screen real estate
+        // Desktop: keep 6px left/right margins
+        return isMobileLayout
+            ? new Avalonia.Thickness(0, 0, 0, 6)
+            : new Avalonia.Thickness(6, 0, 6, 6);
+    }
+
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        throw new NotSupportedException();
+    }
+}
+
+/// <summary>
+/// Converts mobile layout flag to corner radius - removes rounded corners on mobile
+/// </summary>
+public class MobileCornerRadiusConverter : IValueConverter
+{
+    public static readonly MobileCornerRadiusConverter Instance = new();
+
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        var isMobileLayout = value is true;
+        return isMobileLayout ? new Avalonia.CornerRadius(0) : new Avalonia.CornerRadius(12);
+    }
+
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        throw new NotSupportedException();
+    }
+}
+
+/// <summary>
+/// Converts mobile layout flag to border thickness - removes border on mobile
+/// </summary>
+public class MobileBorderThicknessConverter : IValueConverter
+{
+    public static readonly MobileBorderThicknessConverter Instance = new();
+
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        var isMobileLayout = value is true;
+        return isMobileLayout ? new Avalonia.Thickness(0) : new Avalonia.Thickness(1);
+    }
+
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        throw new NotSupportedException();
+    }
+}
+
+/// <summary>
+/// Converts current time (in minutes from midnight) to a relative Y position for month view cells.
+/// Maps 0-1440 minutes to approximately 0-100% of cell height (assuming ~80px usable height).
+/// </summary>
+public class MonthTimeIndicatorConverter : IValueConverter
+{
+    public static readonly MonthTimeIndicatorConverter Instance = new();
+
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        if (value is not double minutes) return 0.0;
+
+        // CurrentTimeTop is minutes from midnight (0-1440)
+        // Map to a percentage of the day, then scale to approximate cell content height
+        var percentOfDay = minutes / 1440.0;
+        // Assume usable content area is roughly 80px in a month cell
+        return percentOfDay * 80.0;
+    }
+
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        throw new NotSupportedException();
+    }
+}
+
+/// <summary>
+/// Converts current time (in minutes from midnight) to a top margin for month view time indicator.
+/// Maps 0-1440 minutes to a percentage-based margin of the cell height.
+/// </summary>
+public class MonthTimeMarginConverter : IValueConverter
+{
+    public static readonly MonthTimeMarginConverter Instance = new();
+
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        if (value is not double minutes) return new Avalonia.Thickness(0);
+
+        // CurrentTimeTop is minutes from midnight (0-1440)
+        // Map to a percentage of the day, then scale to approximate cell content height
+        var percentOfDay = minutes / 1440.0;
+        // Assume usable content area is roughly 100px in a month cell
+        var topMargin = percentOfDay * 100.0;
+        return new Avalonia.Thickness(0, topMargin, 0, 0);
     }
 
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)

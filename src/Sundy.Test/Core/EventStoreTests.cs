@@ -5,10 +5,10 @@ using Sundy.Test.TestHelpers;
 
 namespace Sundy.Test.Core;
 
-public class EventStoreTests
+public class SQLiteEventStoreTests
 {
     [Theory, Auto]
-    public async Task GetEventsInRangeAsync_ReturnsEventsWithinRange(IMediator mediator, EventStore eventStore)
+    public async Task GetEventsInRangeAsync_ReturnsEventsWithinRange(IMediator mediator, SQLiteEventStore SQLiteEventStore)
     {
         // Arrange
         var calendar = TestDataBuilder.CreateTestCalendar();
@@ -23,10 +23,10 @@ public class EventStoreTests
             new DateTime(2024, 1, 10, 10, 0, 0),
             new DateTime(2024, 1, 10, 11, 0, 0),
             "Event Within Range");
-        await eventStore.CreateEventAsync(evt);
+        await SQLiteEventStore.CreateEventAsync(evt);
 
         // Act
-        var results = await eventStore.GetEventsInRangeAsync(
+        var results = await SQLiteEventStore.GetEventsInRangeAsync(
             new DateTimeOffset(rangeStart),
             new DateTimeOffset(rangeEnd),
             calendar.Id);
@@ -37,7 +37,7 @@ public class EventStoreTests
     }
 
     [Theory, Auto]
-    public async Task GetEventsInRangeAsync_ExcludesEventsOutsideRange(IMediator mediator, EventStore eventStore)
+    public async Task GetEventsInRangeAsync_ExcludesEventsOutsideRange(IMediator mediator, SQLiteEventStore SQLiteEventStore)
     {
         // Arrange
         var calendar = TestDataBuilder.CreateTestCalendar();
@@ -51,17 +51,17 @@ public class EventStoreTests
             calendar.Id,
             new DateTime(2024, 1, 10, 7, 0, 0),
             new DateTime(2024, 1, 10, 8, 0, 0));
-        await eventStore.CreateEventAsync(eventBefore);
+        await SQLiteEventStore.CreateEventAsync(eventBefore);
 
         // Event after range
         var eventAfter = TestDataBuilder.CreateTestEvent(
             calendar.Id,
             new DateTime(2024, 1, 10, 18, 0, 0),
             new DateTime(2024, 1, 10, 19, 0, 0));
-        await eventStore.CreateEventAsync(eventAfter);
+        await SQLiteEventStore.CreateEventAsync(eventAfter);
 
         // Act
-        var results = await eventStore.GetEventsInRangeAsync(
+        var results = await SQLiteEventStore.GetEventsInRangeAsync(
             new DateTimeOffset(rangeStart),
             new DateTimeOffset(rangeEnd),
             calendar.Id);
@@ -71,7 +71,7 @@ public class EventStoreTests
     }
 
     [Theory, Auto]
-    public async Task GetEventsInRangeAsync_IncludesEventsOverlappingStartBoundary(IMediator mediator, EventStore eventStore)
+    public async Task GetEventsInRangeAsync_IncludesEventsOverlappingStartBoundary(IMediator mediator, SQLiteEventStore SQLiteEventStore)
     {
         // Arrange - Tests line 11: e.StartTime < endTime && e.EndTime > startTime
         var calendar = TestDataBuilder.CreateTestCalendar();
@@ -85,10 +85,10 @@ public class EventStoreTests
             calendar.Id,
             new DateTime(2024, 1, 10, 8, 30, 0),
             new DateTime(2024, 1, 10, 10, 0, 0));
-        await eventStore.CreateEventAsync(evt);
+        await SQLiteEventStore.CreateEventAsync(evt);
 
         // Act
-        var results = await eventStore.GetEventsInRangeAsync(
+        var results = await SQLiteEventStore.GetEventsInRangeAsync(
             new DateTimeOffset(rangeStart),
             new DateTimeOffset(rangeEnd),
             calendar.Id);
@@ -99,7 +99,7 @@ public class EventStoreTests
     }
 
     [Theory, Auto]
-    public async Task GetEventsInRangeAsync_IncludesEventsOverlappingEndBoundary(IMediator mediator, EventStore eventStore)
+    public async Task GetEventsInRangeAsync_IncludesEventsOverlappingEndBoundary(IMediator mediator, SQLiteEventStore SQLiteEventStore)
     {
         // Arrange - Tests line 11: e.StartTime < endTime && e.EndTime > startTime
         var calendar = TestDataBuilder.CreateTestCalendar();
@@ -113,10 +113,10 @@ public class EventStoreTests
             calendar.Id,
             new DateTime(2024, 1, 10, 16, 30, 0),
             new DateTime(2024, 1, 10, 18, 0, 0));
-        await eventStore.CreateEventAsync(evt);
+        await SQLiteEventStore.CreateEventAsync(evt);
 
         // Act
-        var results = await eventStore.GetEventsInRangeAsync(
+        var results = await SQLiteEventStore.GetEventsInRangeAsync(
             new DateTimeOffset(rangeStart),
             new DateTimeOffset(rangeEnd),
             calendar.Id);
@@ -127,7 +127,7 @@ public class EventStoreTests
     }
 
     [Theory, Auto]
-    public async Task GetEventsInRangeAsync_ExcludesEventsThatEndAtRangeStart(IMediator mediator, EventStore eventStore)
+    public async Task GetEventsInRangeAsync_ExcludesEventsThatEndAtRangeStart(IMediator mediator, SQLiteEventStore SQLiteEventStore)
     {
         // Arrange - Tests boundary condition: e.EndTime > startTime
         var calendar = TestDataBuilder.CreateTestCalendar();
@@ -141,10 +141,10 @@ public class EventStoreTests
             calendar.Id,
             new DateTime(2024, 1, 10, 8, 0, 0),
             new DateTime(2024, 1, 10, 9, 0, 0)); // Ends at 9:00
-        await eventStore.CreateEventAsync(evt);
+        await SQLiteEventStore.CreateEventAsync(evt);
 
         // Act
-        var results = await eventStore.GetEventsInRangeAsync(
+        var results = await SQLiteEventStore.GetEventsInRangeAsync(
             new DateTimeOffset(rangeStart),
             new DateTimeOffset(rangeEnd),
             calendar.Id);
@@ -154,7 +154,7 @@ public class EventStoreTests
     }
 
     [Theory, Auto]
-    public async Task GetEventsInRangeAsync_ExcludesEventsThatStartAtRangeEnd(IMediator mediator, EventStore eventStore)
+    public async Task GetEventsInRangeAsync_ExcludesEventsThatStartAtRangeEnd(IMediator mediator, SQLiteEventStore SQLiteEventStore)
     {
         // Arrange - Tests boundary condition: e.StartTime < endTime
         var calendar = TestDataBuilder.CreateTestCalendar();
@@ -168,10 +168,10 @@ public class EventStoreTests
             calendar.Id,
             new DateTime(2024, 1, 10, 17, 0, 0), // Starts at 17:00
             new DateTime(2024, 1, 10, 18, 0, 0));
-        await eventStore.CreateEventAsync(evt);
+        await SQLiteEventStore.CreateEventAsync(evt);
 
         // Act
-        var results = await eventStore.GetEventsInRangeAsync(
+        var results = await SQLiteEventStore.GetEventsInRangeAsync(
             new DateTimeOffset(rangeStart),
             new DateTimeOffset(rangeEnd),
             calendar.Id);
@@ -181,7 +181,7 @@ public class EventStoreTests
     }
 
     [Theory, Auto]
-    public async Task GetEventsInRangeAsync_HandlesMultiDayEventsSpanningEntireRange(IMediator mediator, EventStore eventStore)
+    public async Task GetEventsInRangeAsync_HandlesMultiDayEventsSpanningEntireRange(IMediator mediator, SQLiteEventStore SQLiteEventStore)
     {
         // Arrange
         var calendar = TestDataBuilder.CreateTestCalendar();
@@ -195,10 +195,10 @@ public class EventStoreTests
             calendar.Id,
             new DateTime(2024, 1, 9, 0, 0, 0),  // Day before
             new DateTime(2024, 1, 11, 23, 59, 0)); // Day after
-        await eventStore.CreateEventAsync(evt);
+        await SQLiteEventStore.CreateEventAsync(evt);
 
         // Act
-        var results = await eventStore.GetEventsInRangeAsync(
+        var results = await SQLiteEventStore.GetEventsInRangeAsync(
             new DateTimeOffset(rangeStart),
             new DateTimeOffset(rangeEnd),
             calendar.Id);
@@ -209,7 +209,7 @@ public class EventStoreTests
     }
 
     [Theory, Auto]
-    public async Task GetEventsInRangeAsync_FiltersByCalendarId(IMediator mediator, EventStore eventStore)
+    public async Task GetEventsInRangeAsync_FiltersByCalendarId(IMediator mediator, SQLiteEventStore SQLiteEventStore)
     {
         // Arrange
         var calendar1 = TestDataBuilder.CreateTestCalendar(name: "Calendar 1");
@@ -229,11 +229,11 @@ public class EventStoreTests
             rangeStart.AddHours(1),
             rangeStart.AddHours(2));
 
-        await eventStore.CreateEventAsync(event1);
-        await eventStore.CreateEventAsync(event2);
+        await SQLiteEventStore.CreateEventAsync(event1);
+        await SQLiteEventStore.CreateEventAsync(event2);
 
         // Act
-        var results = await eventStore.GetEventsInRangeAsync(
+        var results = await SQLiteEventStore.GetEventsInRangeAsync(
             new DateTimeOffset(rangeStart),
             new DateTimeOffset(rangeEnd),
             calendar1.Id);
@@ -244,7 +244,7 @@ public class EventStoreTests
     }
 
     [Theory, Auto]
-    public async Task GetEventsInRangeAsync_ReturnsAllCalendarsWhenCalendarIdIsNull(IMediator mediator, EventStore eventStore)
+    public async Task GetEventsInRangeAsync_ReturnsAllCalendarsWhenCalendarIdIsNull(IMediator mediator, SQLiteEventStore SQLiteEventStore)
     {
         // Arrange
         var calendar1 = TestDataBuilder.CreateTestCalendar(name: "Calendar 1");
@@ -264,11 +264,11 @@ public class EventStoreTests
             rangeStart.AddHours(3),
             rangeStart.AddHours(4));
 
-        await eventStore.CreateEventAsync(event1);
-        await eventStore.CreateEventAsync(event2);
+        await SQLiteEventStore.CreateEventAsync(event1);
+        await SQLiteEventStore.CreateEventAsync(event2);
 
         // Act - null calendarId should return events from all calendars
-        var results = await eventStore.GetEventsInRangeAsync(
+        var results = await SQLiteEventStore.GetEventsInRangeAsync(
             new DateTimeOffset(rangeStart),
             new DateTimeOffset(rangeEnd),
             calendarId: null);
@@ -278,7 +278,7 @@ public class EventStoreTests
     }
 
     [Theory, Auto]
-    public async Task CreateEventAsync_GeneratesIdWhenNull(IMediator mediator, EventStore eventStore)
+    public async Task CreateEventAsync_GeneratesIdWhenNull(IMediator mediator, SQLiteEventStore SQLiteEventStore)
     {
         // Arrange
         var calendar = TestDataBuilder.CreateTestCalendar();
@@ -288,7 +288,7 @@ public class EventStoreTests
         evt.Id = null!; // Explicitly set to null
 
         // Act
-        var created = await eventStore.CreateEventAsync(evt);
+        var created = await SQLiteEventStore.CreateEventAsync(evt);
 
         // Assert
         Assert.NotNull(created.Id);
@@ -296,7 +296,7 @@ public class EventStoreTests
     }
 
     [Theory, Auto]
-    public async Task CreateEventAsync_PreservesIdWhenProvided(IMediator mediator, EventStore eventStore)
+    public async Task CreateEventAsync_PreservesIdWhenProvided(IMediator mediator, SQLiteEventStore SQLiteEventStore)
     {
         // Arrange
         var calendar = TestDataBuilder.CreateTestCalendar();
@@ -307,27 +307,27 @@ public class EventStoreTests
         evt.Id = providedId;
 
         // Act
-        var created = await eventStore.CreateEventAsync(evt);
+        var created = await SQLiteEventStore.CreateEventAsync(evt);
 
         // Assert
         Assert.Equal(providedId, created.Id);
     }
 
     [Theory, Auto]
-    public async Task UpdateEventAsync_UpdatesExistingEvent(IMediator mediator, EventStore eventStore)
+    public async Task UpdateEventAsync_UpdatesExistingEvent(IMediator mediator, SQLiteEventStore SQLiteEventStore)
     {
         // Arrange
         var calendar = TestDataBuilder.CreateTestCalendar();
         await mediator.Send(new CreateCalendarCommand(calendar));
 
         var evt = TestDataBuilder.CreateTestEvent(calendar.Id, title: "Original Title");
-        await eventStore.CreateEventAsync(evt);
+        await SQLiteEventStore.CreateEventAsync(evt);
 
         // Act
         evt.Title = "Updated Title";
-        await eventStore.UpdateEventAsync(evt);
+        await SQLiteEventStore.UpdateEventAsync(evt);
 
-        var updated = await eventStore.GetEventByIdAsync(evt.Id);
+        var updated = await SQLiteEventStore.GetEventByIdAsync(evt.Id);
 
         // Assert
         Assert.NotNull(updated);
@@ -335,46 +335,46 @@ public class EventStoreTests
     }
 
     [Theory, Auto]
-    public async Task DeleteEventAsync_RemovesEvent(IMediator mediator, EventStore eventStore)
+    public async Task DeleteEventAsync_RemovesEvent(IMediator mediator, SQLiteEventStore SQLiteEventStore)
     {
         // Arrange
         var calendar = TestDataBuilder.CreateTestCalendar();
         await mediator.Send(new CreateCalendarCommand(calendar));
 
         var evt = TestDataBuilder.CreateTestEvent(calendar.Id);
-        await eventStore.CreateEventAsync(evt);
+        await SQLiteEventStore.CreateEventAsync(evt);
 
         // Act
-        await eventStore.DeleteEventAsync(evt.Id);
+        await SQLiteEventStore.DeleteEventAsync(evt.Id);
 
-        var deleted = await eventStore.GetEventByIdAsync(evt.Id);
+        var deleted = await SQLiteEventStore.GetEventByIdAsync(evt.Id);
 
         // Assert
         Assert.Null(deleted);
     }
 
     [Theory, Auto]
-    public async Task DeleteEventAsync_DoesNothingWhenEventNotFound(IMediator mediator, EventStore eventStore)
+    public async Task DeleteEventAsync_DoesNothingWhenEventNotFound(IMediator mediator, SQLiteEventStore SQLiteEventStore)
     {
         // Arrange
         var nonExistentId = Guid.NewGuid().ToString();
 
         // Act & Assert - Should not throw
-        await eventStore.DeleteEventAsync(nonExistentId);
+        await SQLiteEventStore.DeleteEventAsync(nonExistentId);
     }
 
     [Theory, Auto]
-    public async Task GetEventByIdAsync_ReturnsEventWhenExists(IMediator mediator, EventStore eventStore)
+    public async Task GetEventByIdAsync_ReturnsEventWhenExists(IMediator mediator, SQLiteEventStore SQLiteEventStore)
     {
         // Arrange
         var calendar = TestDataBuilder.CreateTestCalendar();
         await mediator.Send(new CreateCalendarCommand(calendar));
 
         var evt = TestDataBuilder.CreateTestEvent(calendar.Id);
-        await eventStore.CreateEventAsync(evt);
+        await SQLiteEventStore.CreateEventAsync(evt);
 
         // Act
-        var result = await eventStore.GetEventByIdAsync(evt.Id);
+        var result = await SQLiteEventStore.GetEventByIdAsync(evt.Id);
 
         // Assert
         Assert.NotNull(result);
@@ -383,7 +383,7 @@ public class EventStoreTests
     }
 
     [Theory, Auto]
-    public async Task GetEventsInRangeAsync_HandlesMidnightBoundaryEvents(IMediator mediator, EventStore eventStore)
+    public async Task GetEventsInRangeAsync_HandlesMidnightBoundaryEvents(IMediator mediator, SQLiteEventStore SQLiteEventStore)
     {
         // Arrange
         var calendar = TestDataBuilder.CreateTestCalendar();
@@ -394,13 +394,13 @@ public class EventStoreTests
 
         // Event at exactly midnight
         var evt = TestDataBuilder.CreateTestEventAtMidnight(calendar.Id, date);
-        await eventStore.CreateEventAsync(evt);
+        await SQLiteEventStore.CreateEventAsync(evt);
 
         var rangeStart = midnight;
         var rangeEnd = midnight.AddHours(12);
 
         // Act
-        var results = await eventStore.GetEventsInRangeAsync(
+        var results = await SQLiteEventStore.GetEventsInRangeAsync(
             new DateTimeOffset(rangeStart),
             new DateTimeOffset(rangeEnd),
             calendar.Id);

@@ -191,7 +191,7 @@ public class EventCommandHandlerTests
     }
 
     [Theory, Auto]
-    public async Task GetEventsInRangeQueryHandler_DelegatesToEventStore(IMediator mediator)
+    public async Task GetEventsInRangeQueryHandler_DelegatesToSQLiteEventStore(IMediator mediator)
     {
         // Arrange
         var calendar = TestDataBuilder.CreateTestCalendar();

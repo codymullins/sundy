@@ -1,14 +1,14 @@
 using Mediator;
-using Serilog;
+
 using Sundy.Core.Calendars.Outlook;
 using Sundy.Core.Queries;
 
 namespace Sundy.Core.Handlers;
 
 public class GetEventsInRangeQueryHandler(
-    EventStore repository,
+    IEventStore repository,
     OutlookCalendarProvider outlookProvider,
-    CalendarStore calendarStore)
+    ICalendarStore calendarStore)
     : IRequestHandler<GetEventsInRangeQuery, List<CalendarEvent>>
 {
     public async ValueTask<List<CalendarEvent>> Handle(GetEventsInRangeQuery request,
@@ -73,7 +73,7 @@ public class GetEventsInRangeQueryHandler(
             catch (Exception ex)
             {
                 // Log but don't fail if Outlook fetch fails
-                Serilog.Log.Warning(ex, "Failed to fetch Outlook events, showing local events only");
+                //Log.Warning(ex, "Failed to fetch Outlook events, showing local events only");
             }
         }
 
@@ -105,12 +105,12 @@ public class GetEventsInRangeQueryHandler(
 
                 await calendarStore.AddAsync(calendar, cancellationToken);
                 syncedCalendars.Add(calendar);
-                Log.Information("Auto-synced Outlook calendar: {CalendarName}", calendar.Name);
+                // Log.Information("Auto-synced Outlook calendar: {CalendarName}", calendar.Name);
             }
         }
         catch (Exception ex)
         {
-            Log.Warning(ex, "Failed to auto-sync Outlook calendars");
+            // Log.Warning(ex, "Failed to auto-sync Outlook calendars");
         }
 
         return syncedCalendars;

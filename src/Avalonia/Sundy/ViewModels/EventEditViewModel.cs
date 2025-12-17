@@ -4,8 +4,8 @@ using CommunityToolkit.Mvvm.Input;
 using Mediator;
 using Sundy.Core;
 using Sundy.Core.Commands;
+using Sundy.Core.Meta;
 using Sundy.Core.Queries;
-using Sundy.Core.System;
 using Sundy.ViewModels.Scheduler;
 
 namespace Sundy.ViewModels;

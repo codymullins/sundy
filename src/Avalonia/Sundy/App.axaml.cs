@@ -2,12 +2,12 @@ using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
+using Avalonia.Threading;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Serilog;
 using Sundy.Core;
 using Sundy.Core.Calendars.Outlook;
-using Sundy.Core.System;
+using Sundy.Core.Meta;
 using Sundy.Services;
 using Sundy.ViewModels;
 using Sundy.Views;
@@ -26,14 +26,14 @@ public partial class App : Application
         var services = new ServiceCollection();
 
         // Add logging
-        services.AddLogging(builder => { builder.AddSerilog(dispose: false); });
+        services.AddLogging(builder => { });
 
         // Add Mediator
         services.AddMediator(options => { options.ServiceLifetime = ServiceLifetime.Scoped; });
 
         // Get the application data path
         string dbPath;
-        if (OperatingSystem.IsBrowser())
+        if (OperatingSystem.IsBrowser() || OperatingSystem.IsIOS())
         {
             // For browser, use in-memory database with shared cache
             dbPath = "file::memory:?cache=shared";
@@ -51,10 +51,32 @@ public partial class App : Application
         services.AddDbContext<SundyDbContext>(options =>
             options.UseSqlite(connectionString));
 
+        // Register IDbConnection for Dapper stores
+        services.AddScoped<System.Data.IDbConnection>(_ =>
+        {
+            var connection = new Microsoft.Data.Sqlite.SqliteConnection(connectionString);
+            connection.Open();
+            return connection;
+        });
+
         // Register stores and database manager
-        services.AddScoped<EventStore>();
         services.AddScoped<DatabaseManager>();
-        services.AddScoped<CalendarStore>();
+        services.AddScoped<DapperDatabaseManager>();
+
+        if (OperatingSystem.IsIOS())
+        {
+            services.AddScoped<IEventStore, DapperEventStore>();
+            services.AddScoped<ICalendarStore, DapperCalendarStore>();
+            // services.AddScoped<IEventStore, InMemoryEventStore>();
+            // services.AddScoped<ICalendarStore, InMemoryCalendarStore>();
+        }
+        else
+        {
+            services.AddScoped<IEventStore, DapperEventStore>();
+            services.AddScoped<ICalendarStore, DapperCalendarStore>();
+            // services.AddScoped<IEventStore, SQLiteEventStore>();
+            // services.AddScoped<ICalendarStore, SQLiteCalendarStore>();
+        }
 
         // Register Services
         services.AddSingleton<ICalendarProvider, LocalCalendarProvider>();
@@ -86,19 +108,6 @@ public partial class App : Application
         // Build the service provider
         var serviceProvider = services.BuildServiceProvider();
 
-        // Initialize database schema
-        using (var scope = serviceProvider.CreateScope())
-        {
-            var dbContext = scope.ServiceProvider.GetRequiredService<SundyDbContext>();
-            var metaStore = scope.ServiceProvider.GetRequiredService<DatabaseManager>();
-
-            if (!metaStore.DatabaseExistsAsync(CancellationToken.None).GetAwaiter().GetResult())
-            {
-                Log.Information("Database not found. Creating new database at {DbPath}", dbPath);
-            }
-            metaStore.InitializeDatabaseAsync().GetAwaiter().GetResult();
-        }
-
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             // Avoid duplicate validations from both Avalonia and the CommunityToolkit. 
@@ -113,8 +122,19 @@ public partial class App : Application
                 DataContext = mainViewModel
             };
 
-            // Initialize the view model asynchronously
-            _ = mainViewModel.InitializeAsync();
+            
+            Dispatcher.UIThread.Post(async void () =>
+            {
+                try
+                {
+                    await mainViewModel.InitializeAsync();
+                }
+                catch (Exception ex)
+                {
+                    // log
+                    // Log.Fatal(ex, "Failed to initialize MainViewModel: {Message}", ex.Message);
+                }
+            });
         }
         else if (ApplicationLifetime is ISingleViewApplicationLifetime singleViewPlatform)
         {
@@ -126,8 +146,18 @@ public partial class App : Application
                 DataContext = mainViewModel
             };
 
-            // Initialize the view model asynchronously
-            _ = mainViewModel.InitializeAsync();
+            Dispatcher.UIThread.Post(async void () =>
+            {
+                try
+                {
+                    await mainViewModel.InitializeAsync();
+                }
+                catch (Exception ex)
+                {
+                    // log
+                    // Log.Fatal(ex, "Failed to initialize MainViewModel: {Message}", ex.Message);
+                }
+            });
         }
 
         base.OnFrameworkInitializationCompleted();

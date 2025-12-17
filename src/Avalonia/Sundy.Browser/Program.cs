@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Browser;
-using Serilog;
 using Sundy;
 
 internal sealed partial class Program
@@ -11,12 +10,6 @@ internal sealed partial class Program
     {
         // Initialize SQLite for WebAssembly
         SQLitePCL.Batteries_V2.Init();
-        
-        Log.Logger = new LoggerConfiguration()
-            .MinimumLevel.Debug()
-            .WriteTo.Console()
-            //.WriteTo.Seq("http://localhost:8081")
-            .CreateLogger();
         
         return BuildAvaloniaApp()
             .WithInterFont()

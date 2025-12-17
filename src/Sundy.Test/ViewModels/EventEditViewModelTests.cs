@@ -1,8 +1,8 @@
 using Mediator;
 using Moq;
 using Sundy.Core;
+using Sundy.Core.Meta;
 using Sundy.Core.Queries;
-using Sundy.Core.System;
 using Sundy.Test.TestHelpers;
 using Sundy.ViewModels;
 

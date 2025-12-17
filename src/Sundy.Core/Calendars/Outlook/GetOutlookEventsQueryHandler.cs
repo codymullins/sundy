@@ -1,19 +1,18 @@
 using Mediator;
-using Serilog;
 
 namespace Sundy.Core.Calendars.Outlook;
 
 /// <summary>
 /// Handler for getting events from Outlook calendars.
 /// </summary>
-public class GetOutlookEventsQueryHandler(OutlookCalendarProvider outlookProvider, CalendarStore calendarStore)
+public class GetOutlookEventsQueryHandler(OutlookCalendarProvider outlookProvider, ICalendarStore calendarStore)
     : IQueryHandler<GetOutlookEventsQuery, List<CalendarEvent>>
 {
     public async ValueTask<List<CalendarEvent>> Handle(GetOutlookEventsQuery query, CancellationToken cancellationToken)
     {
         if (!outlookProvider.IsConnected)
         {
-            Log.Warning("Outlook not connected, returning empty event list");
+            // Log.Warning("Outlook not connected, returning empty event list");
             return [];
         }
 
@@ -51,18 +50,18 @@ public class GetOutlookEventsQueryHandler(OutlookCalendarProvider outlookProvide
                     }
 
                     allEvents.AddRange(events);
-                    Log.Debug("Fetched {EventCount} events from Outlook calendar {CalendarName}", 
-                        events.Count, calendar.Name);
+                    // Log.Debug("Fetched {EventCount} events from Outlook calendar {CalendarName}", 
+                    //     events.Count, calendar.Name);
                 }
                 catch (Exception ex)
                 {
-                    Log.Error(ex, "Failed to fetch events from Outlook calendar {CalendarId}", calendar.Id);
+                    // Log.Error(ex, "Failed to fetch events from Outlook calendar {CalendarId}", calendar.Id);
                 }
             }
         }
         catch (Exception ex)
         {
-            Log.Error(ex, "Failed to get Outlook events");
+            // Log.Error(ex, "Failed to get Outlook events");
         }
 
         return allEvents;

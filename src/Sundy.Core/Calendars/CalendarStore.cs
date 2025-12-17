@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Sundy.Core;
 
-public class CalendarStore(SundyDbContext dbContext)
+public class SQLiteCalendarStore(SundyDbContext dbContext) : ICalendarStore
 {
     public async Task DeleteCalendarAsync(string calendarId, CancellationToken ct = default)
     {

@@ -2,6 +2,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Presenters;
 using Avalonia.Input;
+using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Sundy.ViewModels;
 
@@ -9,10 +10,12 @@ namespace Sundy.Views;
 
 public partial class CalendarView : UserControl
 {
+    private DispatcherTimer? _timeUpdateTimer;
+
     public CalendarView()
     {
         InitializeComponent();
-        
+
         LayoutUpdated += OnLayoutUpdated;
         DataContextChanged += OnDataContextChanged;
     }
@@ -21,6 +24,47 @@ public partial class CalendarView : UserControl
     {
         base.OnAttachedToVisualTree(e);
         UpdateEventPositions();
+        StartTimeUpdateTimer();
+    }
+
+    protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        base.OnDetachedFromVisualTree(e);
+        StopTimeUpdateTimer();
+    }
+
+    private void StartTimeUpdateTimer()
+    {
+        _timeUpdateTimer = new DispatcherTimer
+        {
+            Interval = TimeSpan.FromMinutes(1)
+        };
+        _timeUpdateTimer.Tick += OnTimeUpdateTick;
+        _timeUpdateTimer.Start();
+
+        // Update immediately
+        if (DataContext is CalendarViewModel vm)
+        {
+            vm.UpdateCurrentTime();
+        }
+    }
+
+    private void StopTimeUpdateTimer()
+    {
+        if (_timeUpdateTimer != null)
+        {
+            _timeUpdateTimer.Stop();
+            _timeUpdateTimer.Tick -= OnTimeUpdateTick;
+            _timeUpdateTimer = null;
+        }
+    }
+
+    private void OnTimeUpdateTick(object? sender, EventArgs e)
+    {
+        if (DataContext is CalendarViewModel vm)
+        {
+            vm.UpdateCurrentTime();
+        }
     }
     
     private void OnDataContextChanged(object? sender, EventArgs e)

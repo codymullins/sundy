@@ -3,7 +3,7 @@ using System.Diagnostics;
 
 namespace Sundy.Core;
 
-public class LocalCalendarProvider(EventStore eventStore) : ICalendarProvider
+public class LocalCalendarProvider(IEventStore eventStore) : ICalendarProvider
 {
     public async Task<CalendarEvent> CreateEventAsync(string calendarId, CalendarEvent evt, CancellationToken ct = default)
     {

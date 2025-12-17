@@ -44,6 +44,18 @@ public partial class CalendarViewModel : ObservableObject
 
     [ObservableProperty] private CalendarViewMode _viewMode = CalendarViewMode.Month;
 
+    [ObservableProperty] private bool _isMobileLayout;
+
+    [ObservableProperty] private TimeOnly _currentTime = TimeOnly.FromDateTime(DateTime.Now);
+
+    public double CurrentTimeTop => (CurrentTime.Hour * 60 + CurrentTime.Minute);
+
+    public void UpdateCurrentTime()
+    {
+        CurrentTime = TimeOnly.FromDateTime(DateTime.Now);
+        OnPropertyChanged(nameof(CurrentTimeTop));
+    }
+
     [ObservableProperty] private ObservableCollection<MonthDayViewModel> _monthDays = new();
 
     [ObservableProperty] private ObservableCollection<TimeSlotViewModel> _timeSlots = new();

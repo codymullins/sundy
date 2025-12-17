@@ -7,6 +7,8 @@
 
     <UserControl.Resources>
         <scheduler:SubtractConverter x:Key="SubtractConverter" Offset="12"/>
+        <scheduler:MonthTimeIndicatorConverter x:Key="MonthTimeIndicatorConverter"/>
+        <scheduler:MonthTimeMarginConverter x:Key="MonthTimeMarginConverter"/>
     </UserControl.Resources>
 
     <UserControl.Styles>
@@ -27,38 +29,80 @@
                 <Grid Grid.Row="0" ColumnDefinitions="*,*,*,*,*,*,*" Height="40">
                     <Border Grid.Column="0" Background="{DynamicResource BackgroundHover}"
                             BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,1">
-                        <TextBlock Text="Sunday" HorizontalAlignment="Center" VerticalAlignment="Center"
-                                   FontWeight="SemiBold" Foreground="{DynamicResource ForegroundPrimary}" />
+                        <Panel>
+                            <TextBlock Text="Sunday" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                       FontWeight="SemiBold" Foreground="{DynamicResource ForegroundPrimary}"
+                                       IsVisible="{Binding !IsMobileLayout}" />
+                            <TextBlock Text="S" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                       FontWeight="SemiBold" Foreground="{DynamicResource ForegroundPrimary}"
+                                       IsVisible="{Binding IsMobileLayout}" />
+                        </Panel>
                     </Border>
                     <Border Grid.Column="1" Background="{DynamicResource BackgroundHover}"
                             BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,1">
-                        <TextBlock Text="Monday" HorizontalAlignment="Center" VerticalAlignment="Center"
-                                   FontWeight="SemiBold" Foreground="{DynamicResource ForegroundPrimary}" />
+                        <Panel>
+                            <TextBlock Text="Monday" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                       FontWeight="SemiBold" Foreground="{DynamicResource ForegroundPrimary}"
+                                       IsVisible="{Binding !IsMobileLayout}" />
+                            <TextBlock Text="M" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                       FontWeight="SemiBold" Foreground="{DynamicResource ForegroundPrimary}"
+                                       IsVisible="{Binding IsMobileLayout}" />
+                        </Panel>
                     </Border>
                     <Border Grid.Column="2" Background="{DynamicResource BackgroundHover}"
                             BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,1">
-                        <TextBlock Text="Tuesday" HorizontalAlignment="Center" VerticalAlignment="Center"
-                                   FontWeight="SemiBold" Foreground="{DynamicResource ForegroundPrimary}" />
+                        <Panel>
+                            <TextBlock Text="Tuesday" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                       FontWeight="SemiBold" Foreground="{DynamicResource ForegroundPrimary}"
+                                       IsVisible="{Binding !IsMobileLayout}" />
+                            <TextBlock Text="T" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                       FontWeight="SemiBold" Foreground="{DynamicResource ForegroundPrimary}"
+                                       IsVisible="{Binding IsMobileLayout}" />
+                        </Panel>
                     </Border>
                     <Border Grid.Column="3" Background="{DynamicResource BackgroundHover}"
                             BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,1">
-                        <TextBlock Text="Wednesday" HorizontalAlignment="Center" VerticalAlignment="Center"
-                                   FontWeight="SemiBold" Foreground="{DynamicResource ForegroundPrimary}" />
+                        <Panel>
+                            <TextBlock Text="Wednesday" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                       FontWeight="SemiBold" Foreground="{DynamicResource ForegroundPrimary}"
+                                       IsVisible="{Binding !IsMobileLayout}" />
+                            <TextBlock Text="W" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                       FontWeight="SemiBold" Foreground="{DynamicResource ForegroundPrimary}"
+                                       IsVisible="{Binding IsMobileLayout}" />
+                        </Panel>
                     </Border>
                     <Border Grid.Column="4" Background="{DynamicResource BackgroundHover}"
                             BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,1">
-                        <TextBlock Text="Thursday" HorizontalAlignment="Center" VerticalAlignment="Center"
-                                   FontWeight="SemiBold" Foreground="{DynamicResource ForegroundPrimary}" />
+                        <Panel>
+                            <TextBlock Text="Thursday" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                       FontWeight="SemiBold" Foreground="{DynamicResource ForegroundPrimary}"
+                                       IsVisible="{Binding !IsMobileLayout}" />
+                            <TextBlock Text="T" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                       FontWeight="SemiBold" Foreground="{DynamicResource ForegroundPrimary}"
+                                       IsVisible="{Binding IsMobileLayout}" />
+                        </Panel>
                     </Border>
                     <Border Grid.Column="5" Background="{DynamicResource BackgroundHover}"
                             BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,1">
-                        <TextBlock Text="Friday" HorizontalAlignment="Center" VerticalAlignment="Center"
-                                   FontWeight="SemiBold" Foreground="{DynamicResource ForegroundPrimary}" />
+                        <Panel>
+                            <TextBlock Text="Friday" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                       FontWeight="SemiBold" Foreground="{DynamicResource ForegroundPrimary}"
+                                       IsVisible="{Binding !IsMobileLayout}" />
+                            <TextBlock Text="F" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                       FontWeight="SemiBold" Foreground="{DynamicResource ForegroundPrimary}"
+                                       IsVisible="{Binding IsMobileLayout}" />
+                        </Panel>
                     </Border>
                     <Border Grid.Column="6" Background="{DynamicResource BackgroundHover}"
                             BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1">
-                        <TextBlock Text="Saturday" HorizontalAlignment="Center" VerticalAlignment="Center"
-                                   FontWeight="SemiBold" Foreground="{DynamicResource ForegroundPrimary}" />
+                        <Panel>
+                            <TextBlock Text="Saturday" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                       FontWeight="SemiBold" Foreground="{DynamicResource ForegroundPrimary}"
+                                       IsVisible="{Binding !IsMobileLayout}" />
+                            <TextBlock Text="S" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                       FontWeight="SemiBold" Foreground="{DynamicResource ForegroundPrimary}"
+                                       IsVisible="{Binding IsMobileLayout}" />
+                        </Panel>
                     </Border>
                 </Grid>
 
@@ -87,37 +131,38 @@
                                             <Setter Property="BorderThickness" Value="2" />
                                         </Style>
                                     </Border.Styles>
-                                <Grid RowDefinitions="Auto,*">
-                                    <Border Grid.Row="0"
-                                            HorizontalAlignment="Right"
-                                            Margin="0,0,5,5"
-                                            CornerRadius="12"
-                                            Width="24"
-                                            Height="24"
-                                            Classes.is-today="{Binding IsToday}">
-                                        <Border.Styles>
-                                            <Style Selector="Border.is-today">
-                                                <Setter Property="Background" Value="{DynamicResource AccentPrimary}" />
-                                            </Style>
-                                        </Border.Styles>
-                                        <TextBlock Text="{Binding Day}"
-                                                   FontSize="12"
-                                                   HorizontalAlignment="Center"
-                                                   VerticalAlignment="Center">
-                                            <TextBlock.Styles>
-                                                <Style Selector="TextBlock">
-                                                    <Setter Property="Foreground"
-                                                            Value="{DynamicResource ForegroundPrimary}" />
+                                <Panel>
+                                    <Grid RowDefinitions="Auto,*">
+                                        <Border Grid.Row="0"
+                                                HorizontalAlignment="Right"
+                                                Margin="0,0,5,5"
+                                                CornerRadius="12"
+                                                Width="24"
+                                                Height="24"
+                                                Classes.is-today="{Binding IsToday}">
+                                            <Border.Styles>
+                                                <Style Selector="Border.is-today">
+                                                    <Setter Property="Background" Value="{DynamicResource AccentPrimary}" />
                                                 </Style>
-                                                <Style Selector="Border.is-today TextBlock">
-                                                    <Setter Property="Foreground" Value="White" />
-                                                    <Setter Property="FontWeight" Value="SemiBold" />
-                                                </Style>
-                                            </TextBlock.Styles>
-                                        </TextBlock>
-                                    </Border>
+                                            </Border.Styles>
+                                            <TextBlock Text="{Binding Day}"
+                                                       FontSize="12"
+                                                       HorizontalAlignment="Center"
+                                                       VerticalAlignment="Center">
+                                                <TextBlock.Styles>
+                                                    <Style Selector="TextBlock">
+                                                        <Setter Property="Foreground"
+                                                                Value="{DynamicResource ForegroundPrimary}" />
+                                                    </Style>
+                                                    <Style Selector="Border.is-today TextBlock">
+                                                        <Setter Property="Foreground" Value="White" />
+                                                        <Setter Property="FontWeight" Value="SemiBold" />
+                                                    </Style>
+                                                </TextBlock.Styles>
+                                            </TextBlock>
+                                        </Border>
 
-                                    <ListBox Grid.Row="1" ItemsSource="{Binding Events}"
+                                        <ListBox Grid.Row="1" ItemsSource="{Binding Events}"
                                              SelectedItem="{Binding SelectedEvent}"
                                              Background="Transparent"
                                              SelectionMode="Single">
@@ -161,7 +206,51 @@
                                             </DataTemplate>
                                         </ListBox.ItemTemplate>
                                     </ListBox>
-                                </Grid>
+                                    </Grid>
+
+                                    <!-- Current time indicator line for today -->
+                                    <Grid IsVisible="{Binding IsToday}"
+                                          VerticalAlignment="Stretch"
+                                          HorizontalAlignment="Stretch"
+                                          IsHitTestVisible="False">
+                                        <Grid VerticalAlignment="Top"
+                                              Margin="{Binding $parent[ItemsControl].((vm:CalendarViewModel)DataContext).CurrentTimeTop, Converter={StaticResource MonthTimeMarginConverter}}">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <!-- Desktop: show time label -->
+                                            <Border Grid.Column="0"
+                                                    Background="{DynamicResource AccentPrimary}"
+                                                    CornerRadius="3"
+                                                    Padding="3,1"
+                                                    VerticalAlignment="Center">
+                                                <Border.IsVisible>
+                                                    <Binding Path="$parent[ItemsControl].((vm:CalendarViewModel)DataContext).IsMobileLayout">
+                                                        <Binding.Converter>
+                                                            <x:Static Member="BoolConverters.Not"/>
+                                                        </Binding.Converter>
+                                                    </Binding>
+                                                </Border.IsVisible>
+                                                <TextBlock Text="{Binding $parent[ItemsControl].((vm:CalendarViewModel)DataContext).CurrentTime, StringFormat={}{0:h:mm}}"
+                                                           FontSize="9"
+                                                           FontWeight="SemiBold"
+                                                           Foreground="White" />
+                                            </Border>
+                                            <!-- Mobile: just show dot -->
+                                            <Ellipse Grid.Column="0"
+                                                     IsVisible="{Binding $parent[ItemsControl].((vm:CalendarViewModel)DataContext).IsMobileLayout}"
+                                                     Width="5" Height="5"
+                                                     Fill="{DynamicResource AccentPrimary}"
+                                                     VerticalAlignment="Center" />
+                                            <Rectangle Grid.Column="1"
+                                                       Height="1"
+                                                       Fill="{DynamicResource AccentPrimary}"
+                                                       VerticalAlignment="Center"
+                                                       Opacity="0.7" />
+                                        </Grid>
+                                    </Grid>
+                                </Panel>
                                 </Border>
                             </Border>
                         </DataTemplate>
@@ -304,6 +393,16 @@
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
+
+                            <!-- Current time indicator -->
+                            <Canvas>
+                                <scheduler:CurrentTimeIndicator
+                                    CurrentTime="{Binding CurrentTime}"
+                                    IndicatorBrush="{DynamicResource AccentPrimary}"
+                                    Width="2000"
+                                    Canvas.Left="-60"
+                                    Canvas.Top="{Binding CurrentTimeTop}" />
+                            </Canvas>
                         </Grid>
                     </Grid>
                 </ScrollViewer>
@@ -425,6 +524,16 @@
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
+
+                            <!-- Current time indicator -->
+                            <Canvas>
+                                <scheduler:CurrentTimeIndicator
+                                    CurrentTime="{Binding CurrentTime}"
+                                    IndicatorBrush="{DynamicResource AccentPrimary}"
+                                    Width="2000"
+                                    Canvas.Left="-60"
+                                    Canvas.Top="{Binding CurrentTimeTop}" />
+                            </Canvas>
                         </Grid>
                     </Grid>
                 </ScrollViewer>

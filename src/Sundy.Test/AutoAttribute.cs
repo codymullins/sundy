@@ -2,7 +2,6 @@ using AutoFixture;
 using AutoFixture.Xunit2;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Serilog;
 using Sundy.Core;
 
 namespace Sundy.Test;
@@ -21,7 +20,7 @@ public class AutoAttribute : AutoDataAttribute
             var services = new ServiceCollection();
 
             // Add logging
-            services.AddLogging(builder => { builder.AddSerilog(dispose: false); });
+            services.AddLogging(builder => {  });
 
             // Add Mediator
             services.AddMediator(options => { options.ServiceLifetime = ServiceLifetime.Scoped; });
@@ -35,9 +34,9 @@ public class AutoAttribute : AutoDataAttribute
                 options.UseSqlite(connection));
 
             // Register stores and database manager
-            services.AddScoped<EventStore>();
+            services.AddScoped<SQLiteEventStore>();
             services.AddScoped<DatabaseManager>();
-            services.AddScoped<CalendarStore>();
+            services.AddScoped<SQLiteCalendarStore>();
 
             // Register Services
             services.AddScoped<ICalendarProvider, LocalCalendarProvider>();
