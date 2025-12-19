@@ -1,0 +1,54 @@
+<Application x:Class="Sundy.Uno.App"
+       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+       xmlns:converters="using:Sundy.Uno.Converters"
+       RequestedTheme="Dark">
+
+  <Application.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <!-- Load WinUI resources -->
+        <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
+        
+        <!-- Theme Resources -->
+        <ResourceDictionary Source="ms-appx:///Themes/DarkTheme.xaml" />
+      </ResourceDictionary.MergedDictionaries>
+
+      <!-- Global Converters -->
+      <converters:EqualityConverter x:Key="EqualityConverter" />
+      <converters:BoolToBackgroundConverter x:Key="BoolToBackgroundConverter" />
+      <converters:BoolToForegroundConverter x:Key="BoolToForegroundConverter" />
+      <converters:BoolToFontWeightConverter x:Key="BoolToFontWeightConverter" />
+      <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
+      <converters:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
+      <converters:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter" />
+      <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+      <converters:BoolToAccentBackgroundConverter x:Key="BoolToAccentBackgroundConverter" />
+
+      <!-- Event Item Template for Calendar -->
+      <DataTemplate x:Key="EventItemTemplate" xmlns:vm="using:Sundy.Uno.ViewModels">
+        <Border Background="{Binding CalendarColor}"
+                CornerRadius="4"
+                Padding="6,3"
+                Margin="0,1">
+          <TextBlock Text="{Binding Title}"
+                     FontSize="11"
+                     Foreground="White"
+                     TextTrimming="CharacterEllipsis"
+                     MaxLines="1" />
+        </Border>
+      </DataTemplate>
+
+      <!-- Button Styles -->
+      <Style x:Key="DefaultButtonStyle" TargetType="Button">
+        <Setter Property="Background" Value="{ThemeResource BackgroundSecondary}" />
+        <Setter Property="BorderBrush" Value="{ThemeResource BorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="12,6" />
+        <Setter Property="CornerRadius" Value="6" />
+      </Style>
+
+    </ResourceDictionary>
+  </Application.Resources>
+
+</Application>

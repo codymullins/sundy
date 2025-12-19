@@ -1,0 +1,209 @@
+<UserControl x:Class="Sundy.Uno.Views.EventEditView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Sundy.Uno.ViewModels"
+             MaxWidth="700"
+             MinWidth="320">
+
+    <Border Background="{ThemeResource ModalBackground}"
+            BorderBrush="{ThemeResource ModalBorder}"
+            BorderThickness="1"
+            CornerRadius="12"
+            Padding="24"
+            Translation="0,0,16">
+        <Border.Shadow>
+            <ThemeShadow />
+        </Border.Shadow>
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <!-- Header with Calendar Selection -->
+            <Grid Grid.Row="0" Margin="0,0,0,24">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0"
+                           Text="{x:Bind ViewModel.DialogTitle, Mode=OneWay}"
+                           FontSize="24"
+                           FontWeight="SemiBold"
+                           Foreground="{ThemeResource ForegroundPrimary}"
+                           VerticalAlignment="Center"
+                           Margin="0,0,12,0" />
+
+                <!-- Calendar Selector -->
+                <Button Grid.Column="1"
+                        IsEnabled="{x:Bind ViewModel.IsBlockingEvent, Converter={StaticResource InverseBoolConverter}, Mode=OneWay}"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        Padding="8,4"
+                        VerticalAlignment="Center"
+                        x:Name="CalendarSelectorButton">
+                    <Button.Flyout>
+                        <Flyout Placement="Bottom">
+                            <Border Background="{ThemeResource BackgroundPrimary}"
+                                    BorderBrush="{ThemeResource BorderBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="8"
+                                    Padding="8"
+                                    MinWidth="200">
+                                <ItemsRepeater ItemsSource="{x:Bind ViewModel.AvailableCalendars, Mode=OneWay}">
+                                    <ItemsRepeater.ItemTemplate>
+                                        <DataTemplate x:DataType="vm:CalendarItemViewModel">
+                                            <Button Command="{Binding SelectCalendarCommand}"
+                                                    CommandParameter="{Binding}"
+                                                    Background="Transparent"
+                                                    BorderThickness="0"
+                                                    CornerRadius="6"
+                                                    HorizontalAlignment="Stretch"
+                                                    HorizontalContentAlignment="Left"
+                                                    Padding="8,6">
+                                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                                    <Border Width="16"
+                                                            Height="16"
+                                                            Background="{x:Bind Color, Mode=OneWay}"
+                                                            CornerRadius="3" />
+                                                    <TextBlock Text="{x:Bind Name, Mode=OneWay}"
+                                                               VerticalAlignment="Center"
+                                                               Foreground="{ThemeResource ForegroundPrimary}" />
+                                                </StackPanel>
+                                            </Button>
+                                        </DataTemplate>
+                                    </ItemsRepeater.ItemTemplate>
+                                </ItemsRepeater>
+                            </Border>
+                        </Flyout>
+                    </Button.Flyout>
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Border Width="20"
+                                Height="20"
+                                Background="{x:Bind ViewModel.SelectedCalendar.Color, Mode=OneWay}"
+                                CornerRadius="4"
+                                Visibility="{x:Bind ViewModel.SelectedCalendar, Converter={StaticResource NullToVisibilityConverter}, Mode=OneWay}" />
+                        <TextBlock Text="{x:Bind ViewModel.SelectedCalendar.Name, FallbackValue='Select Calendar', Mode=OneWay}"
+                                   FontSize="16"
+                                   Foreground="{ThemeResource ForegroundMuted}"
+                                   VerticalAlignment="Center" />
+                        <FontIcon Glyph="&#xE70D;"
+                                  FontSize="12"
+                                  Foreground="{ThemeResource ForegroundMuted}"
+                                  VerticalAlignment="Center"
+                                  Margin="4,2,0,0" />
+                    </StackPanel>
+                </Button>
+            </Grid>
+
+            <!-- Form Content -->
+            <ScrollViewer Grid.Row="1" MaxHeight="500" Padding="1">
+                <StackPanel Spacing="16" Margin="2,0,2,8">
+                    <!-- Title -->
+                    <StackPanel Spacing="6">
+                        <TextBlock Text="Title *"
+                                   FontWeight="SemiBold"
+                                   FontSize="14"
+                                   Foreground="{ThemeResource ForegroundPrimary}" />
+                        <TextBox Text="{x:Bind ViewModel.Title, Mode=TwoWay}"
+                                 PlaceholderText="Event title"
+                                 IsEnabled="{x:Bind ViewModel.IsBlockingEvent, Converter={StaticResource InverseBoolConverter}, Mode=OneWay}" />
+                    </StackPanel>
+
+                    <!-- Date & Time -->
+                    <StackPanel Spacing="12">
+                        <TextBlock Text="Date &amp; Time *"
+                                   FontWeight="SemiBold"
+                                   FontSize="14"
+                                   Foreground="{ThemeResource ForegroundPrimary}" />
+
+                        <!-- Start Date/Time -->
+                        <Grid ColumnSpacing="8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <DatePicker Grid.Column="0"
+                                        Date="{x:Bind ViewModel.StartDate, Mode=TwoWay}"
+                                        IsEnabled="{x:Bind ViewModel.IsBlockingEvent, Converter={StaticResource InverseBoolConverter}, Mode=OneWay}" />
+                            <TimePicker Grid.Column="1"
+                                        Time="{x:Bind ViewModel.StartTime, Mode=TwoWay}"
+                                        IsEnabled="{x:Bind ViewModel.IsBlockingEvent, Converter={StaticResource InverseBoolConverter}, Mode=OneWay}"
+                                        Visibility="{x:Bind ViewModel.IsAllDay, Converter={StaticResource InverseBoolToVisibilityConverter}, Mode=OneWay}" />
+                        </Grid>
+
+                        <!-- End Date/Time -->
+                        <Grid ColumnSpacing="8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <DatePicker Grid.Column="0"
+                                        Date="{x:Bind ViewModel.EndDate, Mode=TwoWay}"
+                                        IsEnabled="{x:Bind ViewModel.IsBlockingEvent, Converter={StaticResource InverseBoolConverter}, Mode=OneWay}" />
+                            <TimePicker Grid.Column="1"
+                                        Time="{x:Bind ViewModel.EndTime, Mode=TwoWay}"
+                                        IsEnabled="{x:Bind ViewModel.IsBlockingEvent, Converter={StaticResource InverseBoolConverter}, Mode=OneWay}"
+                                        Visibility="{x:Bind ViewModel.IsAllDay, Converter={StaticResource InverseBoolToVisibilityConverter}, Mode=OneWay}" />
+                        </Grid>
+
+                        <!-- All Day Checkbox -->
+                        <CheckBox Content="All day event"
+                                  Margin="4,0,0,0"
+                                  IsChecked="{x:Bind ViewModel.IsAllDay, Mode=TwoWay}"
+                                  IsEnabled="{x:Bind ViewModel.IsBlockingEvent, Converter={StaticResource InverseBoolConverter}, Mode=OneWay}" />
+                    </StackPanel>
+
+                    <!-- Description -->
+                    <StackPanel Spacing="6">
+                        <TextBlock Text="Description"
+                                   FontWeight="SemiBold"
+                                   FontSize="14"
+                                   Foreground="{ThemeResource ForegroundPrimary}" />
+                        <TextBox Text="{x:Bind ViewModel.Description, Mode=TwoWay}"
+                                 PlaceholderText="Add description"
+                                 TextWrapping="Wrap"
+                                 AcceptsReturn="True"
+                                 Height="100"
+                                 IsEnabled="{x:Bind ViewModel.IsBlockingEvent, Converter={StaticResource InverseBoolConverter}, Mode=OneWay}" />
+                    </StackPanel>
+                </StackPanel>
+            </ScrollViewer>
+
+            <!-- Action Buttons -->
+            <Grid Grid.Row="2" ColumnSpacing="10" Margin="0,24,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <Button Grid.Column="0"
+                        Content="Delete"
+                        Command="{x:Bind ViewModel.DeleteCommand}"
+                        Background="{ThemeResource DangerPrimary}"
+                        Foreground="White"
+                        MinWidth="100"
+                        Visibility="{x:Bind ViewModel.IsEditMode, Mode=OneWay}" />
+
+                <Button Grid.Column="2"
+                        Content="Cancel"
+                        Command="{x:Bind ViewModel.CancelCommand}"
+                        MinWidth="100" />
+
+                <Button Grid.Column="3"
+                        Content="{x:Bind ViewModel.SaveButtonText, Mode=OneWay}"
+                        Command="{x:Bind ViewModel.SaveCommand}"
+                        Background="{ThemeResource AccentPrimary}"
+                        Foreground="White"
+                        MinWidth="100" />
+            </Grid>
+        </Grid>
+    </Border>
+</UserControl>
