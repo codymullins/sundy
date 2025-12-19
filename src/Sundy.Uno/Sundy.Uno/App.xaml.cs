@@ -1,14 +1,10 @@
 using System.Data;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Serilog;
 using Sundy.Core;
 using Sundy.Core.Calendars.Outlook;
 using Sundy.Core.Meta;
 using Sundy.Uno.Services;
 using Sundy.Uno.ViewModels;
-using Uno.Resizetizer;
 
 namespace Sundy.Uno;
 
