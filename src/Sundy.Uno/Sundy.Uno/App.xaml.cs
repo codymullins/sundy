@@ -1,3 +1,4 @@
+using System.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -74,10 +75,14 @@ public partial class App : Application
 
         // Register stores and database manager
         services.AddScoped<IEventStore, DapperEventStore>();
-        // services.AddScoped<DatabaseManager>();
-        services.AddScoped<DapperDatabaseManager>();
         services.AddScoped<ICalendarStore, DapperCalendarStore>();
-
+        services.AddScoped<DapperDatabaseManager>();
+        services.AddScoped<IDbConnection>(_ =>
+        {
+            var conn = new Microsoft.Data.Sqlite.SqliteConnection(connectionString);
+            conn.Open();
+            return conn;
+        });
         // Register Services
         services.AddSingleton<ICalendarProvider, LocalCalendarProvider>();
         services.AddSingleton<ITimeZoneProvider, SystemTimeZoneProvider>();

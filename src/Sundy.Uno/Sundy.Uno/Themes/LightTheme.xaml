@@ -88,6 +88,12 @@
                      Color="{StaticResource AccentPrimaryColor}"
                      Opacity="0.35"/>
 
+    <!-- ContentDialog transparent background so EventEditView border is outermost -->
+    <SolidColorBrush x:Key="ContentDialogBackground" Color="Transparent"/>
+    <SolidColorBrush x:Key="ContentDialogBorderBrush" Color="Transparent"/>
+    <Thickness x:Key="ContentDialogBorderWidth">0</Thickness>
+    <Thickness x:Key="ContentDialogPadding">0</Thickness>
+
     <!-- Scheduler Specific -->
     <Color x:Key="SchedulerTimeTextColor">#757575</Color>
     <Color x:Key="SchedulerLineColor">#E0E0E0</Color>

@@ -28,6 +28,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(TargetFramework)' == 'net10.0-browserwasm'">
     <HybridGlobalization>true</HybridGlobalization>
+    <!-- Disable trimming to debug publish issues -->
+    <PublishTrimmed>false</PublishTrimmed>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <CodesignKey>iPhone Developer</CodesignKey>

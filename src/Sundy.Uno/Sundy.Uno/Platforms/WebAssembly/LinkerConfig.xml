@@ -1,10 +1,8 @@
 <linker>
   <assembly fullname="Sundy.Uno" />
-
-  <!--
-  Uncomment this section when using JSON.NET
-  <assembly fullname="System.Core">
-    <type fullname="System.Linq.Expressions*" />
-  </assembly>
-   -->
+  <assembly fullname="Sundy.Core" />
+  <assembly fullname="Dapper" />
+  <assembly fullname="Microsoft.Data.Sqlite" />
+  <assembly fullname="SQLitePCLRaw.core" />
+  <assembly fullname="SQLitePCLRaw.provider.e_sqlite3" />
 </linker>
