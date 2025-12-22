@@ -3,7 +3,6 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Sundy.Core;
 using Sundy.Core.Calendars.Outlook;
@@ -48,8 +47,6 @@ public partial class App : Application
 
         // Register DbContext
         var connectionString = $"Data Source={dbPath}";
-        services.AddDbContext<SundyDbContext>(options =>
-            options.UseSqlite(connectionString));
 
         // Register IDbConnection for Dapper stores
         services.AddScoped<System.Data.IDbConnection>(_ =>
@@ -60,7 +57,6 @@ public partial class App : Application
         });
 
         // Register stores and database manager
-        services.AddScoped<DatabaseManager>();
         services.AddScoped<DapperDatabaseManager>();
 
         if (OperatingSystem.IsIOS())

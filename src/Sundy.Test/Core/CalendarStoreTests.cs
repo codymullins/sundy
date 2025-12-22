@@ -4,36 +4,36 @@ using Sundy.Test.TestHelpers;
 
 namespace Sundy.Test.Core;
 
-public class SQLiteCalendarStoreTests
+public class CalendarStoreTests
 {
     [Theory, Auto]
-    public async Task CreateCalendarAsync_CreatesCalendar(IMediator mediator, SQLiteCalendarStore SQLiteCalendarStore)
+    public async Task CreateCalendarAsync_CreatesCalendar(IMediator mediator, InMemoryCalendarStore calendarStore)
     {
         // Arrange
         var calendar = TestDataBuilder.CreateTestCalendar(name: "Test Calendar");
 
         // Act
-        await SQLiteCalendarStore.CreateCalendarAsync(calendar);
-        var retrieved = await SQLiteCalendarStore.GetAllAsync();
+        await calendarStore.CreateCalendarAsync(calendar);
+        var retrieved = await calendarStore.GetAllAsync();
 
         // Assert
         Assert.Contains(retrieved, c => c.Id == calendar.Id);
     }
 
     [Theory, Auto]
-    public async Task GetAllCalendarsAsync_ReturnsAllCalendars(IMediator mediator, SQLiteCalendarStore SQLiteCalendarStore)
+    public async Task GetAllCalendarsAsync_ReturnsAllCalendars(IMediator mediator, InMemoryCalendarStore calendarStore)
     {
         // Arrange
         var calendar1 = TestDataBuilder.CreateTestCalendar(name: "Calendar 1");
         var calendar2 = TestDataBuilder.CreateTestCalendar(name: "Calendar 2");
         var calendar3 = TestDataBuilder.CreateTestCalendar(name: "Calendar 3");
 
-        await SQLiteCalendarStore.CreateCalendarAsync(calendar1);
-        await SQLiteCalendarStore.CreateCalendarAsync(calendar2);
-        await SQLiteCalendarStore.CreateCalendarAsync(calendar3);
+        await calendarStore.CreateCalendarAsync(calendar1);
+        await calendarStore.CreateCalendarAsync(calendar2);
+        await calendarStore.CreateCalendarAsync(calendar3);
 
         // Act
-        var results = await SQLiteCalendarStore.GetAllAsync();
+        var results = await calendarStore.GetAllAsync();
 
         // Assert
         Assert.Equal(3, results.Count);
@@ -43,52 +43,52 @@ public class SQLiteCalendarStoreTests
     }
 
     [Theory, Auto]
-    public async Task GetAllCalendarsAsync_ReturnsEmptyWhenNoCalendars(IMediator mediator, SQLiteCalendarStore SQLiteCalendarStore)
+    public async Task GetAllCalendarsAsync_ReturnsEmptyWhenNoCalendars(IMediator mediator, InMemoryCalendarStore calendarStore)
     {
         // Act
-        var results = await SQLiteCalendarStore.GetAllAsync();
+        var results = await calendarStore.GetAllAsync();
 
         // Assert
         Assert.Empty(results);
     }
 
     [Theory, Auto]
-    public async Task DeleteCalendarAsync_RemovesCalendar(IMediator mediator, SQLiteCalendarStore SQLiteCalendarStore)
+    public async Task DeleteCalendarAsync_RemovesCalendar(IMediator mediator, InMemoryCalendarStore calendarStore)
     {
         // Arrange
         var calendar = TestDataBuilder.CreateTestCalendar();
-        await SQLiteCalendarStore.CreateCalendarAsync(calendar);
+        await calendarStore.CreateCalendarAsync(calendar);
 
         // Act
-        await SQLiteCalendarStore.DeleteCalendarAsync(calendar.Id);
-        var remaining = await SQLiteCalendarStore.GetAllAsync();
+        await calendarStore.DeleteCalendarAsync(calendar.Id);
+        var remaining = await calendarStore.GetAllAsync();
 
         // Assert
         Assert.DoesNotContain(remaining, c => c.Id == calendar.Id);
     }
 
     [Theory, Auto]
-    public async Task DeleteCalendarAsync_DoesNothingWhenCalendarNotFound(IMediator mediator, SQLiteCalendarStore SQLiteCalendarStore)
+    public async Task DeleteCalendarAsync_DoesNothingWhenCalendarNotFound(IMediator mediator, InMemoryCalendarStore calendarStore)
     {
         // Arrange
         var nonExistentId = Guid.NewGuid().ToString();
 
         // Act & Assert - Should not throw
-        await SQLiteCalendarStore.DeleteCalendarAsync(nonExistentId);
+        await calendarStore.DeleteCalendarAsync(nonExistentId);
     }
 
     [Theory, Auto]
-    public async Task GetCalendarLookupAsync_ReturnsDictionaryKeyedById(IMediator mediator, SQLiteCalendarStore SQLiteCalendarStore)
+    public async Task GetCalendarLookupAsync_ReturnsDictionaryKeyedById(IMediator mediator, InMemoryCalendarStore calendarStore)
     {
         // Arrange
         var calendar1 = TestDataBuilder.CreateTestCalendar(name: "Calendar 1");
         var calendar2 = TestDataBuilder.CreateTestCalendar(name: "Calendar 2");
 
-        await SQLiteCalendarStore.CreateCalendarAsync(calendar1);
-        await SQLiteCalendarStore.CreateCalendarAsync(calendar2);
+        await calendarStore.CreateCalendarAsync(calendar1);
+        await calendarStore.CreateCalendarAsync(calendar2);
 
         // Act
-        var lookup = await SQLiteCalendarStore.GetCalendarLookupAsync();
+        var lookup = await calendarStore.GetCalendarLookupAsync();
 
         // Assert
         Assert.Equal(2, lookup.Count);
@@ -99,17 +99,17 @@ public class SQLiteCalendarStoreTests
     }
 
     [Theory, Auto]
-    public async Task GetCalendarLookupAsync_ReturnsEmptyDictionaryWhenNoCalendars(IMediator mediator, SQLiteCalendarStore SQLiteCalendarStore)
+    public async Task GetCalendarLookupAsync_ReturnsEmptyDictionaryWhenNoCalendars(IMediator mediator, InMemoryCalendarStore calendarStore)
     {
         // Act
-        var lookup = await SQLiteCalendarStore.GetCalendarLookupAsync();
+        var lookup = await calendarStore.GetCalendarLookupAsync();
 
         // Assert
         Assert.Empty(lookup);
     }
 
     [Theory, Auto]
-    public async Task CreateCalendarAsync_WithAllProperties_PreservesData(IMediator mediator, SQLiteCalendarStore SQLiteCalendarStore)
+    public async Task CreateCalendarAsync_WithAllProperties_PreservesData(IMediator mediator, InMemoryCalendarStore calendarStore)
     {
         // Arrange
         var calendar = TestDataBuilder.CreateTestCalendar(
@@ -120,8 +120,8 @@ public class SQLiteCalendarStoreTests
             receiveBlocks: true);
 
         // Act
-        await SQLiteCalendarStore.CreateCalendarAsync(calendar);
-        var retrieved = (await SQLiteCalendarStore.GetAllAsync())
+        await calendarStore.CreateCalendarAsync(calendar);
+        var retrieved = (await calendarStore.GetAllAsync())
             .First(c => c.Id == calendar.Id);
 
         // Assert

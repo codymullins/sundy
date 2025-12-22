@@ -1,8 +1,10 @@
+using System.Data;
 using AutoFixture;
 using AutoFixture.Xunit2;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.DependencyInjection;
 using Sundy.Core;
+using Sundy.Core.Calendars.Outlook;
 
 namespace Sundy.Test;
 
@@ -25,18 +27,21 @@ public class AutoAttribute : AutoDataAttribute
             // Add Mediator
             services.AddMediator(options => { options.ServiceLifetime = ServiceLifetime.Scoped; });
 
-            // Use file-based SQLite database for tests with a new guid each time
-            var dbPath = Path.Combine(Path.GetTempPath(), $"sundy_test_{Guid.NewGuid()}.db");
-            var connection = new Microsoft.Data.Sqlite.SqliteConnection($"Data Source={dbPath}");
+            // Register in-memory SQLite connection for Dapper-based components
+            var connection = new SqliteConnection("Data Source=:memory:");
             connection.Open();
-            
-            services.AddDbContext<SundyDbContext>(options =>
-                options.UseSqlite(connection));
+            services.AddSingleton<IDbConnection>(connection);
+            services.AddSingleton<DapperDatabaseManager>();
 
-            // Register stores and database manager
-            services.AddScoped<SQLiteEventStore>();
-            services.AddScoped<DatabaseManager>();
-            services.AddScoped<SQLiteCalendarStore>();
+            // Register in-memory stores for testing
+            services.AddSingleton<InMemoryEventStore>();
+            services.AddSingleton<IEventStore>(sp => sp.GetRequiredService<InMemoryEventStore>());
+            services.AddSingleton<InMemoryCalendarStore>();
+            services.AddSingleton<ICalendarStore>(sp => sp.GetRequiredService<InMemoryCalendarStore>());
+
+            // Register Outlook services (not connected in tests, but needed for DI)
+            services.AddSingleton<MicrosoftGraphAuthService>();
+            services.AddSingleton<OutlookCalendarProvider>();
 
             // Register Services
             services.AddScoped<ICalendarProvider, LocalCalendarProvider>();
@@ -44,12 +49,9 @@ public class AutoAttribute : AutoDataAttribute
             // Build the service provider
             var serviceProvider = services.BuildServiceProvider();
 
-            // Initialize the database schema
-            using (var scope = serviceProvider.CreateScope())
-            {
-                var dbContext = scope.ServiceProvider.GetRequiredService<SundyDbContext>();
-                dbContext.Database.EnsureCreated();
-            }
+            // Initialize database schema for tests that need it
+            var dbManager = serviceProvider.GetRequiredService<DapperDatabaseManager>();
+            dbManager.InitializeDatabaseAsync().GetAwaiter().GetResult();
 
             // Register a resolver that gets services from the DI container
             fixture.Customize(new SupportMutableValueTypesCustomization());
