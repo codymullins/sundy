@@ -383,4 +383,17 @@ public partial class MainViewModel : ViewModelBase
         OnPropertyChanged(nameof(IsWeekView));
         OnPropertyChanged(nameof(IsMonthView));
     }
+
+    /// <summary>
+    /// Navigates to a specific date (used by macOS menu bar calendar).
+    /// </summary>
+    public void NavigateToDate(DateTime date)
+    {
+        CalendarViewModel.SelectedDate = date;
+        CalendarViewModel.ViewMode = CalendarViewMode.Day;
+        OnPropertyChanged(nameof(IsDayView));
+        OnPropertyChanged(nameof(IsWeekView));
+        OnPropertyChanged(nameof(IsMonthView));
+        OnPropertyChanged(nameof(CurrentPeriodDisplay));
+    }
 }

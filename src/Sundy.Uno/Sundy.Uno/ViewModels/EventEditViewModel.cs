@@ -11,7 +11,6 @@ namespace Sundy.Uno.ViewModels;
 
 /// <summary>
 /// ViewModel for creating and editing calendar events.
-/// Migrated from Avalonia - same logic preserved, scheduler integration simplified.
 /// </summary>
 public partial class EventEditViewModel(
     IMediator mediator,
@@ -24,6 +23,7 @@ public partial class EventEditViewModel(
     private bool _isEditMode;
 
     public event EventHandler? CalendarSelected;
+    public event EventHandler? SchedulerRequested;
 
     [ObservableProperty] private string _title = string.Empty;
     [ObservableProperty] private ObservableCollection<Calendar> _availableCalendars = [];
@@ -40,6 +40,58 @@ public partial class EventEditViewModel(
     [ObservableProperty] private string _saveButtonText = "Create";
 
     public bool IsEditMode => _isEditMode;
+
+    /// <summary>
+    /// Formatted date display (e.g., "Monday, December 22, 2025")
+    /// </summary>
+    public string FormattedDate => StartDate.DateTime.ToString("dddd, MMMM d, yyyy");
+
+    /// <summary>
+    /// Formatted time range display (e.g., "11:00 PM → 12:00 AM")
+    /// </summary>
+    public string FormattedTimeRange
+    {
+        get
+        {
+            if (IsAllDay)
+                return "All day";
+
+            var startDateTime = StartDate.DateTime.Date.Add(StartTime);
+            var endDateTime = EndDate.DateTime.Date.Add(EndTime);
+            return $"{startDateTime:h:mm tt} → {endDateTime:h:mm tt}";
+        }
+    }
+
+    /// <summary>
+    /// Formatted duration display (e.g., "Duration: 1 hr")
+    /// </summary>
+    public string FormattedDuration
+    {
+        get
+        {
+            if (IsAllDay)
+            {
+                var days = (EndDate.Date - StartDate.Date).Days;
+                return days <= 1 ? "All day" : $"Duration: {days} days";
+            }
+
+            var startDateTime = StartDate.DateTime.Date.Add(StartTime);
+            var endDateTime = EndDate.DateTime.Date.Add(EndTime);
+            var duration = endDateTime - startDateTime;
+
+            if (duration.TotalMinutes < 60)
+                return $"Duration: {(int)duration.TotalMinutes} min";
+            if (duration.TotalHours < 24)
+            {
+                var hours = (int)duration.TotalHours;
+                var minutes = duration.Minutes;
+                if (minutes == 0)
+                    return $"Duration: {hours} hr";
+                return $"Duration: {hours} hr {minutes} min";
+            }
+            return $"Duration: {duration.TotalHours:F1} hrs";
+        }
+    }
 
     public async Task InitializeAsync(CalendarEvent? existingEvent = null, string? defaultCalendarId = null, DateOnly? defaultDate = null)
     {
@@ -100,6 +152,7 @@ public partial class EventEditViewModel(
         }
 
         OnPropertyChanged(nameof(IsEditMode));
+        NotifyDateTimeChanged();
     }
 
     [RelayCommand(IncludeCancelCommand = true)]
@@ -163,6 +216,38 @@ public partial class EventEditViewModel(
         CalendarSelected?.Invoke(this, EventArgs.Empty);
     }
 
+    [RelayCommand]
+    private void OpenScheduler()
+    {
+        SchedulerRequested?.Invoke(this, EventArgs.Empty);
+    }
+
+    /// <summary>
+    /// Called when the scheduler confirms new date/time values.
+    /// </summary>
+    public void ApplySchedulerSelection(DateTimeOffset selectedDate, TimeSpan startTime, TimeSpan endTime)
+    {
+        StartDate = selectedDate;
+        StartTime = startTime;
+        EndDate = selectedDate;
+        EndTime = endTime;
+
+        // If end time crosses midnight, adjust end date
+        if (endTime < startTime)
+        {
+            EndDate = selectedDate.AddDays(1);
+        }
+
+        NotifyDateTimeChanged();
+    }
+
+    private void NotifyDateTimeChanged()
+    {
+        OnPropertyChanged(nameof(FormattedDate));
+        OnPropertyChanged(nameof(FormattedTimeRange));
+        OnPropertyChanged(nameof(FormattedDuration));
+    }
+
     partial void OnIsAllDayChanged(bool value)
     {
         if (value)
@@ -180,12 +265,14 @@ public partial class EventEditViewModel(
                 EndTime = TimeSpan.FromHours(10);
             }
         }
+        NotifyDateTimeChanged();
     }
 
     partial void OnStartDateChanged(DateTimeOffset value)
     {
         if (EndDate < value)
             EndDate = value;
+        NotifyDateTimeChanged();
     }
 
     partial void OnStartTimeChanged(TimeSpan value)
@@ -195,5 +282,16 @@ public partial class EventEditViewModel(
             var newEndTime = value.Add(TimeSpan.FromHours(1));
             EndTime = newEndTime.TotalHours >= 24 ? TimeSpan.FromHours(23).Add(TimeSpan.FromMinutes(59)) : newEndTime;
         }
+        NotifyDateTimeChanged();
+    }
+
+    partial void OnEndDateChanged(DateTimeOffset value)
+    {
+        NotifyDateTimeChanged();
+    }
+
+    partial void OnEndTimeChanged(TimeSpan value)
+    {
+        NotifyDateTimeChanged();
     }
 }

@@ -14,14 +14,16 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <!-- Desktop Sidebar (collapsible) -->
+            <!-- Desktop Sidebar (collapsible with slide animation) -->
             <Border Grid.Column="0"
                     x:Name="DesktopSidebar"
-                    Visibility="{x:Bind ViewModel.IsDesktopSidebarVisible, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
                     Width="260"
                     Margin="6,6,0,6"
                     Background="{ThemeResource BackgroundTertiary}"
                     CornerRadius="12">
+                <Border.RenderTransform>
+                    <TranslateTransform x:Name="DesktopSidebarTranslate" X="0" />
+                </Border.RenderTransform>
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="38" />
@@ -251,12 +253,8 @@
 
                         <!-- New Event button -->
                         <Button Command="{x:Bind ViewModel.CreateEventCommand}"
-                                Background="{ThemeResource AccentPrimary}"
-                                BorderThickness="0"
-                                CornerRadius="18"
-                                Padding="14,0"
-                                Height="36"
-                                VerticalAlignment="Center">
+                                Style="{StaticResource AccentButtonStyle}"
+                                Height="36">
                             <StackPanel Orientation="Horizontal" Spacing="6">
                                 <FontIcon Glyph="&#xECC8;"
                                           FontSize="16"
@@ -296,8 +294,10 @@
         <!-- Mobile Sidebar Overlay -->
         <Grid Visibility="{x:Bind ViewModel.IsMobileLayout, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
             <!-- Backdrop -->
-            <Border Background="{ThemeResource ModalOverlay}"
-                    Visibility="{x:Bind ViewModel.IsSidebarOpen, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
+            <Border x:Name="MobileSidebarBackdrop"
+                    Background="{ThemeResource ModalOverlay}"
+                    Opacity="0"
+                    IsHitTestVisible="False"
                     Tapped="OnSidebarBackdropTapped" />
 
             <!-- Mobile Sidebar panel -->
@@ -311,7 +311,7 @@
                     IsHitTestVisible="{x:Bind ViewModel.IsSidebarOpen, Mode=OneWay}"
                     Tapped="OnSidebarContentTapped">
                 <Border.RenderTransform>
-                    <TranslateTransform X="{x:Bind ViewModel.SidebarTranslateX, Mode=OneWay}" />
+                    <TranslateTransform x:Name="MobileSidebarTranslate" X="-292" />
                 </Border.RenderTransform>
 
                 <Grid>

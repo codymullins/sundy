@@ -27,130 +27,186 @@ public partial class App : Application
     }
 
     protected Window? MainWindow { get; private set; }
-    public static IServiceProvider Services => _serviceProvider ?? throw new InvalidOperationException("ServiceProvider not initialized");
+
+    public static IServiceProvider Services =>
+        _serviceProvider ?? throw new InvalidOperationException("ServiceProvider not initialized");
 
     protected override void OnLaunched(LaunchActivatedEventArgs args)
     {
-        // Configure Serilog
-        Log.Logger = new LoggerConfiguration()
-            .MinimumLevel.Information()
-            .WriteTo.Console()
-            .CreateLogger();
-
-        // Configure Dependency Injection
-        var services = new ServiceCollection();
-
-        // Add logging
-        services.AddLogging(builder =>
+        try
         {
-            builder.AddSerilog(dispose: false);
-        });
+            Console.WriteLine("[App] OnLaunched starting...");
+            AppDomain.CurrentDomain.UnhandledException += (s, e) =>
+                Console.WriteLine($"[App] UnhandledException: {e.ExceptionObject}");
+            TaskScheduler.UnobservedTaskException += (s, e) =>
+                Console.WriteLine($"[App] UnobservedTaskException: {e.Exception}");
 
-        // Add Mediator (CQRS pattern)
-        services.AddMediator(options =>
-        {
-            options.ServiceLifetime = ServiceLifetime.Scoped;
-        });
+            // Configure Serilog
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Information()
+                .WriteTo.Console()
+                .CreateLogger();
 
-        // Get the application data path
-        string dbPath;
+            // Configure Dependency Injection
+            var services = new ServiceCollection();
+
+            // Add logging
+            services.AddLogging(builder => { builder.AddSerilog(dispose: false); });
+
+            // Add Mediator (CQRS pattern)
+            services.AddMediator(options => { options.ServiceLifetime = ServiceLifetime.Scoped; });
+
+            // Get the application data path
+            string dbPath;
 #if __WASM__
         // For browser, use in-memory database with shared cache
         dbPath = "file::memory:?cache=shared";
 #else
-        var appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-        var sundyDataPath = Path.Combine(appDataPath, "Sundy");
-        Directory.CreateDirectory(sundyDataPath);
-        dbPath = Path.Combine(sundyDataPath, "sundy.db");
+            var appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            var sundyDataPath = Path.Combine(appDataPath, "Sundy");
+            Directory.CreateDirectory(sundyDataPath);
+            dbPath = Path.Combine(sundyDataPath, "sundy.db");
 #endif
 
-        // Register DbContext
-        var connectionString = $"Data Source={dbPath}";
-        // services.AddDbContext<SundyDbContext>(options =>
-        //     options.UseSqlite(connectionString));
+            // Register DbContext
+            var connectionString = $"Data Source={dbPath}";
+            // services.AddDbContext<SundyDbContext>(options =>
+            //     options.UseSqlite(connectionString));
 
-        // Register stores and database manager
-        services.AddScoped<IEventStore, DapperEventStore>();
-        services.AddScoped<ICalendarStore, DapperCalendarStore>();
-        services.AddScoped<DapperDatabaseManager>();
-        services.AddScoped<IDbConnection>(_ =>
-        {
-            var conn = new Microsoft.Data.Sqlite.SqliteConnection(connectionString);
-            conn.Open();
-            return conn;
-        });
-        // Register Services
-        services.AddSingleton<ICalendarProvider, LocalCalendarProvider>();
-        services.AddSingleton<ITimeZoneProvider, SystemTimeZoneProvider>();
-        services.AddSingleton<EventTimeService>();
+            // Register stores and database manager
+            services.AddScoped<IEventStore, DapperEventStore>();
+            services.AddScoped<ICalendarStore, DapperCalendarStore>();
+            services.AddScoped<DapperDatabaseManager>();
+            services.AddScoped<IDbConnection>(_ =>
+            {
+                var conn = new Microsoft.Data.Sqlite.SqliteConnection(connectionString);
+                conn.Open();
+                return conn;
+            });
+            // Register Services
+            services.AddSingleton<ICalendarProvider, LocalCalendarProvider>();
+            services.AddSingleton<ITimeZoneProvider, SystemTimeZoneProvider>();
+            services.AddSingleton<EventTimeService>();
 
-        // Register Outlook/Microsoft Graph services
-        services.AddSingleton(new OutlookGraphOptions
-        {
-            UseDevelopmentCredential = false,
-            UseDeviceCodeFlow = false
-        });
+            // Register Outlook/Microsoft Graph services
+            services.AddSingleton(new OutlookGraphOptions
+            {
+                UseDevelopmentCredential = false,
+                UseDeviceCodeFlow = false
+            });
 
-        // Register auth service
-        services.AddSingleton<MicrosoftGraphAuthService>();
-        services.AddSingleton<IMicrosoftGraphAuthService>(sp => sp.GetRequiredService<MicrosoftGraphAuthService>());
-        services.AddSingleton<OutlookCalendarProvider>();
+            // Register auth service
+            services.AddSingleton<MicrosoftGraphAuthService>();
+            services.AddSingleton<IMicrosoftGraphAuthService>(sp => sp.GetRequiredService<MicrosoftGraphAuthService>());
+            services.AddSingleton<OutlookCalendarProvider>();
 
-        // Enable copying to clipboard
-        services.AddSingleton<IClipboardService, ClipboardService>();
+            // Enable copying to clipboard
+            services.AddSingleton<IClipboardService, ClipboardService>();
 
-        // XamlRoot provider for ContentDialog support
-        services.AddSingleton<IXamlRootProvider, XamlRootProvider>();
+            // XamlRoot provider for ContentDialog support
+            services.AddSingleton<IXamlRootProvider, XamlRootProvider>();
 
-        // Register ViewModels
-        services.AddTransient<MainViewModel>();
-        services.AddTransient<CalendarViewModel>();
-        services.AddTransient<CalendarSettingsViewModel>();
-        services.AddTransient<EventEditViewModel>();
+            // Menu bar service for macOS status bar item
+            services.AddSingleton<IMenuBarService, MenuBarService>();
 
-        // Build the service provider
-        _serviceProvider = services.BuildServiceProvider();
+            // Register ViewModels
+            services.AddTransient<MainViewModel>();
+            services.AddTransient<CalendarViewModel>();
+            services.AddTransient<CalendarSettingsViewModel>();
+            services.AddTransient<EventEditViewModel>();
 
-        // Initialize database schema
-        // using (var scope = _serviceProvider.CreateScope())
-        // {
-        //     var dbContext = scope.ServiceProvider.GetRequiredService<SundyDbContext>();
-        //     var metaStore = scope.ServiceProvider.GetRequiredService<DatabaseManager>();
-        //
-        //     if (!metaStore.DatabaseExistsAsync(CancellationToken.None).GetAwaiter().GetResult())
-        //     {
-        //         Log.Information("Database not found. Creating new database at {DbPath}", dbPath);
-        //     }
-        //     metaStore.InitializeDatabaseAsync().GetAwaiter().GetResult();
-        // }
+            // Build the service provider
+            _serviceProvider = services.BuildServiceProvider();
 
-        MainWindow = new Window();
+            // Initialize database schema
+            // using (var scope = _serviceProvider.CreateScope())
+            // {
+            //     var dbContext = scope.ServiceProvider.GetRequiredService<SundyDbContext>();
+            //     var metaStore = scope.ServiceProvider.GetRequiredService<DatabaseManager>();
+            //
+            //     if (!metaStore.DatabaseExistsAsync(CancellationToken.None).GetAwaiter().GetResult())
+            //     {
+            //         Log.Information("Database not found. Creating new database at {DbPath}", dbPath);
+            //     }
+            //     metaStore.InitializeDatabaseAsync().GetAwaiter().GetResult();
+            // }
+
+            MainWindow = new Window();
 // #if DEBUG
 //         MainWindow.UseStudio();
 // #endif
 
-        // Do not repeat app initialization when the Window already has content,
-        // just ensure that the window is active
-        if (MainWindow.Content is not Frame rootFrame)
-        {
-            // Create a Frame to act as the navigation context and navigate to the first page
-            rootFrame = new Frame();
+            // Do not repeat app initialization when the Window already has content,
+            // just ensure that the window is active
+            if (MainWindow.Content is not Frame rootFrame)
+            {
+                // Create a Frame to act as the navigation context and navigate to the first page
+                rootFrame = new Frame();
 
-            // Place the frame in the current Window
-            MainWindow.Content = rootFrame;
+                // Place the frame in the current Window
+                MainWindow.Content = rootFrame;
 
-            rootFrame.NavigationFailed += OnNavigationFailed;
+                rootFrame.NavigationFailed += OnNavigationFailed;
+            }
+
+            if (rootFrame.Content == null)
+            {
+                // Navigate to MainPage
+                rootFrame.Navigate(typeof(MainPage), args.Arguments);
+            }
+
+            MainWindow.SetWindowIcon();
+            // Ensure the current window is active
+            Console.WriteLine("[App] Activating main window...");
+            MainWindow.Activate();
+            Console.WriteLine("[App] Main window activated");
+
+            // Initialize macOS menu bar (status bar item with mini calendar)
+            // Dispatch to run after the main loop stabilizes
+            Console.WriteLine("[App] Scheduling menu bar initialization...");
+            if (!MainWindow.DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Low, () =>
+            {
+                Console.WriteLine("[App] Dispatched: Initializing menu bar...");
+                InitializeMenuBar(rootFrame);
+                Console.WriteLine("[App] Dispatched: Menu bar initialized!");
+            }))
+            {
+                Console.WriteLine("[App] WARNING: Failed to enqueue menu bar initialization!");
+            }
+            else
+            {
+                Console.WriteLine("[App] Menu bar initialization enqueued successfully");
+            };
+            Console.WriteLine("[App] OnLaunched complete!");
         }
-
-        if (rootFrame.Content == null)
+        catch (Exception ex)
         {
-            // Navigate to MainPage
-            rootFrame.Navigate(typeof(MainPage), args.Arguments);
+            Console.WriteLine($"[App] OnLaunched EXCEPTION: {ex}");
+            throw;
         }
+    }
 
-        MainWindow.SetWindowIcon();
-        // Ensure the current window is active
-        MainWindow.Activate();
+    private void InitializeMenuBar(Frame rootFrame)
+    {
+        if (!OperatingSystem.IsMacOS()) return;
+
+        var menuBarService = _serviceProvider?.GetService<IMenuBarService>();
+        if (menuBarService == null) return;
+
+        menuBarService.Initialize();
+
+        // Handle date clicks from the mini calendar
+        menuBarService.DateClicked += (date) =>
+        {
+            // Bring window to front
+            MainWindow?.Activate();
+
+            // Navigate to the clicked date via the MainViewModel
+            if (rootFrame.Content is MainPage mainPage)
+            {
+                mainPage.ViewModel?.NavigateToDate(date);
+            }
+        };
     }
 
     /// <summary>

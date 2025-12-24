@@ -1,0 +1,484 @@
+<UserControl x:Class="Sundy.Uno.Views.DateTimeSchedulerView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Sundy.Uno.ViewModels"
+             Width="420"
+             Height="580">
+
+    <Border Background="#2D2D2D"
+            BorderBrush="{ThemeResource ModalBorder}"
+            BorderThickness="1"
+            CornerRadius="16"
+            Translation="0,0,32">
+        <Border.Shadow>
+            <ThemeShadow />
+        </Border.Shadow>
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <!-- Header: Clock Icon and Month -->
+            <Grid Grid.Row="0" Padding="24,20,24,16">
+                <StackPanel Orientation="Horizontal" Spacing="12">
+                    <FontIcon Glyph="&#xE823;"
+                              FontSize="22"
+                              Foreground="#909090" />
+                    <TextBlock Text="{x:Bind ViewModel.CurrentMonth, Mode=OneWay}"
+                               FontSize="20"
+                               FontWeight="SemiBold"
+                               Foreground="White"
+                               VerticalAlignment="Center" />
+                </StackPanel>
+            </Grid>
+
+            <!-- Week Navigation Strip -->
+            <Grid Grid.Row="1" Padding="12,0,12,16">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <!-- Previous Week Button -->
+                <Button Grid.Column="0"
+                        Command="{x:Bind ViewModel.PreviousWeekCommand}"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        Padding="12"
+                        VerticalAlignment="Center"
+                        Width="44"
+                        Height="44">
+                    <FontIcon Glyph="&#xE76B;"
+                              FontSize="16"
+                              Foreground="White" />
+                </Button>
+
+                <!-- Week Days Grid -->
+                <Grid Grid.Column="1" HorizontalAlignment="Center">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="44" />
+                        <ColumnDefinition Width="44" />
+                        <ColumnDefinition Width="44" />
+                        <ColumnDefinition Width="44" />
+                        <ColumnDefinition Width="44" />
+                        <ColumnDefinition Width="44" />
+                        <ColumnDefinition Width="44" />
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Sunday -->
+                    <Button Grid.Column="0"
+                            x:Name="Day0Button"
+                            Click="DayButton_Click"
+                            Tag="0"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            Padding="0"
+                            Width="44"
+                            Height="64"
+                            VerticalContentAlignment="Center"
+                            HorizontalContentAlignment="Center">
+                        <StackPanel Spacing="6" HorizontalAlignment="Center">
+                            <TextBlock x:Name="Day0Letter"
+                                       Text="S"
+                                       FontSize="13"
+                                       Foreground="#808080"
+                                       HorizontalAlignment="Center" />
+                            <Grid Width="34" Height="34">
+                                <Ellipse x:Name="Day0Selected"
+                                         Fill="{ThemeResource AccentPrimary}"
+                                         Visibility="Collapsed" />
+                                <TextBlock x:Name="Day0Number"
+                                           FontSize="15"
+                                           FontWeight="SemiBold"
+                                           Foreground="White"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center" />
+                            </Grid>
+                        </StackPanel>
+                    </Button>
+
+                    <!-- Monday -->
+                    <Button Grid.Column="1"
+                            x:Name="Day1Button"
+                            Click="DayButton_Click"
+                            Tag="1"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            Padding="0"
+                            Width="44"
+                            Height="64"
+                            VerticalContentAlignment="Center"
+                            HorizontalContentAlignment="Center">
+                        <StackPanel Spacing="6" HorizontalAlignment="Center">
+                            <TextBlock x:Name="Day1Letter"
+                                       Text="M"
+                                       FontSize="13"
+                                       Foreground="#808080"
+                                       HorizontalAlignment="Center" />
+                            <Grid Width="34" Height="34">
+                                <Ellipse x:Name="Day1Selected"
+                                         Fill="{ThemeResource AccentPrimary}"
+                                         Visibility="Collapsed" />
+                                <TextBlock x:Name="Day1Number"
+                                           FontSize="15"
+                                           FontWeight="SemiBold"
+                                           Foreground="White"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center" />
+                            </Grid>
+                        </StackPanel>
+                    </Button>
+
+                    <!-- Tuesday -->
+                    <Button Grid.Column="2"
+                            x:Name="Day2Button"
+                            Click="DayButton_Click"
+                            Tag="2"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            Padding="0"
+                            Width="44"
+                            Height="64"
+                            VerticalContentAlignment="Center"
+                            HorizontalContentAlignment="Center">
+                        <StackPanel Spacing="6" HorizontalAlignment="Center">
+                            <TextBlock x:Name="Day2Letter"
+                                       Text="T"
+                                       FontSize="13"
+                                       Foreground="#808080"
+                                       HorizontalAlignment="Center" />
+                            <Grid Width="34" Height="34">
+                                <Ellipse x:Name="Day2Selected"
+                                         Fill="{ThemeResource AccentPrimary}"
+                                         Visibility="Collapsed" />
+                                <TextBlock x:Name="Day2Number"
+                                           FontSize="15"
+                                           FontWeight="SemiBold"
+                                           Foreground="White"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center" />
+                            </Grid>
+                        </StackPanel>
+                    </Button>
+
+                    <!-- Wednesday -->
+                    <Button Grid.Column="3"
+                            x:Name="Day3Button"
+                            Click="DayButton_Click"
+                            Tag="3"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            Padding="0"
+                            Width="44"
+                            Height="64"
+                            VerticalContentAlignment="Center"
+                            HorizontalContentAlignment="Center">
+                        <StackPanel Spacing="6" HorizontalAlignment="Center">
+                            <TextBlock x:Name="Day3Letter"
+                                       Text="W"
+                                       FontSize="13"
+                                       Foreground="#808080"
+                                       HorizontalAlignment="Center" />
+                            <Grid Width="34" Height="34">
+                                <Ellipse x:Name="Day3Selected"
+                                         Fill="{ThemeResource AccentPrimary}"
+                                         Visibility="Collapsed" />
+                                <TextBlock x:Name="Day3Number"
+                                           FontSize="15"
+                                           FontWeight="SemiBold"
+                                           Foreground="White"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center" />
+                            </Grid>
+                        </StackPanel>
+                    </Button>
+
+                    <!-- Thursday -->
+                    <Button Grid.Column="4"
+                            x:Name="Day4Button"
+                            Click="DayButton_Click"
+                            Tag="4"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            Padding="0"
+                            Width="44"
+                            Height="64"
+                            VerticalContentAlignment="Center"
+                            HorizontalContentAlignment="Center">
+                        <StackPanel Spacing="6" HorizontalAlignment="Center">
+                            <TextBlock x:Name="Day4Letter"
+                                       Text="T"
+                                       FontSize="13"
+                                       Foreground="#808080"
+                                       HorizontalAlignment="Center" />
+                            <Grid Width="34" Height="34">
+                                <Ellipse x:Name="Day4Selected"
+                                         Fill="{ThemeResource AccentPrimary}"
+                                         Visibility="Collapsed" />
+                                <TextBlock x:Name="Day4Number"
+                                           FontSize="15"
+                                           FontWeight="SemiBold"
+                                           Foreground="White"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center" />
+                            </Grid>
+                        </StackPanel>
+                    </Button>
+
+                    <!-- Friday -->
+                    <Button Grid.Column="5"
+                            x:Name="Day5Button"
+                            Click="DayButton_Click"
+                            Tag="5"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            Padding="0"
+                            Width="44"
+                            Height="64"
+                            VerticalContentAlignment="Center"
+                            HorizontalContentAlignment="Center">
+                        <StackPanel Spacing="6" HorizontalAlignment="Center">
+                            <TextBlock x:Name="Day5Letter"
+                                       Text="F"
+                                       FontSize="13"
+                                       Foreground="#808080"
+                                       HorizontalAlignment="Center" />
+                            <Grid Width="34" Height="34">
+                                <Ellipse x:Name="Day5Selected"
+                                         Fill="{ThemeResource AccentPrimary}"
+                                         Visibility="Collapsed" />
+                                <TextBlock x:Name="Day5Number"
+                                           FontSize="15"
+                                           FontWeight="SemiBold"
+                                           Foreground="White"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center" />
+                            </Grid>
+                        </StackPanel>
+                    </Button>
+
+                    <!-- Saturday -->
+                    <Button Grid.Column="6"
+                            x:Name="Day6Button"
+                            Click="DayButton_Click"
+                            Tag="6"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            Padding="0"
+                            Width="44"
+                            Height="64"
+                            VerticalContentAlignment="Center"
+                            HorizontalContentAlignment="Center">
+                        <StackPanel Spacing="6" HorizontalAlignment="Center">
+                            <TextBlock x:Name="Day6Letter"
+                                       Text="S"
+                                       FontSize="13"
+                                       Foreground="#808080"
+                                       HorizontalAlignment="Center" />
+                            <Grid Width="34" Height="34">
+                                <Ellipse x:Name="Day6Selected"
+                                         Fill="{ThemeResource AccentPrimary}"
+                                         Visibility="Collapsed" />
+                                <TextBlock x:Name="Day6Number"
+                                           FontSize="15"
+                                           FontWeight="SemiBold"
+                                           Foreground="White"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center" />
+                            </Grid>
+                        </StackPanel>
+                    </Button>
+                </Grid>
+
+                <!-- Next Week Button -->
+                <Button Grid.Column="2"
+                        Command="{x:Bind ViewModel.NextWeekCommand}"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        Padding="12"
+                        VerticalAlignment="Center"
+                        Width="44"
+                        Height="44">
+                    <FontIcon Glyph="&#xE76C;"
+                              FontSize="16"
+                              Foreground="White" />
+                </Button>
+            </Grid>
+
+            <!-- Time Scheduler Area -->
+            <Border Grid.Row="2"
+                    BorderBrush="#3D3D3D"
+                    BorderThickness="0,1,0,0"
+                    Margin="0,0,0,0">
+                <ScrollViewer x:Name="TimeScrollViewer"
+                              VerticalScrollBarVisibility="Auto"
+                              HorizontalScrollBarVisibility="Disabled">
+                    <Grid x:Name="TimeGridContainer"
+                          Margin="0,0,0,0"
+                          Height="1440"
+                          Background="Transparent"
+                          PointerPressed="TimeGrid_PointerPressed"
+                          PointerMoved="TimeGrid_PointerMoved"
+                          PointerReleased="TimeGrid_PointerReleased"
+                          PointerCaptureLost="TimeGrid_PointerCaptureLost">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="65" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Time Labels Column -->
+                        <Canvas Grid.Column="0">
+                            <!-- Time labels positioned absolutely -->
+                            <TextBlock Canvas.Top="0" Text="12 AM" FontSize="12" Foreground="#606060" HorizontalAlignment="Right" Width="55" TextAlignment="Right" Padding="0,0,10,0" />
+                            <TextBlock Canvas.Top="60" Text="1 AM" FontSize="12" Foreground="#606060" HorizontalAlignment="Right" Width="55" TextAlignment="Right" Padding="0,0,10,0" />
+                            <TextBlock Canvas.Top="120" Text="2 AM" FontSize="12" Foreground="#606060" HorizontalAlignment="Right" Width="55" TextAlignment="Right" Padding="0,0,10,0" />
+                            <TextBlock Canvas.Top="180" Text="3 AM" FontSize="12" Foreground="#606060" HorizontalAlignment="Right" Width="55" TextAlignment="Right" Padding="0,0,10,0" />
+                            <TextBlock Canvas.Top="240" Text="4 AM" FontSize="12" Foreground="#606060" HorizontalAlignment="Right" Width="55" TextAlignment="Right" Padding="0,0,10,0" />
+                            <TextBlock Canvas.Top="300" Text="5 AM" FontSize="12" Foreground="#606060" HorizontalAlignment="Right" Width="55" TextAlignment="Right" Padding="0,0,10,0" />
+                            <TextBlock Canvas.Top="360" Text="6 AM" FontSize="12" Foreground="#606060" HorizontalAlignment="Right" Width="55" TextAlignment="Right" Padding="0,0,10,0" />
+                            <TextBlock Canvas.Top="420" Text="7 AM" FontSize="12" Foreground="#606060" HorizontalAlignment="Right" Width="55" TextAlignment="Right" Padding="0,0,10,0" />
+                            <TextBlock Canvas.Top="480" Text="8 AM" FontSize="12" Foreground="#606060" HorizontalAlignment="Right" Width="55" TextAlignment="Right" Padding="0,0,10,0" />
+                            <TextBlock Canvas.Top="540" Text="9 AM" FontSize="12" Foreground="#606060" HorizontalAlignment="Right" Width="55" TextAlignment="Right" Padding="0,0,10,0" />
+                            <TextBlock Canvas.Top="600" Text="10 AM" FontSize="12" Foreground="#606060" HorizontalAlignment="Right" Width="55" TextAlignment="Right" Padding="0,0,10,0" />
+                            <TextBlock Canvas.Top="660" Text="11 AM" FontSize="12" Foreground="#606060" HorizontalAlignment="Right" Width="55" TextAlignment="Right" Padding="0,0,10,0" />
+                            <TextBlock Canvas.Top="720" Text="12 PM" FontSize="12" Foreground="#606060" HorizontalAlignment="Right" Width="55" TextAlignment="Right" Padding="0,0,10,0" />
+                            <TextBlock Canvas.Top="780" Text="1 PM" FontSize="12" Foreground="#606060" HorizontalAlignment="Right" Width="55" TextAlignment="Right" Padding="0,0,10,0" />
+                            <TextBlock Canvas.Top="840" Text="2 PM" FontSize="12" Foreground="#606060" HorizontalAlignment="Right" Width="55" TextAlignment="Right" Padding="0,0,10,0" />
+                            <TextBlock Canvas.Top="900" Text="3 PM" FontSize="12" Foreground="#606060" HorizontalAlignment="Right" Width="55" TextAlignment="Right" Padding="0,0,10,0" />
+                            <TextBlock Canvas.Top="960" Text="4 PM" FontSize="12" Foreground="#606060" HorizontalAlignment="Right" Width="55" TextAlignment="Right" Padding="0,0,10,0" />
+                            <TextBlock Canvas.Top="1020" Text="5 PM" FontSize="12" Foreground="#606060" HorizontalAlignment="Right" Width="55" TextAlignment="Right" Padding="0,0,10,0" />
+                            <TextBlock Canvas.Top="1080" Text="6 PM" FontSize="12" Foreground="#606060" HorizontalAlignment="Right" Width="55" TextAlignment="Right" Padding="0,0,10,0" />
+                            <TextBlock Canvas.Top="1140" Text="7 PM" FontSize="12" Foreground="#606060" HorizontalAlignment="Right" Width="55" TextAlignment="Right" Padding="0,0,10,0" />
+                            <TextBlock Canvas.Top="1200" Text="8 PM" FontSize="12" Foreground="#606060" HorizontalAlignment="Right" Width="55" TextAlignment="Right" Padding="0,0,10,0" />
+                            <TextBlock Canvas.Top="1260" Text="9 PM" FontSize="12" Foreground="#606060" HorizontalAlignment="Right" Width="55" TextAlignment="Right" Padding="0,0,10,0" />
+                            <TextBlock Canvas.Top="1320" Text="10 PM" FontSize="12" Foreground="#606060" HorizontalAlignment="Right" Width="55" TextAlignment="Right" Padding="0,0,10,0" />
+                            <TextBlock Canvas.Top="1380" Text="11 PM" FontSize="12" Foreground="#606060" HorizontalAlignment="Right" Width="55" TextAlignment="Right" Padding="0,0,10,0" />
+                        </Canvas>
+
+                        <!-- Time Grid Lines and Block Area -->
+                        <Grid Grid.Column="1">
+                            <!-- Hour Grid Lines -->
+                            <Canvas>
+                                <Rectangle Canvas.Top="0" Width="400" Height="1" Fill="#2A2A2A" />
+                                <Rectangle Canvas.Top="60" Width="400" Height="1" Fill="#2A2A2A" />
+                                <Rectangle Canvas.Top="120" Width="400" Height="1" Fill="#2A2A2A" />
+                                <Rectangle Canvas.Top="180" Width="400" Height="1" Fill="#2A2A2A" />
+                                <Rectangle Canvas.Top="240" Width="400" Height="1" Fill="#2A2A2A" />
+                                <Rectangle Canvas.Top="300" Width="400" Height="1" Fill="#2A2A2A" />
+                                <Rectangle Canvas.Top="360" Width="400" Height="1" Fill="#2A2A2A" />
+                                <Rectangle Canvas.Top="420" Width="400" Height="1" Fill="#2A2A2A" />
+                                <Rectangle Canvas.Top="480" Width="400" Height="1" Fill="#2A2A2A" />
+                                <Rectangle Canvas.Top="540" Width="400" Height="1" Fill="#2A2A2A" />
+                                <Rectangle Canvas.Top="600" Width="400" Height="1" Fill="#2A2A2A" />
+                                <Rectangle Canvas.Top="660" Width="400" Height="1" Fill="#2A2A2A" />
+                                <Rectangle Canvas.Top="720" Width="400" Height="1" Fill="#2A2A2A" />
+                                <Rectangle Canvas.Top="780" Width="400" Height="1" Fill="#2A2A2A" />
+                                <Rectangle Canvas.Top="840" Width="400" Height="1" Fill="#2A2A2A" />
+                                <Rectangle Canvas.Top="900" Width="400" Height="1" Fill="#2A2A2A" />
+                                <Rectangle Canvas.Top="960" Width="400" Height="1" Fill="#2A2A2A" />
+                                <Rectangle Canvas.Top="1020" Width="400" Height="1" Fill="#2A2A2A" />
+                                <Rectangle Canvas.Top="1080" Width="400" Height="1" Fill="#2A2A2A" />
+                                <Rectangle Canvas.Top="1140" Width="400" Height="1" Fill="#2A2A2A" />
+                                <Rectangle Canvas.Top="1200" Width="400" Height="1" Fill="#2A2A2A" />
+                                <Rectangle Canvas.Top="1260" Width="400" Height="1" Fill="#2A2A2A" />
+                                <Rectangle Canvas.Top="1320" Width="400" Height="1" Fill="#2A2A2A" />
+                                <Rectangle Canvas.Top="1380" Width="400" Height="1" Fill="#2A2A2A" />
+                                <Rectangle Canvas.Top="1440" Width="400" Height="1" Fill="#2A2A2A" />
+                            </Canvas>
+
+                            <!-- Draggable Time Block -->
+                            <Canvas x:Name="TimeBlockCanvas" Margin="8,0,16,0">
+                                <Border x:Name="TimeBlock"
+                                        Background="{ThemeResource AccentPrimary}"
+                                        CornerRadius="10"
+                                        Padding="14,10"
+                                        MinHeight="60">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="*" />
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
+
+                                        <!-- Top Drag Handle -->
+                                        <Ellipse Grid.Row="0"
+                                                 x:Name="TopHandle"
+                                                 Width="10"
+                                                 Height="10"
+                                                 Fill="#1A1A1A"
+                                                 HorizontalAlignment="Center"
+                                                 VerticalAlignment="Top"
+                                                 Margin="0,-6,0,6" />
+
+                                        <!-- Time Display -->
+                                        <StackPanel Grid.Row="1"
+                                                    VerticalAlignment="Center"
+                                                    Spacing="2">
+                                            <TextBlock x:Name="TimeRangeText"
+                                                       FontSize="15"
+                                                       FontWeight="SemiBold"
+                                                       Foreground="White" />
+                                            <TextBlock x:Name="DurationText"
+                                                       FontSize="13"
+                                                       Foreground="White"
+                                                       Opacity="0.75" />
+                                        </StackPanel>
+
+                                        <!-- Bottom Drag Handle -->
+                                        <Ellipse Grid.Row="2"
+                                                 x:Name="BottomHandle"
+                                                 Width="10"
+                                                 Height="10"
+                                                 Fill="#1A1A1A"
+                                                 HorizontalAlignment="Center"
+                                                 VerticalAlignment="Bottom"
+                                                 Margin="0,6,0,-6" />
+                                    </Grid>
+                                </Border>
+                            </Canvas>
+                        </Grid>
+                    </Grid>
+                </ScrollViewer>
+            </Border>
+
+            <!-- Action Buttons -->
+            <Grid Grid.Row="3"
+                  Padding="24,16,24,20"
+                  ColumnSpacing="14"
+                  Background="#2D2D2D">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <Button Grid.Column="1"
+                        Content="Cancel"
+                        Command="{x:Bind ViewModel.CancelCommand}"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        Padding="24,12"
+                        Foreground="White"
+                        FontSize="15"
+                        FontWeight="SemiBold" />
+
+                <Button Grid.Column="2"
+                        Content="Confirm"
+                        Command="{x:Bind ViewModel.ConfirmCommand}"
+                        Background="{ThemeResource AccentPrimary}"
+                        Foreground="White"
+                        BorderThickness="0"
+                        CornerRadius="22"
+                        Padding="28,0"
+                        Height="44"
+                        FontSize="15"
+                        FontWeight="SemiBold" />
+            </Grid>
+        </Grid>
+    </Border>
+</UserControl>
