@@ -39,6 +39,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sundy.Formats.iCalendar", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sundy.Formats.iCalendar.Tests", "Sundy.Formats.iCalendar.Tests\Sundy.Formats.iCalendar.Tests.csproj", "{26DC8E43-E637-4D6C-93D8-A45045310714}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sundy", "Sundy.Tauri\Sundy\src\Sundy.csproj", "{4A6D58E7-BF65-49B2-831E-26F9B0B001C9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -85,6 +87,10 @@ Global
 		{26DC8E43-E637-4D6C-93D8-A45045310714}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{26DC8E43-E637-4D6C-93D8-A45045310714}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{26DC8E43-E637-4D6C-93D8-A45045310714}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4A6D58E7-BF65-49B2-831E-26F9B0B001C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4A6D58E7-BF65-49B2-831E-26F9B0B001C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4A6D58E7-BF65-49B2-831E-26F9B0B001C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4A6D58E7-BF65-49B2-831E-26F9B0B001C9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

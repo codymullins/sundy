@@ -6,8 +6,6 @@ public interface ICalendarStore
 {
     Task DeleteCalendarAsync(string calendarId, CancellationToken ct = default);
     Task<List<Calendar>> GetAllAsync(CancellationToken ct = default);
-    Task CreateCalendarAsync(Calendar calendar, CancellationToken ct = default);
-
     /// <summary>
     /// Alias for CreateCalendarAsync for convenience.
     /// </summary>

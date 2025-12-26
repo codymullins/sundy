@@ -1,0 +1,825 @@
+@page "/"
+@inject IJSRuntime JsRuntime
+@inject IMediator Mediator
+@implements IAsyncDisposable
+@using Mediator
+@using Sundy.Core
+@using Sundy.Core.Commands
+@using Sundy.Core.Queries
+@using Sundy.Models
+@using Sundy.Components
+
+@if (IsLoading)
+{
+    <div style="display: flex; align-items: center; justify-content: center; height: 100vh; background: #1a1a1a; color: #fff;">
+        <p>Loading...</p>
+    </div>
+}
+else if (ErrorMessage != null)
+{
+    <div style="display: flex; align-items: center; justify-content: center; height: 100vh; background: #1a1a1a; color: #ff6b6b;">
+        <p>Error: @ErrorMessage</p>
+    </div>
+}
+else
+{
+<div class="calendar-app @(SidebarOpen ? "sidebar-open" : "")">
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay @(SidebarOpen ? "visible" : "")" @onclick="CloseSidebar"></div>
+
+    <!-- Left Sidebar -->
+    <aside class="calendar-sidebar @(SidebarOpen ? "open" : "")">
+        <div class="sidebar-header">
+            <h2>My Calendars</h2>
+            <button class="sidebar-close-btn" @onclick="CloseSidebar">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+        <div class="calendar-list">
+            @foreach (var cal in Calendars)
+            {
+                <label class="calendar-item">
+                    <input type="checkbox" @bind="cal.IsVisible" />
+                    <span class="calendar-color" style="background-color: @cal.Color"></span>
+                    <span class="calendar-name">@cal.Name</span>
+                </label>
+            }
+        </div>
+        <div class="sidebar-footer">
+            <button class="settings-btn" @onclick="OpenSettings">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                </svg>
+                <span>Settings</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="calendar-main">
+        <!-- Top Toolbar -->
+        <header class="calendar-toolbar">
+            <div class="toolbar-left">
+                <button class="menu-btn" @onclick="ToggleSidebar">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                </button>
+                <button class="today-btn" @onclick="GoToToday">Today</button>
+                <button class="nav-btn" @onclick="NavigatePrevious">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="15 18 9 12 15 6"></polyline>
+                    </svg>
+                </button>
+                <button class="nav-btn" @onclick="NavigateNext">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                </button>
+                <h1 class="current-month">@GetHeaderText()</h1>
+            </div>
+            <div class="toolbar-right">
+                <div class="view-toggle">
+                    <div class="view-slider"></div>
+                    <button class="view-btn @(CurrentView == CalendarView.Day ? "active" : "")" @onclick="() => SetView(CalendarView.Day)">Day</button>
+                    <button class="view-btn @(CurrentView == CalendarView.Week ? "active" : "")" @onclick="() => SetView(CalendarView.Week)">Week</button>
+                    <button class="view-btn @(CurrentView == CalendarView.Month ? "active" : "")" @onclick="() => SetView(CalendarView.Month)">Month</button>
+                </div>
+                <button class="new-event-btn" @onclick="OpenNewEventModal">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="16"></line>
+                        <line x1="8" y1="12" x2="16" y2="12"></line>
+                    </svg>
+                    <span>New Event</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Calendar Views -->
+        @switch (CurrentView)
+        {
+            case CalendarView.Month:
+                <MonthView CurrentDate="CurrentDate"
+                           Events="Events"
+                           Calendars="Calendars"
+                           CalendarLookup="CalendarLookup"
+                           OnDayClick="OnDayClick" />
+                break;
+            case CalendarView.Week:
+                <WeekView CurrentDate="CurrentDate"
+                          Events="Events"
+                          Calendars="Calendars"
+                          CalendarLookup="CalendarLookup"
+                          OnDayClick="OnDayClick" />
+                break;
+            case CalendarView.Day:
+                <DayView CurrentDate="CurrentDate"
+                         Events="Events"
+                         Calendars="Calendars"
+                         CalendarLookup="CalendarLookup"
+                         OnDayClick="OnDayClick" />
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+    </main>
+</div>
+}
+
+<!-- New Event Modal -->
+@if (ShowNewEventModal)
+{
+    <div class="modal-overlay" @onclick="CloseNewEventModal">
+        <div class="modal new-event-modal" @onclick:stopPropagation="true">
+            <div class="modal-header">
+                <h2>New Event</h2>
+                <div class="calendar-selector" @onclick="ToggleCalendarDropdown">
+                    <span class="calendar-color-indicator" style="background-color: @GetSelectedCalendarColor()"></span>
+                    <span>@GetSelectedCalendarName()</span>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                    @if (ShowCalendarDropdown)
+                    {
+                        <div class="calendar-dropdown">
+                            @foreach (var cal in Calendars)
+                            {
+                                <div class="dropdown-item" @onclick="() => SelectCalendar(cal.Id)" @onclick:stopPropagation="true">
+                                    <span class="calendar-color" style="background-color: @cal.Color"></span>
+                                    <span>@cal.Name</span>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Title *</label>
+                    <input type="text" class="form-input" placeholder="Event title" @bind="NewEvent.Title" />
+                </div>
+
+                <div class="form-group">
+                    <label>Date & Time *</label>
+                    <div class="datetime-picker" @onclick="OpenScheduler">
+                        <div class="datetime-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                            </svg>
+                        </div>
+                        <div class="datetime-details">
+                            <div class="datetime-date">@NewEvent.Date.ToString("dddd, MMMM d, yyyy")</div>
+                            <div class="datetime-time">
+                                @if (NewEvent.IsAllDay)
+                                {
+                                    <span>All day</span>
+                                }
+                                else
+                                {
+                                    <span>@NewEvent.StartTime.ToString(@"h\:mm") @GetAmPm(NewEvent.StartTime) → @NewEvent.EndTime.ToString(@"h\:mm") @GetAmPm(NewEvent.EndTime)</span>
+                                }
+                            </div>
+                            <div class="datetime-duration">Duration: @GetDuration()</div>
+                        </div>
+                        <div class="datetime-edit-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <label class="checkbox-label">
+                    <input type="checkbox" @bind="NewEvent.IsAllDay" />
+                    <span>All day event</span>
+                </label>
+
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea class="form-textarea" placeholder="Add description" @bind="NewEvent.Description"></textarea>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn-cancel" @onclick="CloseNewEventModal">Cancel</button>
+                <button class="btn-create" @onclick="CreateEvent">Create</button>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- Date/Time Scheduler Modal -->
+@if (ShowSchedulerModal)
+{
+    <div class="modal-overlay" @onclick="CloseScheduler">
+        <div class="modal scheduler-modal" @onclick:stopPropagation="true">
+            <div class="scheduler-header">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+                <span>@SchedulerDate.ToString("MMMM")</span>
+            </div>
+
+            <div class="scheduler-week-nav">
+                <button class="scheduler-nav-btn" @onclick="PreviousWeek">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="15 18 9 12 15 6"></polyline>
+                    </svg>
+                </button>
+                <div class="scheduler-week-days">
+                    @foreach (var day in GetSchedulerWeek())
+                    {
+                        <div class="scheduler-day @(day.Date == SchedulerDate.Date ? "selected" : "")" @onclick="() => SelectSchedulerDate(day)">
+                            <span class="day-abbrev">@day.ToString("ddd").Substring(0, 1)</span>
+                            <span class="day-num @(day.Date == SchedulerDate.Date ? "selected" : "")">@day.Day</span>
+                        </div>
+                    }
+                </div>
+                <button class="scheduler-nav-btn" @onclick="NextWeek">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="scheduler-time-grid">
+                @for (int hour = 0; hour < 24; hour++)
+                {
+                    var currentHour = hour;
+                    var isInRange = IsHourInRange(currentHour);
+                    <div class="time-slot @(isInRange ? "in-range" : "")" @onclick="() => SetStartHour(currentHour)">
+                        <span class="time-label">@FormatHour(currentHour)</span>
+                        <div class="time-slot-line"></div>
+                    </div>
+                }
+
+                <!-- Draggable time range indicator -->
+                <div class="time-range-indicator"
+                     style="top: @GetTimeRangeTop()px; height: @GetTimeRangeHeight()px;"
+                     @onmousedown="StartDragMove"
+                     @ontouchstart="@(e => StartDragMoveTouch(e))">
+                    <div class="range-handle top"
+                         @onmousedown="StartDragTop"
+                         @onmousedown:stopPropagation="true"
+                         @ontouchstart="@(e => StartDragTopTouch(e))"
+                         @ontouchstart:stopPropagation="true"></div>
+                    <div class="range-content">
+                        <span>@FormatTimeRange()</span>
+                        <span class="range-duration">@GetDuration()</span>
+                    </div>
+                    <div class="range-handle bottom"
+                         @onmousedown="StartDragBottom"
+                         @onmousedown:stopPropagation="true"
+                         @ontouchstart="@(e => StartDragBottomTouch(e))"
+                         @ontouchstart:stopPropagation="true"></div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn-cancel" @onclick="CloseScheduler">Cancel</button>
+                <button class="btn-confirm" @onclick="ConfirmSchedule">Confirm</button>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- Settings Dialog -->
+@if (ShowSettingsDialog)
+{
+    <SettingsDialog OnClose="CloseSettings"
+                    Calendars="Calendars"
+                    OnSettingsChanged="OnSettingsChanged" />
+}
+
+@code {
+    private DateTime CurrentDate { get; set; } = DateTime.Today;
+    private CalendarView CurrentView { get; set; } = CalendarView.Month;
+    private List<CalendarDisplayInfo> Calendars { get; set; } = new();
+    private Dictionary<string, Sundy.Core.Calendar> CalendarLookup { get; set; } = new();
+    private List<Sundy.Core.CalendarEvent> Events { get; set; } = new();
+
+    // Loading state
+    private bool IsLoading { get; set; } = true;
+    private string? ErrorMessage { get; set; }
+
+    // Sidebar state
+    private bool SidebarOpen { get; set; } = true;
+
+    // Modal state
+    private bool ShowNewEventModal { get; set; }
+    private bool ShowSchedulerModal { get; set; }
+    private bool ShowCalendarDropdown { get; set; }
+    private bool ShowSettingsDialog { get; set; }
+    private NewEventModel NewEvent { get; set; } = new();
+
+    // JS Interop
+    private DotNetObjectReference<Calendar>? _dotNetRef;
+    private DateTime SchedulerDate { get; set; } = DateTime.Today;
+    private TimeSpan TempStartTime { get; set; }
+    private TimeSpan TempEndTime { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            await LoadCalendarsAsync();
+            await LoadEventsAsync();
+            IsLoading = false;
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = ex.Message;
+            IsLoading = false;
+        }
+    }
+
+    private async Task LoadCalendarsAsync()
+    {
+        var calendars = await Mediator.Send(new GetAllCalendarsQuery());
+        CalendarLookup = calendars.ToDictionary(c => c.Id);
+        Calendars = calendars.Select(c => new CalendarDisplayInfo
+        {
+            Id = c.Id,
+            Name = c.Name,
+            Color = c.Color,
+            IsVisible = true
+        }).ToList();
+    }
+
+    private async Task LoadEventsAsync()
+    {
+        // Load events for current view range
+        var (start, end) = GetCurrentViewRange();
+        var visibleCalendarIds = Calendars.Where(c => c.IsVisible).Select(c => c.Id).ToList();
+        Events = await Mediator.Send(new GetEventsInRangeQuery(start, end, VisibleCalendarIds: visibleCalendarIds));
+    }
+
+    private (DateTimeOffset start, DateTimeOffset end) GetCurrentViewRange()
+    {
+        var now = DateTimeOffset.Now;
+        return CurrentView switch
+        {
+            CalendarView.Day => (
+                new DateTimeOffset(CurrentDate, now.Offset),
+                new DateTimeOffset(CurrentDate.AddDays(1), now.Offset)
+            ),
+            CalendarView.Week => (
+                new DateTimeOffset(CurrentDate.AddDays(-(int)CurrentDate.DayOfWeek), now.Offset),
+                new DateTimeOffset(CurrentDate.AddDays(7 - (int)CurrentDate.DayOfWeek), now.Offset)
+            ),
+            CalendarView.Month => (
+                new DateTimeOffset(new DateTime(CurrentDate.Year, CurrentDate.Month, 1).AddDays(-7), now.Offset),
+                new DateTimeOffset(new DateTime(CurrentDate.Year, CurrentDate.Month, 1).AddMonths(1).AddDays(7), now.Offset)
+            ),
+            _ => (now.AddMonths(-1), now.AddMonths(1))
+        };
+    }
+
+    private async Task GoToToday()
+    {
+        CurrentDate = DateTime.Today;
+        await LoadEventsAsync();
+    }
+
+    private void ToggleSidebar()
+    {
+        SidebarOpen = !SidebarOpen;
+    }
+
+    private void CloseSidebar()
+    {
+        SidebarOpen = false;
+    }
+
+    private void OpenSettings()
+    {
+        ShowSettingsDialog = true;
+    }
+
+    private void CloseSettings()
+    {
+        ShowSettingsDialog = false;
+    }
+
+    private async Task OnSettingsChanged()
+    {
+        await LoadCalendarsAsync();
+        await LoadEventsAsync();
+    }
+
+    private async Task NavigatePrevious()
+    {
+        CurrentDate = CurrentView switch
+        {
+            CalendarView.Day => CurrentDate.AddDays(-1),
+            CalendarView.Week => CurrentDate.AddDays(-7),
+            CalendarView.Month => CurrentDate.AddMonths(-1),
+            _ => CurrentDate.AddMonths(-1)
+        };
+        await LoadEventsAsync();
+    }
+
+    private async Task NavigateNext()
+    {
+        CurrentDate = CurrentView switch
+        {
+            CalendarView.Day => CurrentDate.AddDays(1),
+            CalendarView.Week => CurrentDate.AddDays(7),
+            CalendarView.Month => CurrentDate.AddMonths(1),
+            _ => CurrentDate.AddMonths(1)
+        };
+        await LoadEventsAsync();
+    }
+
+    private string GetHeaderText()
+    {
+        return CurrentView switch
+        {
+            CalendarView.Day => CurrentDate.ToString("MMMM d, yyyy"),
+            CalendarView.Week => GetWeekRangeText(),
+            CalendarView.Month => CurrentDate.ToString("MMMM yyyy"),
+            _ => CurrentDate.ToString("MMMM yyyy")
+        };
+    }
+
+    private string GetWeekRangeText()
+    {
+        var weekDays = GetCurrentWeekDays();
+        var startDate = weekDays.First();
+        var endDate = weekDays.Last();
+
+        if (startDate.Month == endDate.Month)
+        {
+            return $"{startDate:MMM d} - {endDate:d}, {endDate:yyyy}";
+        }
+        else if (startDate.Year == endDate.Year)
+        {
+            return $"{startDate:MMM d} - {endDate:MMM d}, {endDate:yyyy}";
+        }
+        else
+        {
+            return $"{startDate:MMM d, yyyy} - {endDate:MMM d, yyyy}";
+        }
+    }
+
+    private List<DateTime> GetCurrentWeekDays()
+    {
+        var startOfWeek = CurrentDate.AddDays(-(int)CurrentDate.DayOfWeek);
+        return Enumerable.Range(0, 7).Select(i => startOfWeek.AddDays(i)).ToList();
+    }
+
+    private async Task SetView(CalendarView view)
+    {
+        CurrentView = view;
+        await UpdateViewSlider();
+        await LoadEventsAsync();
+    }
+
+    private async Task UpdateViewSlider()
+    {
+        var index = CurrentView switch
+        {
+            CalendarView.Day => 0,
+            CalendarView.Week => 1,
+            CalendarView.Month => 2,
+            _ => 2
+        };
+        await JsRuntime.InvokeVoidAsync("viewSlider.update", index);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await UpdateViewSlider();
+        }
+    }
+
+    private void OnDayClick(DateTime day)
+    {
+        var (startTime, endTime) = GetDefaultEventTime();
+        NewEvent = new NewEventModel
+        {
+            Date = day,
+            StartTime = startTime,
+            EndTime = endTime,
+            CalendarId = Calendars.FirstOrDefault()?.Id ?? ""
+        };
+        ShowNewEventModal = true;
+    }
+
+    private void OpenNewEventModal()
+    {
+        var (startTime, endTime) = GetDefaultEventTime();
+        NewEvent = new NewEventModel
+        {
+            Date = DateTime.Today,
+            StartTime = startTime,
+            EndTime = endTime,
+            CalendarId = Calendars.FirstOrDefault()?.Id ?? ""
+        };
+        ShowNewEventModal = true;
+    }
+
+    private (TimeSpan startTime, TimeSpan endTime) GetDefaultEventTime()
+    {
+        var now = DateTime.Now;
+        // Round up to next 15-minute increment
+        var minutes = now.Minute;
+        var roundedMinutes = ((minutes / 15) + 1) * 15;
+        var startHour = now.Hour;
+
+        if (roundedMinutes >= 60)
+        {
+            roundedMinutes = 0;
+            startHour = (startHour + 1) % 24;
+        }
+
+        var startTime = new TimeSpan(startHour, roundedMinutes, 0);
+
+        // Default to 1 hour duration
+        var endHour = (startHour + 1) % 24;
+        var endTime = new TimeSpan(endHour, roundedMinutes, 0);
+
+        return (startTime, endTime);
+    }
+
+    private void CloseNewEventModal()
+    {
+        ShowNewEventModal = false;
+        ShowCalendarDropdown = false;
+    }
+
+    private void ToggleCalendarDropdown()
+    {
+        ShowCalendarDropdown = !ShowCalendarDropdown;
+    }
+
+    private void SelectCalendar(string calendarId)
+    {
+        NewEvent.CalendarId = calendarId;
+        ShowCalendarDropdown = false;
+    }
+
+    private string GetSelectedCalendarName()
+    {
+        return Calendars.FirstOrDefault(c => c.Id == NewEvent.CalendarId)?.Name ?? "My Calendar";
+    }
+
+    private string GetSelectedCalendarColor()
+    {
+        return Calendars.FirstOrDefault(c => c.Id == NewEvent.CalendarId)?.Color ?? "#4285f4";
+    }
+
+    private async Task OpenScheduler()
+    {
+        SchedulerDate = NewEvent.Date;
+        TempStartTime = NewEvent.StartTime;
+        TempEndTime = NewEvent.EndTime;
+        ShowSchedulerModal = true;
+
+        // Wait for DOM to render
+        await Task.Delay(100);
+
+        // Initialize JS interop for drag functionality
+        _dotNetRef = DotNetObjectReference.Create(this);
+        await JsRuntime.InvokeVoidAsync("schedulerDrag.init", _dotNetRef);
+
+        // Scroll to the time block position
+        var topPosition = GetTimeRangeTop();
+        await JsRuntime.InvokeVoidAsync("schedulerScroll.scrollToTime", topPosition);
+    }
+
+    private async Task CloseScheduler()
+    {
+        ShowSchedulerModal = false;
+        await JsRuntime.InvokeVoidAsync("schedulerDrag.dispose");
+        _dotNetRef?.Dispose();
+        _dotNetRef = null;
+    }
+
+    private async Task ConfirmSchedule()
+    {
+        NewEvent.Date = SchedulerDate;
+        NewEvent.StartTime = TempStartTime;
+        NewEvent.EndTime = TempEndTime;
+        await CloseScheduler();
+    }
+
+    private List<DateTime> GetSchedulerWeek()
+    {
+        var startOfWeek = SchedulerDate.AddDays(-(int)SchedulerDate.DayOfWeek);
+        return Enumerable.Range(0, 7).Select(i => startOfWeek.AddDays(i)).ToList();
+    }
+
+    private void PreviousWeek()
+    {
+        SchedulerDate = SchedulerDate.AddDays(-7);
+    }
+
+    private void NextWeek()
+    {
+        SchedulerDate = SchedulerDate.AddDays(7);
+    }
+
+    private void SelectSchedulerDate(DateTime date)
+    {
+        SchedulerDate = date;
+    }
+
+    private bool IsHourInRange(int hour)
+    {
+        var startHour = TempStartTime.Hours;
+        var endHour = TempEndTime.Hours == 0 ? 24 : TempEndTime.Hours;
+        return hour >= startHour && hour < endHour;
+    }
+
+    private void SetStartHour(int hour)
+    {
+        TempStartTime = new TimeSpan(hour, 0, 0);
+        var endHour = hour + 1;
+        TempEndTime = new TimeSpan(endHour >= 24 ? 0 : endHour, 0, 0);
+    }
+
+    private string FormatHour(int hour)
+    {
+        if (hour == 0) return "12 AM";
+        if (hour == 12) return "12 PM";
+        if (hour < 12) return $"{hour} AM";
+        return $"{hour - 12} PM";
+    }
+
+    private string FormatTimeRange()
+    {
+        var startHour = TempStartTime.Hours == 0 ? 12 : (TempStartTime.Hours > 12 ? TempStartTime.Hours - 12 : TempStartTime.Hours);
+        var endHour = TempEndTime.Hours == 0 ? 12 : (TempEndTime.Hours > 12 ? TempEndTime.Hours - 12 : TempEndTime.Hours);
+        return $"{startHour}:{TempStartTime.Minutes:D2} {GetAmPm(TempStartTime)} → {endHour}:{TempEndTime.Minutes:D2} {GetAmPm(TempEndTime)}";
+    }
+
+    private double GetTimeRangeTop()
+    {
+        // 48px per hour, 12px per 15 minutes
+        return TempStartTime.Hours * 48 + (TempStartTime.Minutes / 15.0) * 12;
+    }
+
+    private double GetTimeRangeHeight()
+    {
+        var startMinutes = TempStartTime.Hours * 60 + TempStartTime.Minutes;
+        var endMinutes = (TempEndTime.Hours == 0 && TempEndTime.Minutes == 0) ? 24 * 60 : TempEndTime.Hours * 60 + TempEndTime.Minutes;
+        var totalMinutes = endMinutes - startMinutes;
+        // 12px per 15 minutes
+        return Math.Max(totalMinutes / 15.0, 1) * 12;
+    }
+
+    private async Task StartDragMove(MouseEventArgs e)
+    {
+        await JsRuntime.InvokeVoidAsync("schedulerDrag.startDrag", "move", new { clientY = e.ClientY });
+    }
+
+    private async Task StartDragMoveTouch(TouchEventArgs e)
+    {
+        if (e.Touches.Length > 0)
+        {
+            await JsRuntime.InvokeVoidAsync("schedulerDrag.startDrag", "move", new { clientY = e.Touches[0].ClientY, touches = e.Touches });
+        }
+    }
+
+    private async Task StartDragTop(MouseEventArgs e)
+    {
+        await JsRuntime.InvokeVoidAsync("schedulerDrag.startDrag", "top", new { clientY = e.ClientY });
+    }
+
+    private async Task StartDragTopTouch(TouchEventArgs e)
+    {
+        if (e.Touches.Length > 0)
+        {
+            await JsRuntime.InvokeVoidAsync("schedulerDrag.startDrag", "top", new { clientY = e.Touches[0].ClientY, touches = e.Touches });
+        }
+    }
+
+    private async Task StartDragBottom(MouseEventArgs e)
+    {
+        await JsRuntime.InvokeVoidAsync("schedulerDrag.startDrag", "bottom", new { clientY = e.ClientY });
+    }
+
+    private async Task StartDragBottomTouch(TouchEventArgs e)
+    {
+        if (e.Touches.Length > 0)
+        {
+            await JsRuntime.InvokeVoidAsync("schedulerDrag.startDrag", "bottom", new { clientY = e.Touches[0].ClientY, touches = e.Touches });
+        }
+    }
+
+    [JSInvokable]
+    public void OnTimeRangeChanged(int startHour, int startMinute, int endHour, int endMinute)
+    {
+        TempStartTime = new TimeSpan(startHour, startMinute, 0);
+        TempEndTime = new TimeSpan(endHour, endMinute, 0);
+        StateHasChanged();
+    }
+
+    private string GetAmPm(TimeSpan time)
+    {
+        return time.Hours < 12 ? "AM" : "PM";
+    }
+
+    private string GetDuration()
+    {
+        if (NewEvent.IsAllDay) return "All day";
+
+        var start = TempStartTime != default ? TempStartTime : NewEvent.StartTime;
+        var end = TempEndTime != default ? TempEndTime : NewEvent.EndTime;
+
+        var startMinutes = start.Hours * 60 + start.Minutes;
+        var endMinutes = (end.Hours == 0 && end.Minutes == 0) ? 24 * 60 : end.Hours * 60 + end.Minutes;
+        var totalMinutes = endMinutes - startMinutes;
+
+        var hours = totalMinutes / 60;
+        var mins = totalMinutes % 60;
+
+        if (hours == 0) return $"{mins} min";
+        if (mins == 0) return hours == 1 ? "1 hr" : $"{hours} hrs";
+        return $"{hours} hr {mins} min";
+    }
+
+    private async Task CreateEvent()
+    {
+        if (string.IsNullOrWhiteSpace(NewEvent.Title))
+        {
+            return; // Don't create event without title
+        }
+
+        var now = DateTimeOffset.Now;
+        var startDateTime = new DateTimeOffset(
+            NewEvent.Date.Year, NewEvent.Date.Month, NewEvent.Date.Day,
+            NewEvent.StartTime.Hours, NewEvent.StartTime.Minutes, 0, now.Offset);
+        var endDateTime = new DateTimeOffset(
+            NewEvent.Date.Year, NewEvent.Date.Month, NewEvent.Date.Day,
+            NewEvent.EndTime.Hours, NewEvent.EndTime.Minutes, 0, now.Offset);
+
+        // Handle events that span midnight
+        if (endDateTime <= startDateTime)
+        {
+            endDateTime = endDateTime.AddDays(1);
+        }
+
+        var newEvent = new Sundy.Core.CalendarEvent
+        {
+            CalendarId = NewEvent.CalendarId,
+            Title = NewEvent.Title,
+            StartTime = startDateTime,
+            EndTime = endDateTime,
+            Description = NewEvent.Description
+        };
+
+        await Mediator.Send(new CreateEventCommand(newEvent));
+        await LoadEventsAsync();
+        CloseNewEventModal();
+    }
+
+    private bool IsToday(DateTime date)
+    {
+        return date.Date == DateTime.Today;
+    }
+
+    public enum CalendarView
+    {
+        Day,
+        Week,
+        Month
+    }
+
+    public class NewEventModel
+    {
+        public string Title { get; set; } = "";
+        public DateTime Date { get; set; } = DateTime.Today;
+        public TimeSpan StartTime { get; set; } = new TimeSpan(9, 0, 0);
+        public TimeSpan EndTime { get; set; } = new TimeSpan(10, 0, 0);
+        public bool IsAllDay { get; set; }
+        public string Description { get; set; } = "";
+        public string CalendarId { get; set; } = "";
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_dotNetRef != null)
+        {
+            await JsRuntime.InvokeVoidAsync("schedulerDrag.dispose");
+            _dotNetRef.Dispose();
+            _dotNetRef = null;
+        }
+    }
+}

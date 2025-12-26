@@ -1,0 +1,110 @@
+@using Sundy.Core
+@using Sundy.Models
+
+<div class="day-view">
+    <!-- Day Header -->
+    <div class="day-view-header">
+        <div class="time-gutter-header"></div>
+        <div class="day-view-day-header @(IsToday(CurrentDate) ? "today" : "")">
+            <span class="day-view-day-name">@CurrentDate.ToString("dddd").ToUpper()</span>
+            <span class="day-view-day-number @(IsToday(CurrentDate) ? "today-number" : "")">@CurrentDate.Day</span>
+        </div>
+    </div>
+
+    <!-- Day Time Grid -->
+    <div class="day-time-grid">
+        <div class="time-gutter">
+            @for (int hour = 0; hour < 24; hour++)
+            {
+                <div class="time-gutter-slot">
+                    <span class="time-gutter-label">@FormatHour(hour)</span>
+                </div>
+            }
+        </div>
+        <div class="day-column" @onclick="() => OnDayClicked(CurrentDate)">
+            @for (int hour = 0; hour < 24; hour++)
+            {
+                <div class="day-time-slot"></div>
+            }
+            <!-- Events for this day -->
+            @foreach (var evt in GetEventsForDay(CurrentDate))
+            {
+                <div class="day-event"
+                     style="top: @GetEventTop(evt)px; height: @GetEventHeight(evt)px; background-color: @GetEventColor(evt);">
+                    <div class="day-event-title">@evt.Title</div>
+                    <div class="day-event-time">@FormatEventTime(evt)</div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public DateTime CurrentDate { get; set; }
+    [Parameter] public List<CalendarEvent> Events { get; set; } = new();
+    [Parameter] public List<CalendarDisplayInfo> Calendars { get; set; } = new();
+    [Parameter] public Dictionary<string, Calendar> CalendarLookup { get; set; } = new();
+    [Parameter] public EventCallback<DateTime> OnDayClick { get; set; }
+
+    private void OnDayClicked(DateTime day)
+    {
+        OnDayClick.InvokeAsync(day);
+    }
+
+    private bool IsToday(DateTime date)
+    {
+        return date.Date == DateTime.Today;
+    }
+
+    private IEnumerable<CalendarEvent> GetEventsForDay(DateTime date)
+    {
+        var visibleCalendarIds = Calendars.Where(c => c.IsVisible).Select(c => c.Id).ToHashSet();
+        return Events.Where(e =>
+            e.StartTime.LocalDateTime.Date == date.Date &&
+            e.CalendarId != null &&
+            visibleCalendarIds.Contains(e.CalendarId));
+    }
+
+    private string GetEventColor(CalendarEvent evt)
+    {
+        if (evt.CalendarId != null && CalendarLookup.TryGetValue(evt.CalendarId, out var calendar))
+        {
+            return calendar.Color;
+        }
+        return "#4285f4";
+    }
+
+    private double GetEventTop(CalendarEvent evt)
+    {
+        var localStart = evt.StartTime.LocalDateTime;
+        return localStart.Hour * 48 + (localStart.Minute / 60.0) * 48;
+    }
+
+    private double GetEventHeight(CalendarEvent evt)
+    {
+        var duration = evt.EndTime - evt.StartTime;
+        var durationMinutes = duration.TotalMinutes;
+        if (durationMinutes <= 0) durationMinutes = 60;
+        return Math.Max(durationMinutes * 0.8, 24);
+    }
+
+    private string FormatEventTime(CalendarEvent evt)
+    {
+        var localStart = evt.StartTime.LocalDateTime;
+        var localEnd = evt.EndTime.LocalDateTime;
+        var startHour = localStart.Hour == 0 ? 12 : (localStart.Hour > 12 ? localStart.Hour - 12 : localStart.Hour);
+        var endHour = localEnd.Hour == 0 ? 12 : (localEnd.Hour > 12 ? localEnd.Hour - 12 : localEnd.Hour);
+        var startAmPm = localStart.Hour < 12 ? "AM" : "PM";
+        var endAmPm = localEnd.Hour < 12 ? "AM" : "PM";
+        return $"{startHour}:{localStart.Minute:D2} {startAmPm} - {endHour}:{localEnd.Minute:D2} {endAmPm}";
+    }
+
+    private string FormatHour(int hour)
+    {
+        if (hour == 0) return "12 AM";
+        if (hour == 12) return "12 PM";
+        if (hour < 12) return $"{hour} AM";
+        return $"{hour - 12} PM";
+    }
+
+}

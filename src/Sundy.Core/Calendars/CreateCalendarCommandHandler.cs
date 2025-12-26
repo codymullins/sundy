@@ -8,7 +8,7 @@ public class CreateCalendarCommandHandler(ICalendarStore store) : IRequestHandle
 
     public async ValueTask<Unit> Handle(CreateCalendarCommand request, CancellationToken cancellationToken)
     {
-        await store.CreateCalendarAsync(request.Calendar, cancellationToken);
+        await store.AddAsync(request.Calendar, cancellationToken);
         return Unit.Value;
     }
 }

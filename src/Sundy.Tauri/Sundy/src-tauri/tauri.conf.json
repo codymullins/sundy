@@ -1,0 +1,36 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "sundy",
+  "version": "0.1.0",
+  "identifier": "com.voltern.sundy",
+  "build": {
+    "beforeDevCommand": "dotnet watch run --project src/Sundy.csproj",
+    "devUrl": "http://localhost:1420",
+    "beforeBuildCommand": "dotnet publish -c release src/Sundy.csproj -o dist",
+    "frontendDist": "../dist/wwwroot"
+  },
+  "app": {
+    "withGlobalTauri": true,
+    "windows": [
+      {
+        "title": "sundy",
+        "width": 800,
+        "height": 600
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ]
+  }
+}

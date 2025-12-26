@@ -1,0 +1,207 @@
+@inject IMediator Mediator
+@using Mediator
+@using Sundy.Core
+@using Sundy.Core.Commands
+@using Sundy.Core.Meta
+@using Sundy.Models
+
+<div class="modal-overlay" @onclick="Close">
+    <div class="modal settings-modal" @onclick:stopPropagation="true">
+        <div class="modal-header">
+            <h2>Settings</h2>
+            <button class="close-btn" @onclick="Close">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+
+        <div class="settings-layout">
+            <!-- Sidebar -->
+            <div class="settings-sidebar">
+                <div class="settings-tab @(ActiveTab == "general" ? "active" : "")" @onclick="SetTabGeneral">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                    </svg>
+                    <span>General</span>
+                </div>
+                <div class="settings-tab @(ActiveTab == "integrations" ? "active" : "")" @onclick="SetTabIntegrations">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M16 16v1a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2"></path>
+                        <rect x="8" y="2" width="13" height="13" rx="2" ry="2"></rect>
+                    </svg>
+                    <span>Integrations</span>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="settings-content">
+                @if (ActiveTab == "general")
+                {
+                    <!-- Calendars Section -->
+                    <div class="settings-section">
+                        <h3>Calendars</h3>
+                        <div class="calendar-list">
+                            @foreach (var cal in Calendars)
+                            {
+                                <div class="calendar-list-item">
+                                    <div class="calendar-list-info">
+                                        <span class="calendar-color-dot" style="background-color: @cal.Color"></span>
+                                        <span class="calendar-list-name">@cal.Name</span>
+                                    </div>
+                                    <button class="delete-btn" @onclick="() => DeleteCalendar(cal.Id)" title="Delete calendar">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="3 6 5 6 21 6"></polyline>
+                                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                            }
+                        </div>
+
+                        @if (ShowNewCalendarForm)
+                        {
+                            <div class="new-calendar-form">
+                                <div class="form-row">
+                                    <input type="color" class="color-picker" @bind="NewCalendarColor" />
+                                    <input type="text" class="form-input" placeholder="Calendar name" @bind="NewCalendarName" />
+                                </div>
+                                <div class="form-actions">
+                                    <button class="btn-cancel" @onclick="CancelNewCalendar">Cancel</button>
+                                    <button class="btn-create" @onclick="CreateCalendar">Create</button>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <button class="add-calendar-btn" @onclick="ShowNewCalendarFormToggle">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                </svg>
+                                <span>Add Calendar</span>
+                            </button>
+                        }
+                    </div>
+
+                    <!-- Data Section -->
+                    <div class="settings-section">
+                        <h3>Data</h3>
+                        @if (ShowResetConfirmation)
+                        {
+                            <div class="reset-confirmation">
+                                <p>Are you sure you want to reset the database? This will delete all calendars and events.</p>
+                                <div class="form-actions">
+                                    <button class="btn-cancel" @onclick="CancelResetConfirmation">Cancel</button>
+                                    <button class="btn-danger" @onclick="ResetDatabase">Reset</button>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <button class="reset-db-btn" @onclick="ShowResetConfirmationToggle">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path>
+                                </svg>
+                                <span>Reset Database</span>
+                            </button>
+                        }
+                    </div>
+                }
+                else if (ActiveTab == "integrations")
+                {
+                    <!-- Outlook Section -->
+                    <div class="settings-section">
+                        <h3>Outlook Calendar</h3>
+                        <div class="integration-card">
+                            <div class="integration-info">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                                    <line x1="8" y1="21" x2="16" y2="21"></line>
+                                    <line x1="12" y1="17" x2="12" y2="21"></line>
+                                </svg>
+                                <div class="integration-details">
+                                    <span class="integration-name">Microsoft Outlook</span>
+                                    <span class="integration-status">Not connected</span>
+                                </div>
+                            </div>
+                            <button class="connect-btn">
+                                <span>Connect</span>
+                            </button>
+                        </div>
+                        <p class="integration-note">Connect your Outlook account to sync your calendar events.</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public EventCallback OnClose { get; set; }
+    [Parameter] public List<CalendarDisplayInfo> Calendars { get; set; } = new();
+    [Parameter] public EventCallback OnSettingsChanged { get; set; }
+
+    private string ActiveTab { get; set; } = "general";
+    private bool ShowNewCalendarForm { get; set; }
+    private string NewCalendarName { get; set; } = "";
+    private string NewCalendarColor { get; set; } = "#4285f4";
+    private bool ShowResetConfirmation { get; set; }
+
+    private void SetTabGeneral() => ActiveTab = "general";
+    private void SetTabIntegrations() => ActiveTab = "integrations";
+    private void ShowResetConfirmationToggle() => ShowResetConfirmation = true;
+    private void CancelResetConfirmation() => ShowResetConfirmation = false;
+
+    private async Task Close()
+    {
+        await OnClose.InvokeAsync();
+    }
+
+    private void ShowNewCalendarFormToggle()
+    {
+        ShowNewCalendarForm = true;
+        NewCalendarName = "";
+        NewCalendarColor = "#4285f4";
+    }
+
+    private void CancelNewCalendar()
+    {
+        ShowNewCalendarForm = false;
+        NewCalendarName = "";
+    }
+
+    private async Task CreateCalendar()
+    {
+        if (string.IsNullOrWhiteSpace(NewCalendarName)) return;
+
+        var calendar = new Sundy.Core.Calendar
+        {
+            Id = Guid.NewGuid().ToString(),
+            Name = NewCalendarName.Trim(),
+            Color = NewCalendarColor,
+            Type = CalendarType.Local
+        };
+
+        await Mediator.Send(new CreateCalendarCommand(calendar));
+        ShowNewCalendarForm = false;
+        NewCalendarName = "";
+        await OnSettingsChanged.InvokeAsync();
+    }
+
+    private async Task DeleteCalendar(string calendarId)
+    {
+        await Mediator.Send(new DeleteCalendarCommand(calendarId));
+        await OnSettingsChanged.InvokeAsync();
+    }
+
+    private async Task ResetDatabase()
+    {
+        // Re-initialize the database (drops and recreates tables)
+        await Mediator.Send(new InitializeDatabaseCommand());
+        ShowResetConfirmation = false;
+        await OnSettingsChanged.InvokeAsync();
+    }
+}

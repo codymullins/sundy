@@ -1,0 +1,107 @@
+@using Sundy.Core
+@using Sundy.Models
+
+<div class="calendar-grid">
+    <!-- Day Headers -->
+    <div class="day-headers">
+        @foreach (var day in DayNames)
+        {
+            <div class="day-header">
+                <span class="day-full">@day</span>
+                <span class="day-short">@day[0]</span>
+            </div>
+        }
+    </div>
+
+    <!-- Calendar Cells -->
+    <div class="calendar-cells">
+        @foreach (var week in GetCalendarWeeks())
+        {
+            var isEmptyWeek = !week.Any(d => d.Month == CurrentDate.Month);
+            <div class="calendar-week @(isEmptyWeek ? "empty-week" : "")">
+                @foreach (var day in week)
+                {
+                    <div class="calendar-cell @(IsToday(day) ? "today" : "") @(day.Month != CurrentDate.Month ? "other-month" : "")"
+                         @onclick="() => OnDayClicked(day)">
+                        <span class="day-number @(IsToday(day) ? "today-number" : "")">@day.Day</span>
+                        <div class="cell-events">
+                            @foreach (var evt in GetEventsForDay(day).Take(3))
+                            {
+                                <div class="event-badge" style="background-color: @GetEventColor(evt)" title="@evt.Title">
+                                    @evt.Title
+                                </div>
+                            }
+                            @{
+                                var remainingCount = GetEventsForDay(day).Count() - 3;
+                                if (remainingCount > 0)
+                                {
+                                    <div class="more-events">+@remainingCount more</div>
+                                }
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public DateTime CurrentDate { get; set; }
+    [Parameter] public List<CalendarEvent> Events { get; set; } = new();
+    [Parameter] public List<CalendarDisplayInfo> Calendars { get; set; } = new();
+    [Parameter] public Dictionary<string, Calendar> CalendarLookup { get; set; } = new();
+    [Parameter] public EventCallback<DateTime> OnDayClick { get; set; }
+
+    private static readonly string[] DayNames = { "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" };
+
+    private void OnDayClicked(DateTime day)
+    {
+        OnDayClick.InvokeAsync(day);
+    }
+
+    private bool IsToday(DateTime date)
+    {
+        return date.Date == DateTime.Today;
+    }
+
+    private List<List<DateTime>> GetCalendarWeeks()
+    {
+        var weeks = new List<List<DateTime>>();
+        var firstDayOfMonth = new DateTime(CurrentDate.Year, CurrentDate.Month, 1);
+        var startDate = firstDayOfMonth.AddDays(-(int)firstDayOfMonth.DayOfWeek);
+
+        var currentDate = startDate;
+        for (int week = 0; week < 6; week++)
+        {
+            var weekDays = new List<DateTime>();
+            for (int day = 0; day < 7; day++)
+            {
+                weekDays.Add(currentDate);
+                currentDate = currentDate.AddDays(1);
+            }
+            weeks.Add(weekDays);
+        }
+
+        return weeks;
+    }
+
+    private IEnumerable<CalendarEvent> GetEventsForDay(DateTime date)
+    {
+        var visibleCalendarIds = Calendars.Where(c => c.IsVisible).Select(c => c.Id).ToHashSet();
+        return Events.Where(e =>
+            e.StartTime.LocalDateTime.Date == date.Date &&
+            e.CalendarId != null &&
+            visibleCalendarIds.Contains(e.CalendarId));
+    }
+
+    private string GetEventColor(CalendarEvent evt)
+    {
+        if (evt.CalendarId != null && CalendarLookup.TryGetValue(evt.CalendarId, out var calendar))
+        {
+            return calendar.Color;
+        }
+        return "#4285f4";
+    }
+
+}
