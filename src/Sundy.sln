@@ -41,6 +41,15 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sundy.Formats.iCalendar.Tes
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sundy", "Sundy.Tauri\Sundy\src\Sundy.csproj", "{4A6D58E7-BF65-49B2-831E-26F9B0B001C9}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tauri", "tauri", "{099A5FC0-49EF-4842-9C72-853A4C3A5689}"
+	ProjectSection(SolutionItems) = preProject
+		Sundy.Tauri\Sundy\src-tauri\tauri.conf.json = Sundy.Tauri\Sundy\src-tauri\tauri.conf.json
+		Sundy.Tauri\Sundy\src-tauri\build.rs = Sundy.Tauri\Sundy\src-tauri\build.rs
+		Sundy.Tauri\Sundy\src-tauri\Cargo.toml = Sundy.Tauri\Sundy\src-tauri\Cargo.toml
+		Sundy.Tauri\Sundy\src-tauri\tauri.macos.conf.json = Sundy.Tauri\Sundy\src-tauri\tauri.macos.conf.json
+		Sundy.Tauri\Sundy\dev.sh = Sundy.Tauri\Sundy\dev.sh
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

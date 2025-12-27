@@ -2,7 +2,7 @@ using System.Data;
 using Mediator;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using Microsoft.Data.Sqlite;
+using SqliteWasmBlazor;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Sundy;
@@ -17,10 +17,8 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
-// Register in-memory SQLite connection (must stay open for lifetime of app)
-var connectionString = "Data Source=SundyInMemory;Mode=Memory;Cache=Shared";
-var connection = new SqliteConnection(connectionString);
-connection.Open();
+// Register OPFS-backed SQLite connection for persistent storage
+var connection = new SqliteWasmConnection("Data Source=Sundy.db");
 builder.Services.AddSingleton<IDbConnection>(connection);
 
 // Register database manager and Dapper-based stores
@@ -42,6 +40,9 @@ builder.Services.AddMediator(options =>
 });
 
 var host = builder.Build();
+
+// Open the OPFS-backed connection (must be done before any DB operations)
+await connection.OpenAsync();
 
 // Initialize database schema
 var mediator = host.Services.GetRequiredService<IMediator>();

@@ -156,17 +156,39 @@ button {
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
-  transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-              transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  margin-left: -280px; /* Hidden by default */
+  margin-left: -280px;
 }
 
 .calendar-sidebar.open {
-  margin-left: 0; /* Visible when open */
+  margin-left: 0;
+}
+
+.sidebar-toggle-row {
+  display: none;
+  justify-content: flex-end;
+  padding: 12px 16px 0;
+}
+
+.sidebar-toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background-color: #2a2a2a;
+  border: none;
+  border-radius: 50%;
+  color: #e0e0e0;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.sidebar-toggle-btn:hover {
+  background-color: #3a3a3a;
 }
 
 .sidebar-header {
-  padding: 16px 20px;
+  padding: 12px 20px 16px;
   border-bottom: 1px solid #333;
   display: flex;
   align-items: center;
@@ -180,29 +202,8 @@ button {
   color: #f6f6f6;
 }
 
-.sidebar-close-btn {
-  display: flex;
-  width: 32px;
-  height: 32px;
-  align-items: center;
-  justify-content: center;
-  background: transparent;
-  border: none;
-  border-radius: 6px;
-  color: #a0a0a0;
-  cursor: pointer;
-  padding: 0;
-  box-shadow: none;
-  transition: background-color 0.15s, color 0.15s;
-}
-
-.sidebar-close-btn:hover {
-  background-color: #2a2a2a;
-  color: #f6f6f6;
-}
-
-/* Responsive Sidebar - Flyout overlay on small screens */
-@media (max-width: 900px) {
+/* Responsive Sidebar - Flyout overlay on mobile */
+@media (max-width: 640px) {
   .sidebar-overlay {
     display: block;
     position: fixed;
@@ -332,6 +333,51 @@ button {
   flex-shrink: 0;
   flex-wrap: nowrap;
   overflow: hidden;
+  position: relative;
+  -webkit-app-region: drag;
+  app-region: drag;
+}
+
+/* macOS traffic light spacing */
+.platform-macos .calendar-toolbar {
+  padding-left: 90px;
+}
+
+.platform-macos .sidebar-open .calendar-toolbar {
+  padding-left: 20px;
+}
+
+.platform-macos .sidebar-header {
+  padding-top: 68px;
+}
+
+/* Mobile: show sidebar toggle, hide toolbar menu when sidebar open */
+@media (max-width: 640px) {
+
+  .platform-macos .sidebar-toggle-row {
+    padding-top: 12px;
+    padding-left: 80px;
+  }
+
+  .platform-macos .sidebar-header {
+    padding-top: 12px;
+  }
+
+  .sidebar-toggle-row {
+    display: flex;
+  }
+
+  .sidebar-open .menu-btn {
+    display: none;
+  }
+}
+
+.drag-region {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  -webkit-app-region: drag;
+  app-region: drag;
 }
 
 .toolbar-left {
@@ -341,6 +387,9 @@ button {
   flex-wrap: nowrap;
   min-width: 0;
   overflow: hidden;
+  position: relative;
+  z-index: 1;
+  pointer-events: none;
 }
 
 .toolbar-right {
@@ -348,6 +397,22 @@ button {
   align-items: center;
   gap: 12px;
   flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Re-enable pointer events on interactive elements and exclude from drag */
+.toolbar-left button,
+.toolbar-left input,
+.toolbar-left select,
+.toolbar-right button,
+.toolbar-right input,
+.toolbar-right select,
+.view-toggle {
+  pointer-events: auto;
+  -webkit-app-region: no-drag;
+  app-region: no-drag;
 }
 
 .menu-btn,
@@ -359,7 +424,7 @@ button {
   height: 36px;
   background-color: #2a2a2a;
   border: none;
-  border-radius: 8px;
+  border-radius: 50%;
   color: #e0e0e0;
   cursor: pointer;
   transition: background-color 0.15s;
@@ -373,10 +438,13 @@ button {
 }
 
 .today-btn {
-  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  height: 36px;
+  padding: 0 16px;
   background-color: #2a2a2a;
   border: none;
-  border-radius: 8px;
+  border-radius: 20px;
   color: #e0e0e0;
   font-size: 14px;
   font-weight: 500;
@@ -399,24 +467,27 @@ button {
   overflow: hidden;
   text-overflow: ellipsis;
   min-width: 0;
+  pointer-events: none;
 }
 
 .view-toggle {
   display: flex;
+  align-items: center;
+  height: 36px;
   background-color: #2a2a2a;
-  border-radius: 8px;
+  border-radius: 20px;
   overflow: hidden;
   position: relative;
-  padding: 4px;
+  padding: 0 4px;
 }
 
 .view-slider {
   position: absolute;
   top: 4px;
-  left: 0;
-  height: calc(100% - 8px);
+  bottom: 4px;
+  left: 4px;
   background: linear-gradient(135deg, #7c3aed 0%, #9333ea 100%);
-  border-radius: 6px;
+  border-radius: 14px;
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
               width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 2px 8px rgba(124, 58, 237, 0.4);
@@ -450,7 +521,8 @@ button {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 16px;
+  height: 36px;
+  padding: 0 16px;
   background-color: #7c3aed;
   border: none;
   border-radius: 20px;

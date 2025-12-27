@@ -29,14 +29,16 @@ else
 
     <!-- Left Sidebar -->
     <aside class="calendar-sidebar @(SidebarOpen ? "open" : "")">
-        <div class="sidebar-header">
-            <h2>My Calendars</h2>
-            <button class="sidebar-close-btn" @onclick="CloseSidebar">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                    <line x1="6" y1="6" x2="18" y2="18"></line>
+        <div class="sidebar-toggle-row">
+            <button class="sidebar-toggle-btn" @onclick="ToggleSidebar">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="9" y1="3" x2="9" y2="21"></line>
                 </svg>
             </button>
+        </div>
+        <div class="sidebar-header">
+            <h2>My Calendars</h2>
         </div>
         <div class="calendar-list">
             @foreach (var cal in Calendars)
@@ -62,8 +64,10 @@ else
     <!-- Main Content -->
     <main class="calendar-main">
         <!-- Top Toolbar -->
-        <header class="calendar-toolbar">
-            <div class="toolbar-left">
+        <header class="calendar-toolbar" data-tauri-drag-region>
+            <div class="drag-region" data-tauri-drag-region></div>
+
+            <div class="toolbar-left" data-tauri-drag-region>
                 <button class="menu-btn" @onclick="ToggleSidebar">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="3" y1="6" x2="21" y2="6"></line>
@@ -84,7 +88,7 @@ else
                 </button>
                 <h1 class="current-month">@GetHeaderText()</h1>
             </div>
-            <div class="toolbar-right">
+            <div class="toolbar-right" data-tauri-drag-region>
                 <div class="view-toggle">
                     <div class="view-slider"></div>
                     <button class="view-btn @(CurrentView == CalendarView.Day ? "active" : "")" @onclick="() => SetView(CalendarView.Day)">Day</button>
@@ -316,7 +320,7 @@ else
     private string? ErrorMessage { get; set; }
 
     // Sidebar state
-    private bool SidebarOpen { get; set; } = true;
+    private bool SidebarOpen { get; set; } = false;
 
     // Modal state
     private bool ShowNewEventModal { get; set; }
@@ -505,6 +509,18 @@ else
         if (firstRender)
         {
             await UpdateViewSlider();
+            _dotNetRef ??= DotNetObjectReference.Create(this);
+            await JsRuntime.InvokeVoidAsync("sidebarWatcher.init", _dotNetRef);
+        }
+    }
+
+    [JSInvokable]
+    public void OnWindowBecameSmall()
+    {
+        if (SidebarOpen)
+        {
+            SidebarOpen = false;
+            StateHasChanged();
         }
     }
 
@@ -817,6 +833,7 @@ else
     {
         if (_dotNetRef != null)
         {
+            await JsRuntime.InvokeVoidAsync("sidebarWatcher.dispose");
             await JsRuntime.InvokeVoidAsync("schedulerDrag.dispose");
             _dotNetRef.Dispose();
             _dotNetRef = null;

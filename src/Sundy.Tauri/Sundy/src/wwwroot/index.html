@@ -9,6 +9,12 @@
   </head>
 
   <body>
+    <script>
+      // Detect macOS for traffic light spacing
+      if (navigator.platform.toUpperCase().indexOf('MAC') >= 0) {
+        document.body.classList.add('platform-macos');
+      }
+    </script>
     <div id="app"></div>
     <script src="_framework/blazor.webassembly.js"></script>
     <script src="js/scheduler.js"></script>

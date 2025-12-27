@@ -1,3 +1,28 @@
+// Responsive sidebar watcher
+window.sidebarWatcher = {
+    dotNetRef: null,
+    wasLarge: window.innerWidth > 640,
+
+    init: function(dotNetRef) {
+        this.dotNetRef = dotNetRef;
+        this.wasLarge = window.innerWidth > 640;
+        window.addEventListener('resize', this.handleResize.bind(this));
+    },
+
+    handleResize: function() {
+        const isLarge = window.innerWidth > 640;
+        if (this.wasLarge && !isLarge && this.dotNetRef) {
+            this.dotNetRef.invokeMethodAsync('OnWindowBecameSmall');
+        }
+        this.wasLarge = isLarge;
+    },
+
+    dispose: function() {
+        window.removeEventListener('resize', this.handleResize.bind(this));
+        this.dotNetRef = null;
+    }
+};
+
 // View toggle slider
 window.viewSlider = {
     update: function(activeIndex) {
