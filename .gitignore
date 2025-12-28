@@ -407,4 +407,4 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
-/src/Avalonia/Sundy.Browser/.env
+/ui/avalonia/Sundy.Browser/.env

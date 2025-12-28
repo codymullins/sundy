@@ -32,11 +32,11 @@ jobs:
         run: dotnet workload install wasm-tools
 
       - name: Restore dependencies
-        run: dotnet restore src/Avalonia/Sundy.Browser/Sundy.Browser.csproj
+        run: dotnet restore ui/avalonia/Sundy.Browser/Sundy.Browser.csproj
 
       - name: Build and Publish
         run: |
-          dotnet publish src/Avalonia/Sundy.Browser/Sundy.Browser.csproj \
+          dotnet publish ui/avalonia/Sundy.Browser/Sundy.Browser.csproj \
             -c Release \
             -o ./publish/browser
 
