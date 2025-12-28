@@ -1,0 +1,63 @@
+name: Tauri CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/Sundy.Tauri/**'
+      - 'src/Sundy.Core/**'
+      - '.github/workflows/tauri-ci.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'src/Sundy.Tauri/**'
+      - 'src/Sundy.Core/**'
+      - '.github/workflows/tauri-ci.yml'
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup Rust
+        uses: dtolnay/rust-action@stable
+
+      - name: Install Linux dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+
+      - name: Install Tauri CLI
+        run: cargo install tauri-cli
+
+      - name: Restore .NET dependencies
+        working-directory: src/Sundy.Tauri/Sundy
+        run: dotnet restore src/Sundy.csproj
+
+      - name: Build Blazor project
+        working-directory: src/Sundy.Tauri/Sundy
+        run: dotnet build src/Sundy.csproj -c Release --no-restore
+
+      - name: Publish Blazor project
+        working-directory: src/Sundy.Tauri/Sundy
+        run: dotnet publish src/Sundy.csproj -c Release -o dist
+
+      - name: Build Tauri app
+        working-directory: src/Sundy.Tauri/Sundy/src-tauri
+        run: cargo build --release

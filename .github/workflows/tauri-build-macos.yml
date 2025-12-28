@@ -1,0 +1,74 @@
+name: Build macOS
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/Sundy.Tauri/**'
+      - 'src/Sundy.Core/**'
+      - '.github/workflows/tauri-build-macos.yml'
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    strategy:
+      matrix:
+        include:
+          - target: aarch64-apple-darwin
+            arch: arm64
+          - target: x86_64-apple-darwin
+            arch: x64
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup Rust
+        uses: dtolnay/rust-action@stable
+
+      - name: Add Rust target
+        run: rustup target add ${{ matrix.target }}
+
+      - name: Install Tauri CLI
+        run: cargo install tauri-cli
+
+      - name: Restore .NET dependencies
+        working-directory: src/Sundy.Tauri/Sundy
+        run: dotnet restore src/Sundy.csproj
+
+      - name: Publish Blazor project
+        working-directory: src/Sundy.Tauri/Sundy
+        run: dotnet publish src/Sundy.csproj -c Release -o dist
+
+      - name: Build Tauri app
+        working-directory: src/Sundy.Tauri/Sundy
+        run: cargo tauri build --target ${{ matrix.target }}
+
+      - name: Upload DMG artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-dmg-${{ matrix.arch }}
+          path: src/Sundy.Tauri/Sundy/src-tauri/target/${{ matrix.target }}/release/bundle/dmg/*.dmg
+          retention-days: 14
+
+      - name: Upload app bundle artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-app-${{ matrix.arch }}
+          path: src/Sundy.Tauri/Sundy/src-tauri/target/${{ matrix.target }}/release/bundle/macos/*.app
+          retention-days: 14
