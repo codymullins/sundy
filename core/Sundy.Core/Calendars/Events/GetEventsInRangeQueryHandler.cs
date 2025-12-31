@@ -5,10 +5,15 @@ using Sundy.Core.Queries;
 
 namespace Sundy.Core.Handlers;
 
+/// <summary>
+/// Handler for getting events in a date range.
+/// Supports multiple Microsoft accounts via IMicrosoftAccountManager.
+/// </summary>
 public class GetEventsInRangeQueryHandler(
     IEventStore repository,
     OutlookCalendarProvider outlookProvider,
-    ICalendarStore calendarStore)
+    ICalendarStore calendarStore,
+    IMicrosoftAccountManager accountManager)
     : IRequestHandler<GetEventsInRangeQuery, List<CalendarEvent>>
 {
     public async ValueTask<List<CalendarEvent>> Handle(GetEventsInRangeQuery request,
@@ -22,97 +27,64 @@ public class GetEventsInRangeQueryHandler(
             request.VisibleCalendarIds,
             cancellationToken);
 
-        // Get Outlook events if connected
         var allEvents = new List<CalendarEvent>(localEvents);
 
-        if (outlookProvider.IsConnected)
+        // Get all Microsoft calendars we have registered
+        var calendars = await calendarStore.GetAllAsync(cancellationToken);
+        var outlookCalendars = calendars.Where(c => c.Type == CalendarType.Microsoft).ToList();
+
+        foreach (var calendar in outlookCalendars)
         {
+            // Check if this calendar should be included
+            if (request.CalendarId != null && calendar.Id != request.CalendarId)
+            {
+                continue;
+            }
+
+            if (request.VisibleCalendarIds != null && !request.VisibleCalendarIds.Contains(calendar.Id))
+            {
+                continue;
+            }
+
+            // Need ExternalAccountId to fetch from the right account
+            if (string.IsNullOrEmpty(calendar.ExternalAccountId))
+            {
+                continue;
+            }
+
+            // Check if the account is still authenticated
+            if (!accountManager.IsAccountAuthenticated(calendar.ExternalAccountId))
+            {
+                continue;
+            }
+
             try
             {
-                // Get all Outlook calendars we have registered
-                var calendars = await calendarStore.GetAllAsync(cancellationToken);
-                var outlookCalendars = calendars.Where(c => c.Type == CalendarType.Microsoft).ToList();
+                // Extract the actual Outlook calendar ID from our ID format
+                var graphCalendarId = calendar.Id.Replace("outlook_", "");
 
-                // If connected but no calendars synced yet, sync them now
-                if (outlookCalendars.Count == 0)
+                var outlookEvents = await outlookProvider.GetEventsAsync(
+                    calendar.ExternalAccountId,
+                    graphCalendarId,
+                    request.StartTime,
+                    request.EndTime,
+                    cancellationToken);
+
+                // Update CalendarId to use our internal ID format
+                foreach (var evt in outlookEvents)
                 {
-                    outlookCalendars = await SyncOutlookCalendarsAsync(cancellationToken);
+                    evt.CalendarId = calendar.Id;
                 }
 
-                foreach (var calendar in outlookCalendars)
-                {
-                    // Check if this calendar should be included
-                    if (request.CalendarId != null && calendar.Id != request.CalendarId)
-                    {
-                        continue;
-                    }
-
-                    if (request.VisibleCalendarIds != null && !request.VisibleCalendarIds.Contains(calendar.Id))
-                    {
-                        continue;
-                    }
-
-                    // Extract the actual Outlook calendar ID from our ID format
-                    var outlookCalendarId = calendar.Id.Replace("outlook_", "");
-
-                    var outlookEvents = await outlookProvider.GetEventsAsync(
-                        outlookCalendarId,
-                        request.StartTime,
-                        request.EndTime,
-                        cancellationToken);
-
-                    // Update CalendarId to use our internal ID format
-                    foreach (var evt in outlookEvents)
-                    {
-                        evt.CalendarId = calendar.Id;
-                    }
-
-                    allEvents.AddRange(outlookEvents);
-                }
+                allEvents.AddRange(outlookEvents);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                // Log but don't fail if Outlook fetch fails
-                //Log.Warning(ex, "Failed to fetch Outlook events, showing local events only");
+                // Log but don't fail if fetching events for one calendar fails
+                // Continue with other calendars
             }
         }
 
         return allEvents;
-    }
-
-    /// <summary>
-    /// Syncs Outlook calendars to the local store when connected but calendars don't exist yet.
-    /// </summary>
-    private async Task<List<Calendar>> SyncOutlookCalendarsAsync(CancellationToken cancellationToken)
-    {
-        var syncedCalendars = new List<Calendar>();
-
-        try
-        {
-            var outlookCalendarInfos = await outlookProvider.GetCalendarsAsync(cancellationToken);
-
-            foreach (var outlookCal in outlookCalendarInfos)
-            {
-                var calendar = new Calendar
-                {
-                    Id = $"outlook_{outlookCal.Id}",
-                    Name = $"{outlookCal.Name} (Outlook)",
-                    Color = outlookCal.Color,
-                    Type = CalendarType.Microsoft,
-                    EnableBlocking = true,
-                    ReceiveBlocks = false
-                };
-
-                await calendarStore.AddAsync(calendar, cancellationToken);
-                syncedCalendars.Add(calendar);
-                // Log.Information("Auto-synced Outlook calendar: {CalendarName}", calendar.Name);
-            }
-        }
-        catch (Exception ex)
-        {
-            // Log.Warning(ex, "Failed to auto-sync Outlook calendars");
-        }
-
-        return syncedCalendars;
     }
 }

@@ -1,5 +1,6 @@
 @using Sundy.Core
 @using Sundy.Models
+@inject IJSRuntime JsRuntime
 
 <div class="week-view">
     <div class="week-scroll-container">
@@ -38,14 +39,21 @@
                         <!-- Events for this day -->
                         @foreach (var evt in GetEventsForDay(day))
                         {
-                            <div class="week-event"
-                                 style="top: @GetEventTop(evt)px; height: @GetEventHeight(evt)px; background-color: @GetEventColor(evt);">
-                                <div class="week-event-title">@evt.Title</div>
+                            <div class="week-event @(IsPastEvent(evt) ? "past" : "")"
+                                 style="top: @GetEventTop(evt)px; height: @GetEventHeight(evt)px; background-color: @GetEventColor(evt);"
+                                 @onclick="() => OnEventClick.InvokeAsync(evt)"
+                                 @onclick:stopPropagation="true">
+                                <div class="week-event-title">@GetDisplayTitle(evt.Title)</div>
                                 <div class="week-event-time">@FormatEventTime(evt)</div>
                             </div>
                         }
                     </div>
                 }
+                <!-- Current time indicator spanning all columns -->
+                <CurrentTimeIndicator CurrentTime="CurrentTime"
+                                      IsVisible="@IsCurrentWeek()"
+                                      ShowLabel="true"
+                                      CssClass="week-indicator" />
             </div>
         </div>
     </div>
@@ -57,6 +65,11 @@
     [Parameter] public List<CalendarDisplayInfo> Calendars { get; set; } = new();
     [Parameter] public Dictionary<string, Calendar> CalendarLookup { get; set; } = new();
     [Parameter] public EventCallback<DateTime> OnDayClick { get; set; }
+    [Parameter] public EventCallback<CalendarEvent> OnEventClick { get; set; }
+    [Parameter] public bool HideEventTitles { get; set; }
+
+    [CascadingParameter(Name = "CurrentTime")]
+    public DateTime CurrentTime { get; set; }
 
     private void OnDayClicked(DateTime day)
     {
@@ -66,6 +79,16 @@
     private bool IsToday(DateTime date)
     {
         return date.Date == DateTime.Today;
+    }
+
+    private bool IsPastEvent(CalendarEvent evt)
+    {
+        return evt.EndTime.LocalDateTime < CurrentTime;
+    }
+
+    private bool IsCurrentWeek()
+    {
+        return GetCurrentWeekDays().Any(d => d.Date == DateTime.Today);
     }
 
     private List<DateTime> GetCurrentWeekDays()
@@ -123,6 +146,26 @@
         if (hour == 12) return "12 PM";
         if (hour < 12) return $"{hour} AM";
         return $"{hour - 12} PM";
+    }
+
+    private string GetDisplayTitle(string? title)
+    {
+        if (HideEventTitles)
+        {
+            return "Private Event";
+        }
+        return title ?? "(No title)";
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // Scroll to current time position
+            var now = DateTime.Now;
+            var topPosition = now.Hour * 48 + (now.Minute / 60.0) * 48;
+            await JsRuntime.InvokeVoidAsync("calendarScroll.scrollToCurrentTime", ".week-scroll-container", topPosition);
+        }
     }
 
 }

@@ -482,3 +482,11 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
+
+# Playwright test artifacts
+playwright-report/
+test-results/
+playwright/.cache/
+
+# npm package lock (optional - remove if you want to track it)
+package-lock.json

@@ -1,13 +1,19 @@
 @page "/"
 @inject IJSRuntime JsRuntime
 @inject IMediator Mediator
+@inject ISyncStateManager SyncStateManager
+@inject ISettingsService SettingsService
 @implements IAsyncDisposable
 @using Mediator
 @using Sundy.Core
 @using Sundy.Core.Commands
 @using Sundy.Core.Queries
+@using Sundy.Core.Calendars.Outlook
+@using Sundy.Core.Calendars.Sync
+@using Sundy.Core.Settings
 @using Sundy.Models
 @using Sundy.Components
+@using Sundy.Services
 
 @if (IsLoading)
 {
@@ -23,12 +29,15 @@ else if (ErrorMessage != null)
 }
 else
 {
+<DemoModeBanner @ref="_demoBanner" OnDismissed="OnDemoBannerDismissed" />
+<div class="page-wrapper @(_showDemoBanner ? "has-demo-banner" : "")" @onclick="HideContextMenu">
 <div class="calendar-app @(SidebarOpen ? "sidebar-open" : "")">
     <!-- Sidebar Overlay -->
     <div class="sidebar-overlay @(SidebarOpen ? "visible" : "")" @onclick="CloseSidebar"></div>
 
     <!-- Left Sidebar -->
     <aside class="calendar-sidebar @(SidebarOpen ? "open" : "")">
+        <div class="sidebar-drag-region" data-tauri-drag-region></div>
         <div class="sidebar-toggle-row">
             <button class="sidebar-toggle-btn" @onclick="ToggleSidebar">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -41,15 +50,82 @@ else
             <h2>My Calendars</h2>
         </div>
         <div class="calendar-list">
-            @foreach (var cal in Calendars)
+            @foreach (var group in CalendarGroups)
             {
-                <label class="calendar-item">
-                    <input type="checkbox" @bind="cal.IsVisible" />
-                    <span class="calendar-color" style="background-color: @cal.Color"></span>
-                    <span class="calendar-name">@cal.Name</span>
-                </label>
+                <div class="calendar-group">
+                    <div class="group-header" @onclick="() => ToggleGroup(group.Key)">
+                        <span class="collapse-icon">@(group.IsExpanded ? "▼" : "►")</span>
+                        <span class="group-name">@group.DisplayName</span>
+                        <span class="group-count">(@group.Calendars.Count)</span>
+                    </div>
+                    @if (group.IsExpanded)
+                    {
+                        @foreach (var cal in group.Calendars.Where(c => !c.IsHidden || ShowHiddenCalendars))
+                        {
+                            <div class="calendar-item-wrapper"
+                                 @oncontextmenu="(e) => ShowCalendarContextMenu(e, cal)"
+                                 @oncontextmenu:preventDefault="true">
+                                <div class="calendar-item @(cal.IsHidden ? "hidden-calendar" : "")"
+                                     @onclick="(e) => OnCalendarItemClick(e, cal)">
+                                    <input type="checkbox" @bind="cal.IsVisible" @onclick:stopPropagation="true" />
+                                    <span class="calendar-color" style="background-color: @cal.Color"></span>
+                                    <span class="calendar-name" title="@cal.OriginalName">@cal.EffectiveName</span>
+                                    @if (!string.IsNullOrEmpty(cal.AccountId))
+                                    {
+                                        <SyncStatusIndicator CalendarId="@cal.Id" />
+                                    }
+                                </div>
+                            </div>
+                        }
+                    }
+                </div>
+            }
+            @if (HiddenCalendarCount > 0)
+            {
+                <button class="show-hidden-btn" @onclick="() => ShowHiddenCalendars = !ShowHiddenCalendars">
+                    @(ShowHiddenCalendars ? "Hide system calendars" : $"Show hidden calendars ({HiddenCalendarCount})")
+                </button>
             }
         </div>
+
+        @* Calendar Context Menu *@
+        @if (ContextMenuVisible && ContextMenuCalendar != null)
+        {
+            <div class="calendar-context-menu"
+                 style="top: @(ContextMenuY)px; left: @(ContextMenuX)px;"
+                 @onclick:stopPropagation="true">
+                <button class="context-menu-item" @onclick="RenameContextMenuCalendar">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                    </svg>
+                    <span>Rename</span>
+                </button>
+            </div>
+        }
+
+        @* Rename Calendar Modal *@
+        @if (ShowRenameCalendarModal && RenamingCalendar != null)
+        {
+            <div class="rename-calendar-modal-overlay" @onclick="CloseRenameModal">
+                <div class="rename-calendar-modal" @onclick:stopPropagation="true">
+                    <h4>Rename Calendar</h4>
+                    @if (RenamingCalendar.OriginalName != null)
+                    {
+                        <p class="original-name-hint">Original: @RenamingCalendar.OriginalName</p>
+                    }
+                    <div class="form-row">
+                        <span class="calendar-color-dot" style="background-color: @RenamingCalendar.Color"></span>
+                        <input type="text" class="form-input" @bind="RenameCalendarName" placeholder="Calendar name" />
+                    </div>
+                    <div class="form-actions">
+                        <button class="btn-cancel" @onclick="CloseRenameModal">Cancel</button>
+                        <button class="btn-create" @onclick="SaveCalendarRename">Save</button>
+                    </div>
+                </div>
+            </div>
+        }
+
         <div class="sidebar-footer">
             <button class="settings-btn" @onclick="OpenSettings">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -94,6 +170,10 @@ else
                     <button class="view-btn @(CurrentView == CalendarView.Day ? "active" : "")" @onclick="() => SetView(CalendarView.Day)">Day</button>
                     <button class="view-btn @(CurrentView == CalendarView.Week ? "active" : "")" @onclick="() => SetView(CalendarView.Week)">Week</button>
                     <button class="view-btn @(CurrentView == CalendarView.Month ? "active" : "")" @onclick="() => SetView(CalendarView.Month)">Month</button>
+                    @if (_dynamicViewEnabled)
+                    {
+                        <button class="view-btn @(CurrentView == CalendarView.Dynamic ? "active" : "")" @onclick="() => SetView(CalendarView.Dynamic)">Dynamic</button>
+                    }
                 </div>
                 <div class="view-dropdown-mobile">
                     <button class="view-dropdown-btn" @onclick="ToggleViewDropdown">
@@ -115,6 +195,12 @@ else
                                     <path d="m19,4h-2v-2h-2v2h-6v-2h-2v2h-2c-1.1,0-2,.9-2,2v14c0,1.1.9,2,2,2h14c1.1,0,2-.9,2-2V6c0-1.1-.9-2-2-2ZM5,20v-12h14v-2,14s-14,0-14,0Z"></path>
                                     <path d="M7 11H9V13H7z"></path><path d="M11 11H13V13H11z"></path><path d="M15 11H17V13H15z"></path>
                                     <path d="M7 15H9V17H7z"></path><path d="M11 15H13V17H11z"></path><path d="M15 15H17V17H15z"></path>
+                                </svg>
+                                break;
+                            case CalendarView.Dynamic:
+                                <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="m19,4h-2v-2h-2v2h-6v-2h-2v2h-2c-1.1,0-2,.9-2,2v14c0,1.1.9,2,2,2h14c1.1,0,2-.9,2-2V6c0-1.1-.9-2-2-2ZM5,20v-12h14v-2,14s-14,0-14,0Z"></path>
+                                    <path d="M7 10H17V12H7z"></path><path d="M7 13H17V15H7z"></path><path d="M7 16H17V18H7z"></path>
                                 </svg>
                                 break;
                         }
@@ -143,6 +229,16 @@ else
                                 </svg>
                                 Month
                             </button>
+                            @if (_dynamicViewEnabled)
+                            {
+                                <button class="view-dropdown-item @(CurrentView == CalendarView.Dynamic ? "active" : "")" @onclick="() => SelectView(CalendarView.Dynamic)">
+                                    <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="m19,4h-2v-2h-2v2h-6v-2h-2v2h-2c-1.1,0-2,.9-2,2v14c0,1.1.9,2,2,2h14c1.1,0,2-.9,2-2V6c0-1.1-.9-2-2-2ZM5,20v-12h14v-2,14s-14,0-14,0Z"></path>
+                                        <path d="M7 10H17V12H7z"></path><path d="M7 13H17V15H7z"></path><path d="M7 16H17V18H7z"></path>
+                                    </svg>
+                                    Dynamic
+                                </button>
+                            }
                         </div>
                     }
                 </div>
@@ -158,43 +254,70 @@ else
         </header>
 
         <!-- Calendar Views -->
-        @switch (CurrentView)
-        {
-            case CalendarView.Month:
-                <MonthView CurrentDate="CurrentDate"
-                           Events="Events"
-                           Calendars="Calendars"
-                           CalendarLookup="CalendarLookup"
-                           OnDayClick="OnDayClick" />
-                break;
-            case CalendarView.Week:
-                <WeekView CurrentDate="CurrentDate"
-                          Events="Events"
-                          Calendars="Calendars"
-                          CalendarLookup="CalendarLookup"
-                          OnDayClick="OnDayClick" />
-                break;
-            case CalendarView.Day:
-                <DayView CurrentDate="CurrentDate"
-                         Events="Events"
-                         Calendars="Calendars"
-                         CalendarLookup="CalendarLookup"
-                         OnDayClick="OnDayClick" />
-                break;
-            default:
-                throw new ArgumentOutOfRangeException();
-        }
+        <CascadingValue Value="_currentTime" Name="CurrentTime">
+        <CascadingValue Value="_collapsePastEvents" Name="CollapsePastEvents">
+            @switch (CurrentView)
+            {
+                case CalendarView.Month:
+                    <MonthView CurrentDate="CurrentDate"
+                               Events="Events"
+                               Calendars="Calendars"
+                               CalendarLookup="CalendarLookup"
+                               HideEventTitles="_privacyMode && _privacyHideEventTitles"
+                               OnDayClick="OnDayClick"
+                               OnEventClick="OnEventClick" />
+                    break;
+                case CalendarView.Week:
+                    <WeekView CurrentDate="CurrentDate"
+                              Events="Events"
+                              Calendars="Calendars"
+                              CalendarLookup="CalendarLookup"
+                              HideEventTitles="_privacyMode && _privacyHideEventTitles"
+                              OnDayClick="OnDayClick"
+                              OnEventClick="OnEventClick" />
+                    break;
+                case CalendarView.Day:
+                    <DayView CurrentDate="CurrentDate"
+                             Events="Events"
+                             Calendars="Calendars"
+                             CalendarLookup="CalendarLookup"
+                             HideEventTitles="_privacyMode && _privacyHideEventTitles"
+                             OnDayClick="OnDayClick"
+                             OnEventClick="OnEventClick" />
+                    break;
+                case CalendarView.Dynamic:
+                    <DynamicMonthView CurrentDate="CurrentDate"
+                                      Events="Events"
+                                      Calendars="Calendars"
+                                      CalendarLookup="CalendarLookup"
+                                      HideEventTitles="_privacyMode && _privacyHideEventTitles"
+                                      OnDayClick="OnDayClick"
+                                      OnEventClick="OnEventClick"
+                                      OnLoadMoreEvents="OnLoadMoreDynamicEvents" />
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        </CascadingValue>
+        </CascadingValue>
     </main>
+</div>
+
+<!-- Status Bar -->
+<StatusBar />
+
+<!-- Toast Notifications -->
+<ToastContainer />
 </div>
 }
 
-<!-- New Event Modal -->
+<!-- New/Edit Event Modal -->
 @if (ShowNewEventModal)
 {
     <div class="modal-overlay" @onclick="CloseNewEventModal">
         <div class="modal new-event-modal" @onclick:stopPropagation="true">
             <div class="modal-header">
-                <h2>New Event</h2>
+                <h2>@(IsEditMode ? "Edit Event" : "New Event")</h2>
                 <div class="calendar-selector" @onclick="ToggleCalendarDropdown">
                     <span class="calendar-color-indicator" style="background-color: @GetSelectedCalendarColor()"></span>
                     <span>@GetSelectedCalendarName()</span>
@@ -269,7 +392,7 @@ else
 
             <div class="modal-footer">
                 <button class="btn-cancel" @onclick="CloseNewEventModal">Cancel</button>
-                <button class="btn-create" @onclick="CreateEvent">Create</button>
+                <button class="btn-create" @onclick="SaveEvent">@(IsEditMode ? "Save" : "Create")</button>
             </div>
         </div>
     </div>
@@ -363,8 +486,13 @@ else
     private DateTime CurrentDate { get; set; } = DateTime.Today;
     private CalendarView CurrentView { get; set; } = CalendarView.Month;
     private List<CalendarDisplayInfo> Calendars { get; set; } = new();
+    private List<CalendarGroup> CalendarGroups { get; set; } = new();
     private Dictionary<string, Sundy.Core.Calendar> CalendarLookup { get; set; } = new();
     private List<Sundy.Core.CalendarEvent> Events { get; set; } = new();
+
+    // Current time for time indicator
+    private DateTime _currentTime = DateTime.Now;
+    private System.Threading.Timer? _timeUpdateTimer;
 
     // Loading state
     private bool IsLoading { get; set; } = true;
@@ -372,6 +500,34 @@ else
 
     // Sidebar state
     private bool SidebarOpen { get; set; } = false;
+    private bool ShowHiddenCalendars { get; set; } = false;
+    private int HiddenCalendarCount => Calendars.Count(c => c.IsHidden);
+
+    // Context menu state
+    private bool ContextMenuVisible { get; set; }
+    private CalendarDisplayInfo? ContextMenuCalendar { get; set; }
+    private double ContextMenuX { get; set; }
+    private double ContextMenuY { get; set; }
+
+    // Rename calendar modal state
+    private bool ShowRenameCalendarModal { get; set; }
+    private CalendarDisplayInfo? RenamingCalendar { get; set; }
+    private string RenameCalendarName { get; set; } = "";
+
+    // Privacy mode
+    private bool _privacyMode;
+    private bool _privacyHideEmails;
+    private bool _privacyHideEventTitles;
+
+    // Collapse past events in month view
+    private bool _collapsePastEvents;
+
+    // Feature flags
+    private bool _dynamicViewEnabled;
+
+    // Demo mode banner
+    private DemoModeBanner? _demoBanner;
+    private bool _showDemoBanner;
 
     // Modal state
     private bool ShowNewEventModal { get; set; }
@@ -380,6 +536,10 @@ else
     private bool ShowCalendarDropdown { get; set; }
     private bool ShowSettingsDialog { get; set; }
     private NewEventModel NewEvent { get; set; } = new();
+
+    // Edit mode state
+    private Sundy.Core.CalendarEvent? EditingEvent { get; set; }
+    private bool IsEditMode => EditingEvent != null;
 
     // JS Interop
     private DotNetObjectReference<Calendar>? _dotNetRef;
@@ -391,6 +551,29 @@ else
     {
         try
         {
+            // Subscribe to sync state changes to refresh UI when sync completes
+            SyncStateManager.OnStateChanged += OnSyncStateChanged;
+
+            // Load settings
+            _privacyMode = await SettingsService.GetPrivacyModeAsync();
+            _privacyHideEmails = await SettingsService.GetPrivacyHideEmailsAsync();
+            _privacyHideEventTitles = await SettingsService.GetPrivacyHideEventTitlesAsync();
+            _collapsePastEvents = await SettingsService.GetCollapsePastEventsAsync();
+            _dynamicViewEnabled = await SettingsService.GetDynamicViewEnabledAsync();
+
+            // Check if demo mode banner should be shown
+            var demoMode = await SettingsService.GetDemoModeAsync();
+            var demoBannerDismissed = await SettingsService.GetDemoBannerDismissedAsync();
+            _showDemoBanner = demoMode && !demoBannerDismissed;
+
+            // Start timer to update current time indicator every minute
+            _timeUpdateTimer = new System.Threading.Timer(
+                _ => InvokeAsync(() => { _currentTime = DateTime.Now; StateHasChanged(); }),
+                null,
+                TimeSpan.Zero,
+                TimeSpan.FromMinutes(1)
+            );
+
             await LoadCalendarsAsync();
             await LoadEventsAsync();
             IsLoading = false;
@@ -402,17 +585,101 @@ else
         }
     }
 
+    private async void OnSyncStateChanged()
+    {
+        // Refresh events when sync state changes (new events may have been added/updated/deleted)
+        try
+        {
+            await InvokeAsync(async () =>
+            {
+                await LoadCalendarsAsync();
+                await LoadEventsAsync();
+                StateHasChanged();
+            });
+        }
+        catch
+        {
+            // Ignore errors during refresh (component may be disposed)
+        }
+    }
+
     private async Task LoadCalendarsAsync()
     {
         var calendars = await Mediator.Send(new GetAllCalendarsQuery());
+        var accounts = await Mediator.Send(new GetConnectedAccountsQuery());
+        var accountLookup = accounts.ToDictionary(a => a.Id, a => a.Email);
+
         CalendarLookup = calendars.ToDictionary(c => c.Id);
-        Calendars = calendars.Select(c => new CalendarDisplayInfo
+        Calendars = calendars.Select(c =>
         {
-            Id = c.Id,
-            Name = c.Name,
-            Color = c.Color,
-            IsVisible = true
+            var baseName = c.ExternalAccountId != null && accountLookup.ContainsKey(c.ExternalAccountId)
+                ? c.Name.Replace($" ({accountLookup[c.ExternalAccountId]})", "") // Clean email suffix from name
+                : c.Name;
+            return new CalendarDisplayInfo
+            {
+                Id = c.Id,
+                Name = baseName,
+                DisplayName = c.DisplayName,
+                OriginalName = c.ExternalAccountId != null ? baseName : null,
+                Color = c.Color,
+                IsVisible = true,
+                IsHidden = c.IsHidden,
+                AccountId = c.ExternalAccountId,
+                AccountEmail = c.ExternalAccountId != null
+                    ? accountLookup.GetValueOrDefault(c.ExternalAccountId)
+                    : null
+            };
         }).ToList();
+
+        BuildCalendarGroups();
+    }
+
+    private void BuildCalendarGroups()
+    {
+        CalendarGroups = Calendars
+            .GroupBy(c => c.AccountId ?? "local")
+            .Select(g => new CalendarGroup
+            {
+                Key = g.Key,
+                DisplayName = g.Key == "local" ? "Local"
+                    : (_privacyMode && _privacyHideEmails ? MaskEmail(g.First().AccountEmail) : g.First().AccountEmail ?? g.Key),
+                IsExpanded = true,
+                Calendars = g.OrderBy(c => c.Name).ToList()
+            })
+            .OrderBy(g => g.Key == "local" ? 0 : 1)
+            .ThenBy(g => g.DisplayName)
+            .ToList();
+    }
+
+    private string MaskEmail(string? email)
+    {
+        if (string.IsNullOrEmpty(email)) return "***";
+        var parts = email.Split('@');
+        if (parts.Length != 2) return "***";
+
+        var local = parts[0].Length > 0 ? parts[0][0] + "***" : "***";
+        var domainParts = parts[1].Split('.');
+        var tld = domainParts.Length > 0 ? domainParts[^1] : "***";
+
+        return $"{local}@***.{tld}";
+    }
+
+    private string GetEventDisplayTitle(string? title)
+    {
+        if (_privacyMode && _privacyHideEventTitles)
+        {
+            return "Private Event";
+        }
+        return title ?? "(No title)";
+    }
+
+    private void ToggleGroup(string key)
+    {
+        var group = CalendarGroups.FirstOrDefault(g => g.Key == key);
+        if (group != null)
+        {
+            group.IsExpanded = !group.IsExpanded;
+        }
     }
 
     private async Task LoadEventsAsync()
@@ -421,6 +688,21 @@ else
         var (start, end) = GetCurrentViewRange();
         var visibleCalendarIds = Calendars.Where(c => c.IsVisible).Select(c => c.Id).ToList();
         Events = await Mediator.Send(new GetEventsInRangeQuery(start, end, VisibleCalendarIds: visibleCalendarIds));
+    }
+
+    private async Task OnLoadMoreDynamicEvents((DateTimeOffset start, DateTimeOffset end) range)
+    {
+        var visibleCalendarIds = Calendars.Where(c => c.IsVisible).Select(c => c.Id).ToList();
+        var newEvents = await Mediator.Send(new GetEventsInRangeQuery(
+            range.start,
+            range.end,
+            VisibleCalendarIds: visibleCalendarIds
+        ));
+
+        // Merge with existing events (avoiding duplicates)
+        var existingIds = Events.Select(e => e.Id).ToHashSet();
+        var uniqueNewEvents = newEvents.Where(e => !existingIds.Contains(e.Id));
+        Events.AddRange(uniqueNewEvents);
     }
 
     private (DateTimeOffset start, DateTimeOffset end) GetCurrentViewRange()
@@ -439,6 +721,10 @@ else
             CalendarView.Month => (
                 new DateTimeOffset(new DateTime(CurrentDate.Year, CurrentDate.Month, 1).AddDays(-7), now.Offset),
                 new DateTimeOffset(new DateTime(CurrentDate.Year, CurrentDate.Month, 1).AddMonths(1).AddDays(7), now.Offset)
+            ),
+            CalendarView.Dynamic => (
+                new DateTimeOffset(DateTime.Today.AddDays(-28), now.Offset),
+                new DateTimeOffset(DateTime.Today.AddDays(56), now.Offset)
             ),
             _ => (now.AddMonths(-1), now.AddMonths(1))
         };
@@ -471,6 +757,11 @@ else
         SidebarOpen = false;
     }
 
+    private void OnDemoBannerDismissed()
+    {
+        _showDemoBanner = false;
+    }
+
     private void OpenSettings()
     {
         ShowSettingsDialog = true;
@@ -483,8 +774,84 @@ else
 
     private async Task OnSettingsChanged()
     {
+        // Reload settings in case they changed
+        _privacyMode = await SettingsService.GetPrivacyModeAsync();
+        _privacyHideEmails = await SettingsService.GetPrivacyHideEmailsAsync();
+        _privacyHideEventTitles = await SettingsService.GetPrivacyHideEventTitlesAsync();
+        _collapsePastEvents = await SettingsService.GetCollapsePastEventsAsync();
+        _dynamicViewEnabled = await SettingsService.GetDynamicViewEnabledAsync();
         await LoadCalendarsAsync();
         await LoadEventsAsync();
+        StateHasChanged();
+    }
+
+    // Context menu methods
+    private void ShowCalendarContextMenu(MouseEventArgs e, CalendarDisplayInfo calendar)
+    {
+        ContextMenuCalendar = calendar;
+        ContextMenuX = e.ClientX;
+        ContextMenuY = e.ClientY;
+        ContextMenuVisible = true;
+    }
+
+    private void OnCalendarItemClick(MouseEventArgs e, CalendarDisplayInfo cal)
+    {
+        // Only toggle on left-click (button 0), ignore right-click (button 2)
+        if (e.Button == 0)
+        {
+            cal.IsVisible = !cal.IsVisible;
+        }
+    }
+
+    private void HideContextMenu()
+    {
+        ContextMenuVisible = false;
+        ContextMenuCalendar = null;
+    }
+
+    private void RenameContextMenuCalendar()
+    {
+        if (ContextMenuCalendar != null)
+        {
+            RenamingCalendar = ContextMenuCalendar;
+            RenameCalendarName = ContextMenuCalendar.EffectiveName;
+            ShowRenameCalendarModal = true;
+        }
+        HideContextMenu();
+    }
+
+    private void CloseRenameModal()
+    {
+        ShowRenameCalendarModal = false;
+        RenamingCalendar = null;
+        RenameCalendarName = "";
+    }
+
+    private async Task SaveCalendarRename()
+    {
+        if (RenamingCalendar == null || string.IsNullOrWhiteSpace(RenameCalendarName))
+            return;
+
+        var calendars = await Mediator.Send(new GetAllCalendarsQuery());
+        var calendar = calendars.FirstOrDefault(c => c.Id == RenamingCalendar.Id);
+
+        if (calendar != null)
+        {
+            // For external calendars, set DisplayName; for local, update Name directly
+            if (calendar.ExternalAccountId != null)
+            {
+                calendar.DisplayName = RenameCalendarName.Trim();
+            }
+            else
+            {
+                calendar.Name = RenameCalendarName.Trim();
+            }
+
+            await Mediator.Send(new UpdateCalendarCommand(calendar));
+            await LoadCalendarsAsync();
+        }
+
+        CloseRenameModal();
     }
 
     private async Task NavigatePrevious()
@@ -518,6 +885,7 @@ else
             CalendarView.Day => CurrentDate.ToString("MMMM d, yyyy"),
             CalendarView.Week => GetWeekRangeText(),
             CalendarView.Month => CurrentDate.ToString("MMMM yyyy"),
+            CalendarView.Dynamic => "Dynamic View",
             _ => CurrentDate.ToString("MMMM yyyy")
         };
     }
@@ -562,6 +930,7 @@ else
             CalendarView.Day => 0,
             CalendarView.Week => 1,
             CalendarView.Month => 2,
+            CalendarView.Dynamic => 3,
             _ => 2
         };
         await JsRuntime.InvokeVoidAsync("viewSlider.update", index);
@@ -589,6 +958,7 @@ else
 
     private void OnDayClick(DateTime day)
     {
+        EditingEvent = null; // Clear edit mode
         var (startTime, endTime) = GetDefaultEventTime();
         NewEvent = new NewEventModel
         {
@@ -600,8 +970,24 @@ else
         ShowNewEventModal = true;
     }
 
+    private void OnEventClick(Sundy.Core.CalendarEvent evt)
+    {
+        EditingEvent = evt;
+        NewEvent = new NewEventModel
+        {
+            Title = evt.Title ?? "",
+            Date = evt.StartTime.LocalDateTime.Date,
+            StartTime = evt.StartTime.LocalDateTime.TimeOfDay,
+            EndTime = evt.EndTime.LocalDateTime.TimeOfDay,
+            Description = evt.Description ?? "",
+            CalendarId = evt.CalendarId ?? Calendars.FirstOrDefault()?.Id ?? ""
+        };
+        ShowNewEventModal = true;
+    }
+
     private void OpenNewEventModal()
     {
+        EditingEvent = null; // Clear edit mode
         var (startTime, endTime) = GetDefaultEventTime();
         NewEvent = new NewEventModel
         {
@@ -640,6 +1026,7 @@ else
     {
         ShowNewEventModal = false;
         ShowCalendarDropdown = false;
+        EditingEvent = null;
     }
 
     private void ToggleCalendarDropdown()
@@ -834,11 +1221,11 @@ else
         return $"{hours} hr {mins} min";
     }
 
-    private async Task CreateEvent()
+    private async Task SaveEvent()
     {
         if (string.IsNullOrWhiteSpace(NewEvent.Title))
         {
-            return; // Don't create event without title
+            return; // Don't save event without title
         }
 
         var now = DateTimeOffset.Now;
@@ -855,16 +1242,32 @@ else
             endDateTime = endDateTime.AddDays(1);
         }
 
-        var newEvent = new Sundy.Core.CalendarEvent
+        if (IsEditMode && EditingEvent != null)
         {
-            CalendarId = NewEvent.CalendarId,
-            Title = NewEvent.Title,
-            StartTime = startDateTime,
-            EndTime = endDateTime,
-            Description = NewEvent.Description
-        };
+            // Update existing event
+            EditingEvent.CalendarId = NewEvent.CalendarId;
+            EditingEvent.Title = NewEvent.Title;
+            EditingEvent.StartTime = startDateTime;
+            EditingEvent.EndTime = endDateTime;
+            EditingEvent.Description = NewEvent.Description;
 
-        await Mediator.Send(new CreateEventCommand(newEvent));
+            await Mediator.Send(new UpdateEventCommand(EditingEvent));
+        }
+        else
+        {
+            // Create new event
+            var newEvent = new Sundy.Core.CalendarEvent
+            {
+                CalendarId = NewEvent.CalendarId,
+                Title = NewEvent.Title,
+                StartTime = startDateTime,
+                EndTime = endDateTime,
+                Description = NewEvent.Description
+            };
+
+            await Mediator.Send(new CreateEventCommand(newEvent));
+        }
+
         await LoadEventsAsync();
         CloseNewEventModal();
     }
@@ -878,7 +1281,8 @@ else
     {
         Day,
         Week,
-        Month
+        Month,
+        Dynamic
     }
 
     public class NewEventModel
@@ -892,8 +1296,26 @@ else
         public string CalendarId { get; set; } = "";
     }
 
+    public class CalendarGroup
+    {
+        public string Key { get; set; } = "";
+        public string DisplayName { get; set; } = "";
+        public bool IsExpanded { get; set; } = true;
+        public List<CalendarDisplayInfo> Calendars { get; set; } = new();
+    }
+
     public async ValueTask DisposeAsync()
     {
+        // Unsubscribe from sync state changes
+        SyncStateManager.OnStateChanged -= OnSyncStateChanged;
+
+        // Dispose time update timer
+        if (_timeUpdateTimer != null)
+        {
+            await _timeUpdateTimer.DisposeAsync();
+            _timeUpdateTimer = null;
+        }
+
         if (_dotNetRef != null)
         {
             await JsRuntime.InvokeVoidAsync("sidebarWatcher.dispose");

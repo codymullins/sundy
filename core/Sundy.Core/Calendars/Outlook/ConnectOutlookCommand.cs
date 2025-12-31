@@ -11,8 +11,8 @@ public record ConnectOutlookCommand : ICommand<ConnectOutlookResult>;
 /// Result of connecting to Outlook.
 /// </summary>
 public record ConnectOutlookResult(
-    bool Success, 
-    string? UserDisplayName = null, 
+    bool Success,
+    ConnectedAccount? Account = null,
     string? ErrorMessage = null,
     List<OutlookCalendarInfo>? Calendars = null);
 

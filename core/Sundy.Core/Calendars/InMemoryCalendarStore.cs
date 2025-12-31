@@ -10,7 +10,7 @@ public interface ICalendarStore
     /// Alias for CreateCalendarAsync for convenience.
     /// </summary>
     Task AddAsync(Calendar calendar, CancellationToken ct = default);
-
+    Task UpdateCalendarAsync(Calendar calendar, CancellationToken ct = default);
     Task<Dictionary<string, Calendar>> GetCalendarLookupAsync(CancellationToken ct = default);
 }
 
@@ -40,6 +40,15 @@ public class InMemoryCalendarStore : ICalendarStore
     /// </summary>
     public Task AddAsync(Calendar calendar, CancellationToken ct = default)
         => CreateCalendarAsync(calendar, ct);
+
+    public Task UpdateCalendarAsync(Calendar calendar, CancellationToken ct = default)
+    {
+        if (_calendars.ContainsKey(calendar.Id))
+        {
+            _calendars[calendar.Id] = calendar;
+        }
+        return Task.CompletedTask;
+    }
 
     public Task<Dictionary<string, Calendar>> GetCalendarLookupAsync(CancellationToken ct = default)
     {

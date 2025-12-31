@@ -167,8 +167,8 @@ public class MicrosoftGraphAuthService(ILogger<MicrosoftGraphAuthService> log, O
                 result = await AcquireByDeviceCodeAsync(pca);
             }
 
-            // Create a custom TokenCredential that wraps the MSAL PublicClientApplication
-            var tokenCredential = new MsalTokenCredential(pca, scopes);
+            // Create a token credential using the acquired access token
+            var tokenCredential = new MsalAccessTokenCredential(pca, scopes, result.Account);
             _graphClient = new GraphServiceClient(tokenCredential, scopes);
 
             // Test the connection by getting the current user
@@ -276,5 +276,42 @@ public class MicrosoftGraphAuthService(ILogger<MicrosoftGraphAuthService> log, O
         _isAuthenticated = false;
         _userDisplayName = null;
         log.LogInformation("Signed out of Microsoft Graph");
+    }
+}
+
+/// <summary>
+/// TokenCredential that wraps MSAL PublicClientApplication for token acquisition.
+/// Used by the legacy MicrosoftGraphAuthService.
+/// </summary>
+internal class MsalAccessTokenCredential : TokenCredential
+{
+    private readonly IPublicClientApplication _pca;
+    private readonly string[] _scopes;
+    private readonly IAccount _account;
+
+    public MsalAccessTokenCredential(IPublicClientApplication pca, string[] scopes, IAccount account)
+    {
+        _pca = pca;
+        _scopes = scopes;
+        _account = account;
+    }
+
+    public override async ValueTask<AccessToken> GetTokenAsync(TokenRequestContext requestContext, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var result = await _pca.AcquireTokenSilent(_scopes, _account)
+                .ExecuteAsync(cancellationToken);
+            return new AccessToken(result.AccessToken, result.ExpiresOn);
+        }
+        catch (MsalUiRequiredException)
+        {
+            throw new InvalidOperationException("Token expired. Please re-authenticate.");
+        }
+    }
+
+    public override AccessToken GetToken(TokenRequestContext requestContext, CancellationToken cancellationToken)
+    {
+        return GetTokenAsync(requestContext, cancellationToken).AsTask().GetAwaiter().GetResult();
     }
 }

@@ -26,6 +26,7 @@
           <PrivateAssets>all</PrivateAssets>
         </PackageReference>
         <PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.1" />
+        <PackageReference Include="Microsoft.Identity.Client" Version="4.78.0" />
     </ItemGroup>
 
     <ItemGroup>

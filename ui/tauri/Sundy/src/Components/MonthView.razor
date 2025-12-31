@@ -21,21 +21,58 @@
             <div class="calendar-week @(isEmptyWeek ? "empty-week" : "")">
                 @foreach (var day in week)
                 {
-                    <div class="calendar-cell @(IsToday(day) ? "today" : "") @(day.Month != CurrentDate.Month ? "other-month" : "")"
-                         @onclick="() => OnDayClicked(day)">
+                    <div
+                        class="calendar-cell @(IsToday(day) ? "today" : "") @(day.Month != CurrentDate.Month ? "other-month" : "")"
+                        @onclick="() => OnDayClicked(day)">
                         <span class="day-number @(IsToday(day) ? "today-number" : "")">@day.Day</span>
+                        @if (IsToday(day))
+                        {
+                            <div class="current-time-indicator month-indicator" style="top: @GetMonthIndicatorTop();">
+                                <div class="current-time-dot"></div>
+                                <div class="current-time-line"></div>
+                            </div>
+                        }
                         <div class="cell-events">
-                            @foreach (var evt in GetEventsForDay(day).Take(3))
+                            @{
+                                var dayEvents = GetEventsForDay(day).ToList();
+                                var isPastDay = IsPastDay(day);
+                                var shouldCollapse = CollapsePastEvents && isPastDay && !IsDayExpanded(day);
+                            }
+
+                            @if (shouldCollapse && dayEvents.Count > 0)
                             {
-                                <div class="event-badge" style="background-color: @GetEventColor(evt)" title="@evt.Title">
-                                    @evt.Title
+                                <!-- Collapsed summary for past day -->
+                                <div class="past-events-summary" @onclick="() => ToggleDayExpanded(day)"
+                                     @onclick:stopPropagation="true">
+                                    @dayEvents.Count event@(dayEvents.Count != 1 ? "s" : "")
                                 </div>
                             }
-                            @{
-                                var remainingCount = GetEventsForDay(day).Count() - 3;
-                                if (remainingCount > 0)
+                            else
+                            {
+                                <!-- Normal event rendering -->
+                                @foreach (var evt in dayEvents.Take(3))
                                 {
-                                    <div class="more-events">+@remainingCount more</div>
+                                    <div class="event-badge @(IsPastEvent(evt) ? "past" : "")"
+                                         style="background-color: @GetEventColor(evt)"
+                                         title="@GetDisplayTitle(evt.Title)"
+                                         @onclick="() => OnEventClick.InvokeAsync(evt)"
+                                         @onclick:stopPropagation="true">
+                                        @GetDisplayTitle(evt.Title)
+                                    </div>
+                                }
+
+                                @if (dayEvents.Count > 3)
+                                {
+                                    <div class="more-events">+@(dayEvents.Count - 3) more</div>
+                                }
+
+                                @if (isPastDay && CollapsePastEvents && IsDayExpanded(day) && dayEvents.Count > 0)
+                                {
+                                    <!-- Collapse button when expanded -->
+                                    <div class="collapse-past-btn" @onclick="() => ToggleDayExpanded(day)"
+                                         @onclick:stopPropagation="true">
+                                        collapse
+                                    </div>
                                 }
                             }
                         </div>
@@ -52,6 +89,17 @@
     [Parameter] public List<CalendarDisplayInfo> Calendars { get; set; } = new();
     [Parameter] public Dictionary<string, Calendar> CalendarLookup { get; set; } = new();
     [Parameter] public EventCallback<DateTime> OnDayClick { get; set; }
+    [Parameter] public EventCallback<CalendarEvent> OnEventClick { get; set; }
+    [Parameter] public bool HideEventTitles { get; set; }
+
+    [CascadingParameter(Name = "CurrentTime")]
+    public DateTime CurrentTime { get; set; }
+
+    [CascadingParameter(Name = "CollapsePastEvents")]
+    public bool CollapsePastEvents { get; set; }
+
+    // Track which past days are expanded (by date string key)
+    private HashSet<string> _expandedPastDays = [];
 
     private static readonly string[] DayNames = { "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" };
 
@@ -63,6 +111,35 @@
     private bool IsToday(DateTime date)
     {
         return date.Date == DateTime.Today;
+    }
+
+    private bool IsPastEvent(CalendarEvent evt)
+    {
+        return evt.EndTime.LocalDateTime < CurrentTime;
+    }
+
+    private bool IsPastDay(DateTime day) => day.Date < DateTime.Today;
+
+    private bool IsDayExpanded(DateTime day) => _expandedPastDays.Contains(day.ToString("yyyy-MM-dd"));
+
+    private void ToggleDayExpanded(DateTime day)
+    {
+        var key = day.ToString("yyyy-MM-dd");
+        if (!_expandedPastDays.Add(key))
+        {
+            _expandedPastDays.Remove(key);
+        }
+    }
+
+    private string GetMonthIndicatorTop()
+    {
+        // Map current time to percentage of day (0-100%)
+        // Account for the day number header (~28px) and some padding
+        var minutesInDay = CurrentTime.Hour * 60 + CurrentTime.Minute;
+        var percentOfDay = minutesInDay / 1440.0; // 1440 = 24 * 60 minutes
+        // Cell has ~28px header for day number, then usable area
+        // Use calc() to position relative to cell height
+        return $"calc(28px + {(percentOfDay * 70).ToString("F1")}%)";
     }
 
     private List<List<DateTime>> GetCalendarWeeks()
@@ -80,6 +157,7 @@
                 weekDays.Add(currentDate);
                 currentDate = currentDate.AddDays(1);
             }
+
             weeks.Add(weekDays);
         }
 
@@ -101,7 +179,18 @@
         {
             return calendar.Color;
         }
+
         return "#4285f4";
+    }
+
+    private string GetDisplayTitle(string? title)
+    {
+        if (HideEventTitles)
+        {
+            return "Private Event";
+        }
+
+        return title ?? "(No title)";
     }
 
 }

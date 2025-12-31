@@ -1,0 +1,75 @@
+@using Sundy.Core.Calendars.Sync
+@inject ISyncStateManager SyncStateManager
+@implements IDisposable
+
+<span class="sync-indicator @GetStatusClass()" title="@GetTooltip()">
+    @switch (State.Status)
+    {
+        case SyncStatus.Syncing:
+            <svg class="sync-spinner" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 12a9 9 0 1 1-6.219-8.56"></path>
+            </svg>
+            break;
+        case SyncStatus.Success:
+            <svg class="sync-check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            break;
+        case SyncStatus.Error:
+            <svg class="sync-error" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            break;
+        case SyncStatus.Idle:
+        default:
+            // Show nothing for idle state (no indicator)
+            break;
+    }
+</span>
+
+@code {
+    [Parameter]
+    public string CalendarId { get; set; } = "";
+
+    private CalendarSyncState State => SyncStateManager.GetCalendarState(CalendarId);
+
+    protected override void OnInitialized()
+    {
+        SyncStateManager.OnStateChanged += HandleStateChanged;
+    }
+
+    private void HandleStateChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    private string GetStatusClass()
+    {
+        return State.Status switch
+        {
+            SyncStatus.Syncing => "syncing",
+            SyncStatus.Success => "success",
+            SyncStatus.Error => "error",
+            _ => "idle"
+        };
+    }
+
+    private string GetTooltip()
+    {
+        return State.Status switch
+        {
+            SyncStatus.Syncing => "Syncing...",
+            SyncStatus.Success when State.LastSyncTime.HasValue =>
+                $"Last synced: {State.LastSyncTime.Value.ToLocalTime():g}",
+            SyncStatus.Error => State.ErrorMessage ?? "Sync error",
+            _ => ""
+        };
+    }
+
+    public void Dispose()
+    {
+        SyncStateManager.OnStateChanged -= HandleStateChanged;
+    }
+}

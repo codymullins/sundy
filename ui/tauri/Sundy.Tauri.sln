@@ -3,10 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sundy", "Sundy", "{DF3EA27A-9D46-4446-8951-6F46E381844F}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{2A7AAE4C-CEE8-6C72-A47A-0C04CABEED55}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sundy", "Sundy\src\Sundy.csproj", "{143AFB0E-6A34-436B-864D-C5CEDE6F3E4B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sundy.Core", "..\..\core\Sundy.Core\Sundy.Core.csproj", "{B9718F28-BC89-4FE5-A2B2-ADD15BAF9A7F}"
@@ -50,7 +46,5 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{2A7AAE4C-CEE8-6C72-A47A-0C04CABEED55} = {DF3EA27A-9D46-4446-8951-6F46E381844F}
-		{143AFB0E-6A34-436B-864D-C5CEDE6F3E4B} = {2A7AAE4C-CEE8-6C72-A47A-0C04CABEED55}
 	EndGlobalSection
 EndGlobal

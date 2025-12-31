@@ -38,6 +38,18 @@ public class InMemoryEventStore : IEventStore
         return Task.FromResult(evt);
     }
 
+    public Task<CalendarEvent?> GetByExternalIdAsync(string calendarId, string externalId, CancellationToken ct = default)
+    {
+        var evt = _events.Values.FirstOrDefault(e => e.CalendarId == calendarId && e.ExternalId == externalId);
+        return Task.FromResult(evt);
+    }
+
+    public Task<List<CalendarEvent>> GetByCalendarIdAsync(string calendarId, CancellationToken ct = default)
+    {
+        var events = _events.Values.Where(e => e.CalendarId == calendarId).ToList();
+        return Task.FromResult(events);
+    }
+
     public Task<CalendarEvent> CreateEventAsync(CalendarEvent evt, CancellationToken ct = default)
     {
         if (string.IsNullOrEmpty(evt.Id))
@@ -70,6 +82,16 @@ public class InMemoryEventStore : IEventStore
     public Task DeleteEventAsync(string eventId, CancellationToken ct = default)
     {
         _events.TryRemove(eventId, out _);
+        return Task.CompletedTask;
+    }
+
+    public Task DeleteByCalendarIdAsync(string calendarId, CancellationToken ct = default)
+    {
+        var toRemove = _events.Values.Where(e => e.CalendarId == calendarId).Select(e => e.Id!).ToList();
+        foreach (var id in toRemove)
+        {
+            _events.TryRemove(id, out _);
+        }
         return Task.CompletedTask;
     }
 }

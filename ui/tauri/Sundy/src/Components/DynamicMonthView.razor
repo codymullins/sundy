@@ -1,0 +1,220 @@
+@using Sundy.Core
+@using Sundy.Models
+
+<div class="dynamic-month-view">
+    <!-- Day Headers (sticky) -->
+    <div class="dynamic-day-headers">
+        @foreach (var day in DayNames)
+        {
+            <div class="day-header">
+                <span class="day-full">@day</span>
+                <span class="day-short">@day[0]</span>
+            </div>
+        }
+    </div>
+
+    <!-- Month Grid -->
+    <div class="dynamic-weeks-container">
+        @foreach (var week in _visibleWeeks)
+        {
+            var isCurrentWeek = IsCurrentWeek(week.StartDate);
+
+            <div class="dynamic-week-row @(isCurrentWeek ? "current-week" : "")">
+                @foreach (var day in week.Days)
+                {
+                    var isCurrentMonth = day.Month == CurrentDate.Month;
+                    <div class="calendar-cell @GetDayCellClasses(day) @(isCurrentMonth ? "" : "other-month")"
+                         @onclick="() => OnDayClicked(day)">
+                        <span class="day-number @(IsToday(day) ? "today-number" : "")">@day.Day</span>
+                        @if (IsToday(day))
+                        {
+                            <div class="current-time-indicator month-indicator" style="top: @GetMonthIndicatorTop();">
+                                <div class="current-time-dot"></div>
+                                <div class="current-time-line"></div>
+                            </div>
+                        }
+                        <div class="cell-events">
+                            @{
+                                var dayEvents = GetEventsForDay(day).ToList();
+                                var isPastDay = IsPastDay(day);
+                                var shouldCollapse = CollapsePastEvents && isPastDay && !IsDayExpanded(day);
+                            }
+
+                            @if (shouldCollapse && dayEvents.Count > 0)
+                            {
+                                <div class="past-events-summary" @onclick="() => ToggleDayExpanded(day)" @onclick:stopPropagation="true">
+                                    @dayEvents.Count event@(dayEvents.Count != 1 ? "s" : "")
+                                </div>
+                            }
+                            else
+                            {
+                                @foreach (var evt in dayEvents.Take(3))
+                                {
+                                    <div class="event-badge @(IsPastEvent(evt) ? "past" : "")"
+                                         style="background-color: @GetEventColor(evt)"
+                                         title="@GetDisplayTitle(evt.Title)"
+                                         @onclick="() => OnEventClick.InvokeAsync(evt)"
+                                         @onclick:stopPropagation="true">
+                                        @GetDisplayTitle(evt.Title)
+                                    </div>
+                                }
+                                @if (dayEvents.Count > 3)
+                                {
+                                    <div class="more-events">+@(dayEvents.Count - 3) more</div>
+                                }
+
+                                @if (isPastDay && CollapsePastEvents && IsDayExpanded(day) && dayEvents.Count > 0)
+                                {
+                                    <div class="collapse-past-btn" @onclick="() => ToggleDayExpanded(day)" @onclick:stopPropagation="true">
+                                        collapse
+                                    </div>
+                                }
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public DateTime CurrentDate { get; set; }
+    [Parameter] public List<CalendarEvent> Events { get; set; } = new();
+    [Parameter] public List<CalendarDisplayInfo> Calendars { get; set; } = new();
+    [Parameter] public Dictionary<string, Calendar> CalendarLookup { get; set; } = new();
+    [Parameter] public EventCallback<DateTime> OnDayClick { get; set; }
+    [Parameter] public EventCallback<CalendarEvent> OnEventClick { get; set; }
+    [Parameter] public EventCallback<(DateTimeOffset start, DateTimeOffset end)> OnLoadMoreEvents { get; set; }
+    [Parameter] public bool HideEventTitles { get; set; }
+
+    [CascadingParameter(Name = "CurrentTime")]
+    public DateTime CurrentTime { get; set; }
+
+    [CascadingParameter(Name = "CollapsePastEvents")]
+    public bool CollapsePastEvents { get; set; }
+
+    private List<WeekData> _visibleWeeks = new();
+    private DateTime _lastCurrentDate;
+    private HashSet<string> _expandedPastDays = new();
+
+    private static readonly string[] DayNames = { "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" };
+
+    private class WeekData
+    {
+        public DateTime StartDate { get; set; }
+        public List<DateTime> Days { get; set; } = new();
+    }
+
+    protected override void OnInitialized()
+    {
+        GenerateMonthWeeks();
+    }
+
+    protected override void OnParametersSet()
+    {
+        // Regenerate weeks if month changed
+        if (_lastCurrentDate.Year != CurrentDate.Year || _lastCurrentDate.Month != CurrentDate.Month)
+        {
+            GenerateMonthWeeks();
+        }
+    }
+
+    private void GenerateMonthWeeks()
+    {
+        _lastCurrentDate = CurrentDate;
+        _visibleWeeks.Clear();
+
+        // Get the first day of the month
+        var firstOfMonth = new DateTime(CurrentDate.Year, CurrentDate.Month, 1);
+        // Get the start of the week containing the first day
+        var weekStart = firstOfMonth.AddDays(-(int)firstOfMonth.DayOfWeek);
+
+        // Get the last day of the month
+        var lastOfMonth = firstOfMonth.AddMonths(1).AddDays(-1);
+        // Get the end of the week containing the last day
+        var weekEnd = lastOfMonth.AddDays(6 - (int)lastOfMonth.DayOfWeek);
+
+        var current = weekStart;
+        while (current <= weekEnd)
+        {
+            _visibleWeeks.Add(new WeekData
+            {
+                StartDate = current,
+                Days = Enumerable.Range(0, 7).Select(i => current.AddDays(i)).ToList()
+            });
+            current = current.AddDays(7);
+        }
+    }
+
+    private bool IsCurrentWeek(DateTime weekStart)
+    {
+        var today = DateTime.Today;
+        var todayWeekStart = today.AddDays(-(int)today.DayOfWeek);
+        return weekStart.Date == todayWeekStart.Date;
+    }
+
+    private string GetDayCellClasses(DateTime day)
+    {
+        var classes = new List<string>();
+        if (IsToday(day)) classes.Add("today");
+        if (day.DayOfWeek == DayOfWeek.Saturday || day.DayOfWeek == DayOfWeek.Sunday) classes.Add("weekend");
+        return string.Join(" ", classes);
+    }
+
+    private void OnDayClicked(DateTime day)
+    {
+        OnDayClick.InvokeAsync(day);
+    }
+
+    private bool IsToday(DateTime date) => date.Date == DateTime.Today;
+
+    private bool IsPastEvent(CalendarEvent evt) => evt.EndTime.LocalDateTime < CurrentTime;
+
+    private bool IsPastDay(DateTime day) => day.Date < DateTime.Today;
+
+    private bool IsDayExpanded(DateTime day) => _expandedPastDays.Contains(day.ToString("yyyy-MM-dd"));
+
+    private void ToggleDayExpanded(DateTime day)
+    {
+        var key = day.ToString("yyyy-MM-dd");
+        if (_expandedPastDays.Contains(key))
+            _expandedPastDays.Remove(key);
+        else
+            _expandedPastDays.Add(key);
+    }
+
+    private string GetMonthIndicatorTop()
+    {
+        var minutesInDay = CurrentTime.Hour * 60 + CurrentTime.Minute;
+        var percentOfDay = minutesInDay / 1440.0;
+        return $"calc(28px + {(percentOfDay * 70).ToString("F1")}%)";
+    }
+
+    private IEnumerable<CalendarEvent> GetEventsForDay(DateTime date)
+    {
+        var visibleCalendarIds = Calendars.Where(c => c.IsVisible).Select(c => c.Id).ToHashSet();
+        return Events.Where(e =>
+            e.StartTime.LocalDateTime.Date == date.Date &&
+            e.CalendarId != null &&
+            visibleCalendarIds.Contains(e.CalendarId));
+    }
+
+    private string GetEventColor(CalendarEvent evt)
+    {
+        if (evt.CalendarId != null && CalendarLookup.TryGetValue(evt.CalendarId, out var calendar))
+        {
+            return calendar.Color;
+        }
+        return "#4285f4";
+    }
+
+    private string GetDisplayTitle(string? title)
+    {
+        if (HideEventTitles)
+        {
+            return "Private Event";
+        }
+        return title ?? "(No title)";
+    }
+}

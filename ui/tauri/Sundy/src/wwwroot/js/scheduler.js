@@ -66,6 +66,24 @@ window.schedulerScroll = {
     }
 };
 
+// Scroll calendar views to current time
+window.calendarScroll = {
+    scrollToCurrentTime: function(selector, topPosition) {
+        // Use requestAnimationFrame to ensure DOM is ready
+        requestAnimationFrame(() => {
+            const container = document.querySelector(selector);
+            if (!container) return;
+
+            // Calculate scroll position - show some time before current time
+            // Offset by ~2 hours (96px at 48px/hour) so current time isn't at very top
+            const offset = 96;
+            const scrollTarget = Math.max(0, topPosition - offset);
+
+            container.scrollTop = scrollTarget;
+        });
+    }
+};
+
 // Scheduler drag functionality
 window.schedulerDrag = {
     dotNetRef: null,

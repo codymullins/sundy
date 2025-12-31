@@ -1,0 +1,195 @@
+@using Sundy.Core.Calendars.Sync
+@using Sundy.Core.Settings
+@inject ISyncStateManager SyncStateManager
+@inject ISettingsService Settings
+@implements IDisposable
+
+@if (IsVisible)
+{
+<div class="status-bar @(IsMinimized ? "minimized" : "")">
+    @if (IsMinimized)
+    {
+        <!-- Minimized View -->
+        <div class="status-bar-mini">
+            <div class="status-bar-mini-left">
+                @if (SyncStateManager.IsAnySyncing)
+                {
+                    <span class="status-bar-syncing">
+                        <svg class="sync-spinner-small" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 12a9 9 0 1 1-6.219-8.56"></path>
+                        </svg>
+                        Syncing...
+                    </span>
+                }
+                else
+                {
+                    <span class="status-bar-summary">
+                        @GetSummaryText()
+                    </span>
+                }
+            </div>
+            <div class="status-bar-mini-right">
+                <button class="status-bar-toggle" @onclick="Expand" title="Expand activity log">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="18 15 12 9 6 15"></polyline>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    }
+    else
+    {
+        <!-- Expanded View -->
+        <div class="status-bar-header">
+            <span class="status-bar-title">Activity Log</span>
+            <div class="status-bar-actions">
+                @if (SyncStateManager.IsAnySyncing)
+                {
+                    <span class="status-bar-syncing">
+                        <svg class="sync-spinner-small" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 12a9 9 0 1 1-6.219-8.56"></path>
+                        </svg>
+                        Syncing...
+                    </span>
+                }
+                <button class="status-bar-clear" @onclick="ClearLogs">Clear</button>
+                <button class="status-bar-toggle" @onclick="Minimize" title="Minimize">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <div class="status-bar-content">
+            @if (LogEntries.Any())
+            {
+                @foreach (var entry in LogEntries)
+                {
+                    <div class="log-entry @entry.Level.ToString().ToLowerInvariant()">
+                        <span class="log-time">@entry.Timestamp.ToLocalTime().ToString("HH:mm:ss")</span>
+                        @if (!string.IsNullOrEmpty(entry.CalendarName))
+                        {
+                            <span class="log-calendar">[@MaskCalendarName(entry.CalendarName)]</span>
+                        }
+                        <span class="log-message">@entry.Message</span>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="log-empty">No sync activity yet</div>
+            }
+        </div>
+    }
+</div>
+}
+
+@code {
+    private bool IsVisible { get; set; }
+    private bool IsMinimized { get; set; } = true; // Start minimized
+    private bool PrivacyMode { get; set; }
+    private IReadOnlyList<SyncLogEntry> LogEntries => SyncStateManager.GetRecentLogs(50);
+
+    protected override async Task OnInitializedAsync()
+    {
+        IsVisible = await Settings.GetShowStatusBarAsync();
+        PrivacyMode = await Settings.GetPrivacyModeAsync();
+        SyncStateManager.OnStateChanged += HandleStateChanged;
+        Settings.OnSettingChanged += HandleSettingChanged;
+    }
+
+    private void HandleStateChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    private async void HandleSettingChanged(string key)
+    {
+        if (key == SettingKeys.ShowStatusBar)
+        {
+            IsVisible = await Settings.GetShowStatusBarAsync();
+            await InvokeAsync(StateHasChanged);
+        }
+        else if (key == SettingKeys.PrivacyMode)
+        {
+            PrivacyMode = await Settings.GetPrivacyModeAsync();
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private string MaskCalendarName(string? name)
+    {
+        if (string.IsNullOrEmpty(name)) return "";
+        if (!PrivacyMode) return name;
+
+        // If name contains an email pattern, mask it
+        if (name.Contains('@'))
+        {
+            var atIndex = name.IndexOf('@');
+            var start = name.LastIndexOf(' ', atIndex);
+            if (start < 0) start = 0;
+            else start++;
+
+            var end = name.IndexOf(' ', atIndex);
+            if (end < 0) end = name.Length;
+
+            var email = name.Substring(start, end - start);
+            var masked = MaskEmail(email);
+            return name.Replace(email, masked);
+        }
+
+        return name;
+    }
+
+    private string MaskEmail(string email)
+    {
+        var parts = email.Split('@');
+        if (parts.Length != 2) return "***";
+
+        var local = parts[0].Length > 0 ? parts[0][0] + "***" : "***";
+        var domainParts = parts[1].Split('.');
+        var tld = domainParts.Length > 0 ? domainParts[^1] : "***";
+
+        return $"{local}@***.{tld}";
+    }
+
+    private string GetSummaryText()
+    {
+        var entries = LogEntries;
+        if (!entries.Any())
+            return "No recent activity";
+
+        var lastEntry = entries.First();
+        var timeSince = DateTimeOffset.Now - lastEntry.Timestamp;
+
+        if (timeSince.TotalMinutes < 1)
+            return $"Last sync: just now";
+        if (timeSince.TotalMinutes < 60)
+            return $"Last sync: {(int)timeSince.TotalMinutes}m ago";
+        if (timeSince.TotalHours < 24)
+            return $"Last sync: {(int)timeSince.TotalHours}h ago";
+
+        return $"Last sync: {lastEntry.Timestamp.ToLocalTime():MMM d, h:mm tt}";
+    }
+
+    private void Minimize()
+    {
+        IsMinimized = true;
+    }
+
+    private void Expand()
+    {
+        IsMinimized = false;
+    }
+
+    private void ClearLogs()
+    {
+        SyncStateManager.ClearLogs();
+    }
+
+    public void Dispose()
+    {
+        SyncStateManager.OnStateChanged -= HandleStateChanged;
+        Settings.OnSettingChanged -= HandleSettingChanged;
+    }
+}

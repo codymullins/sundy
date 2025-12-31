@@ -15,7 +15,7 @@ public class DapperEventStore(IDbConnection connection) : IEventStore
     {
         // DateTimeOffset is stored as ISO8601 string, which sorts correctly lexicographically
         var sql = new StringBuilder("""
-            SELECT Id, CalendarId, Title, StartTime, EndTime, Description, Location, IsBlockingEvent, SourceEventId
+            SELECT Id, CalendarId, Title, StartTime, EndTime, Description, Location, IsBlockingEvent, SourceEventId, ExternalId, ExternalModifiedAt
             FROM Events
             WHERE StartTime < @EndTime AND EndTime > @StartTime
             """);
@@ -47,13 +47,37 @@ public class DapperEventStore(IDbConnection connection) : IEventStore
     public async Task<CalendarEvent?> GetEventByIdAsync(string eventId, CancellationToken ct = default)
     {
         const string sql = """
-            SELECT Id, CalendarId, Title, StartTime, EndTime, Description, Location, IsBlockingEvent, SourceEventId
+            SELECT Id, CalendarId, Title, StartTime, EndTime, Description, Location, IsBlockingEvent, SourceEventId, ExternalId, ExternalModifiedAt
             FROM Events
             WHERE Id = @Id
             """;
         var command = new CommandDefinition(sql, new { Id = eventId }, cancellationToken: ct);
         var dto = await connection.QueryFirstOrDefaultAsync<EventDto>(command).ConfigureAwait(false);
         return dto is null ? null : MapFromDto(dto);
+    }
+
+    public async Task<CalendarEvent?> GetByExternalIdAsync(string calendarId, string externalId, CancellationToken ct = default)
+    {
+        const string sql = """
+            SELECT Id, CalendarId, Title, StartTime, EndTime, Description, Location, IsBlockingEvent, SourceEventId, ExternalId, ExternalModifiedAt
+            FROM Events
+            WHERE CalendarId = @CalendarId AND ExternalId = @ExternalId
+            """;
+        var command = new CommandDefinition(sql, new { CalendarId = calendarId, ExternalId = externalId }, cancellationToken: ct);
+        var dto = await connection.QueryFirstOrDefaultAsync<EventDto>(command).ConfigureAwait(false);
+        return dto is null ? null : MapFromDto(dto);
+    }
+
+    public async Task<List<CalendarEvent>> GetByCalendarIdAsync(string calendarId, CancellationToken ct = default)
+    {
+        const string sql = """
+            SELECT Id, CalendarId, Title, StartTime, EndTime, Description, Location, IsBlockingEvent, SourceEventId, ExternalId, ExternalModifiedAt
+            FROM Events
+            WHERE CalendarId = @CalendarId
+            """;
+        var command = new CommandDefinition(sql, new { CalendarId = calendarId }, cancellationToken: ct);
+        var results = await connection.QueryAsync<EventDto>(command).ConfigureAwait(false);
+        return results.Select(MapFromDto).ToList();
     }
 
     public async Task<CalendarEvent> CreateEventAsync(CalendarEvent evt, CancellationToken ct = default)
@@ -64,8 +88,8 @@ public class DapperEventStore(IDbConnection connection) : IEventStore
         }
 
         const string sql = """
-            INSERT INTO Events (Id, CalendarId, Title, StartTime, EndTime, Description, Location, IsBlockingEvent, SourceEventId)
-            VALUES (@Id, @CalendarId, @Title, @StartTime, @EndTime, @Description, @Location, @IsBlockingEvent, @SourceEventId)
+            INSERT INTO Events (Id, CalendarId, Title, StartTime, EndTime, Description, Location, IsBlockingEvent, SourceEventId, ExternalId, ExternalModifiedAt)
+            VALUES (@Id, @CalendarId, @Title, @StartTime, @EndTime, @Description, @Location, @IsBlockingEvent, @SourceEventId, @ExternalId, @ExternalModifiedAt)
             """;
         var command = new CommandDefinition(sql, new
         {
@@ -77,7 +101,9 @@ public class DapperEventStore(IDbConnection connection) : IEventStore
             evt.Description,
             evt.Location,
             IsBlockingEvent = evt.IsBlockingEvent ? 1 : 0,
-            evt.SourceEventId
+            evt.SourceEventId,
+            evt.ExternalId,
+            ExternalModifiedAt = evt.ExternalModifiedAt?.ToString("o")
         }, cancellationToken: ct);
         await connection.ExecuteAsync(command).ConfigureAwait(false);
 
@@ -101,7 +127,9 @@ public class DapperEventStore(IDbConnection connection) : IEventStore
                 Location = @Location,
                 Description = @Description,
                 CalendarId = @CalendarId,
-                IsBlockingEvent = @IsBlockingEvent
+                IsBlockingEvent = @IsBlockingEvent,
+                ExternalId = @ExternalId,
+                ExternalModifiedAt = @ExternalModifiedAt
             WHERE Id = @Id
             """;
         var command = new CommandDefinition(sql, new
@@ -113,7 +141,9 @@ public class DapperEventStore(IDbConnection connection) : IEventStore
             evt.Location,
             evt.Description,
             evt.CalendarId,
-            IsBlockingEvent = evt.IsBlockingEvent ? 1 : 0
+            IsBlockingEvent = evt.IsBlockingEvent ? 1 : 0,
+            evt.ExternalId,
+            ExternalModifiedAt = evt.ExternalModifiedAt?.ToString("o")
         }, cancellationToken: ct);
         await connection.ExecuteAsync(command).ConfigureAwait(false);
     }
@@ -122,6 +152,13 @@ public class DapperEventStore(IDbConnection connection) : IEventStore
     {
         const string sql = "DELETE FROM Events WHERE Id = @Id";
         var command = new CommandDefinition(sql, new { Id = eventId }, cancellationToken: ct);
+        await connection.ExecuteAsync(command).ConfigureAwait(false);
+    }
+
+    public async Task DeleteByCalendarIdAsync(string calendarId, CancellationToken ct = default)
+    {
+        const string sql = "DELETE FROM Events WHERE CalendarId = @CalendarId";
+        var command = new CommandDefinition(sql, new { CalendarId = calendarId }, cancellationToken: ct);
         await connection.ExecuteAsync(command).ConfigureAwait(false);
     }
 
@@ -135,7 +172,11 @@ public class DapperEventStore(IDbConnection connection) : IEventStore
         Description = dto.Description,
         Location = dto.Location,
         IsBlockingEvent = dto.IsBlockingEvent,
-        SourceEventId = dto.SourceEventId
+        SourceEventId = dto.SourceEventId,
+        ExternalId = dto.ExternalId,
+        ExternalModifiedAt = string.IsNullOrEmpty(dto.ExternalModifiedAt)
+            ? null
+            : DateTimeOffset.Parse(dto.ExternalModifiedAt)
     };
 
     // DTO for Dapper mapping since DateTimeOffset is stored as ISO8601 string
@@ -150,5 +191,7 @@ public class DapperEventStore(IDbConnection connection) : IEventStore
         public string? Location { get; set; }
         public bool IsBlockingEvent { get; set; }
         public string? SourceEventId { get; set; }
+        public string? ExternalId { get; set; }
+        public string? ExternalModifiedAt { get; set; }
     }
 }

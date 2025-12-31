@@ -1,0 +1,21 @@
+@if (IsVisible)
+{
+    <div class="current-time-indicator @CssClass" style="top: @(TopPosition.ToString("F1"))px;">
+        @if (ShowLabel)
+        {
+            <span class="current-time-label">@CurrentTime.ToString("h:mm tt").ToUpper()</span>
+        }
+        <div class="current-time-dot"></div>
+        <div class="current-time-line"></div>
+    </div>
+}
+
+@code {
+    [Parameter] public DateTime CurrentTime { get; set; } = DateTime.Now;
+    [Parameter] public bool ShowLabel { get; set; } = true;
+    [Parameter] public bool IsVisible { get; set; } = true;
+    [Parameter] public string CssClass { get; set; } = "";
+    [Parameter] public double PixelsPerHour { get; set; } = 48;
+
+    private double TopPosition => CurrentTime.Hour * PixelsPerHour + (CurrentTime.Minute / 60.0) * PixelsPerHour;
+}

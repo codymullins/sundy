@@ -1,21 +1,21 @@
 using Mediator;
+using Microsoft.Extensions.Logging;
 
 namespace Sundy.Core.Calendars.Outlook;
 
 /// <summary>
 /// Handler for getting events from Outlook calendars.
+/// Supports multiple accounts via IMicrosoftAccountManager.
 /// </summary>
-public class GetOutlookEventsQueryHandler(OutlookCalendarProvider outlookProvider, ICalendarStore calendarStore)
+public class GetOutlookEventsQueryHandler(
+    OutlookCalendarProvider outlookProvider,
+    ICalendarStore calendarStore,
+    IMicrosoftAccountManager accountManager,
+    ILogger<GetOutlookEventsQueryHandler> logger)
     : IQueryHandler<GetOutlookEventsQuery, List<CalendarEvent>>
 {
     public async ValueTask<List<CalendarEvent>> Handle(GetOutlookEventsQuery query, CancellationToken cancellationToken)
     {
-        if (!outlookProvider.IsConnected)
-        {
-            // Log.Warning("Outlook not connected, returning empty event list");
-            return [];
-        }
-
         var allEvents = new List<CalendarEvent>();
 
         try
@@ -26,8 +26,20 @@ public class GetOutlookEventsQueryHandler(OutlookCalendarProvider outlookProvide
 
             foreach (var calendar in outlookCalendars)
             {
+                // Need ExternalAccountId to fetch from the right account
+                if (string.IsNullOrEmpty(calendar.ExternalAccountId))
+                {
+                    continue;
+                }
+
+                // Check if the account is still authenticated
+                if (!accountManager.IsAccountAuthenticated(calendar.ExternalAccountId))
+                {
+                    continue;
+                }
+
                 // Extract the actual Outlook calendar ID from our ID format
-                var outlookCalendarId = calendar.Id.Replace("outlook_", "");
+                var graphCalendarId = calendar.Id.Replace("outlook_", "");
 
                 // Filter by specific calendar if requested
                 if (query.CalendarId != null && calendar.Id != query.CalendarId)
@@ -38,9 +50,10 @@ public class GetOutlookEventsQueryHandler(OutlookCalendarProvider outlookProvide
                 try
                 {
                     var events = await outlookProvider.GetEventsAsync(
-                        outlookCalendarId, 
-                        query.Start, 
-                        query.End, 
+                        calendar.ExternalAccountId,
+                        graphCalendarId,
+                        query.Start,
+                        query.End,
                         cancellationToken);
 
                     // Update CalendarId to use our internal ID format
@@ -50,18 +63,16 @@ public class GetOutlookEventsQueryHandler(OutlookCalendarProvider outlookProvide
                     }
 
                     allEvents.AddRange(events);
-                    // Log.Debug("Fetched {EventCount} events from Outlook calendar {CalendarName}", 
-                    //     events.Count, calendar.Name);
                 }
                 catch (Exception ex)
                 {
-                    // Log.Error(ex, "Failed to fetch events from Outlook calendar {CalendarId}", calendar.Id);
+                    logger.LogError(ex, "Failed to fetch events from Outlook calendar {CalendarId}", calendar.Id);
                 }
             }
         }
         catch (Exception ex)
         {
-            // Log.Error(ex, "Failed to get Outlook events");
+            logger.LogError(ex, "Failed to get Outlook events");
         }
 
         return allEvents;

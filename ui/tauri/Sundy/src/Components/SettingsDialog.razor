@@ -1,9 +1,27 @@
 @inject IMediator Mediator
+@inject IMicrosoftAccountManager AccountManager
+@inject ISyncService SyncService
+@inject IOutlookSyncService OutlookSyncService
+@inject ISettingsService SettingsService
+@inject IBackupService BackupService
+@inject IJSRuntime JSRuntime
+@inject ILogger<SettingsDialog> Logger
+@inject IToastService ToastService
+@using Sundy.Services
+@using Microsoft.JSInterop
+@using Microsoft.Extensions.Logging
 @using Mediator
 @using Sundy.Core
+@using Sundy.Core.Calendars.Outlook
+@using Sundy.Core.Calendars.Sync
 @using Sundy.Core.Commands
+@using Sundy.Core.Queries
 @using Sundy.Core.Meta
+@using Sundy.Core.Settings
+@using Sundy.Core.Sync
+@using Sundy.Core.Backup
 @using Sundy.Models
+@implements IDisposable
 
 <div class="modal-overlay" @onclick="Close">
     <div class="modal settings-modal" @onclick:stopPropagation="true">
@@ -34,6 +52,36 @@
                     </svg>
                     <span>Integrations</span>
                 </div>
+                <div class="settings-tab @(ActiveTab == "sync" ? "active" : "")" @onclick="SetTabSync">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="23 4 23 10 17 10"></polyline>
+                        <polyline points="1 20 1 14 7 14"></polyline>
+                        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                    </svg>
+                    <span>Sync</span>
+                </div>
+                <div class="settings-tab @(ActiveTab == "backup" ? "active" : "")" @onclick="SetTabBackup">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    <span>Backup</span>
+                </div>
+                <div class="settings-tab @(ActiveTab == "privacy" ? "active" : "")" @onclick="SetTabPrivacy">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    </svg>
+                    <span>Privacy</span>
+                </div>
+                <div class="settings-tab @(ActiveTab == "advanced" ? "active" : "")" @onclick="SetTabAdvanced">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 20h9"></path>
+                        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"></path>
+                    </svg>
+                    <span>Advanced</span>
+                </div>
             </div>
 
             <!-- Content -->
@@ -49,14 +97,22 @@
                                 <div class="calendar-list-item">
                                     <div class="calendar-list-info">
                                         <span class="calendar-color-dot" style="background-color: @cal.Color"></span>
-                                        <span class="calendar-list-name">@cal.Name</span>
+                                        <span class="calendar-list-name" title="@cal.OriginalName">@cal.EffectiveName</span>
                                     </div>
-                                    <button class="delete-btn" @onclick="() => DeleteCalendar(cal.Id)" title="Delete calendar">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <polyline points="3 6 5 6 21 6"></polyline>
-                                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                                        </svg>
-                                    </button>
+                                    <div class="calendar-list-actions">
+                                        <button class="edit-btn" @onclick="() => EditCalendar(cal)" title="Rename calendar">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                            </svg>
+                                        </button>
+                                        <button class="delete-btn" @onclick="() => DeleteCalendar(cal.Id)" @onclick:stopPropagation="true" title="Delete calendar">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="pointer-events: none;">
+                                                <polyline points="3 6 5 6 21 6"></polyline>
+                                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                            </svg>
+                                        </button>
+                                    </div>
                                 </div>
                             }
                         </div>
@@ -83,6 +139,27 @@
                                 </svg>
                                 <span>Add Calendar</span>
                             </button>
+                        }
+
+                        @if (ShowEditCalendarModal && EditingCalendar != null)
+                        {
+                            <div class="edit-calendar-modal">
+                                <div class="edit-calendar-header">
+                                    <h4>Rename Calendar</h4>
+                                    @if (EditingCalendar.OriginalName != null)
+                                    {
+                                        <span class="edit-calendar-original">Original: @EditingCalendar.OriginalName</span>
+                                    }
+                                </div>
+                                <div class="form-row">
+                                    <span class="calendar-color-dot" style="background-color: @EditingCalendar.Color"></span>
+                                    <input type="text" class="form-input" @bind="EditCalendarName" placeholder="Calendar name" />
+                                </div>
+                                <div class="form-actions">
+                                    <button class="btn-cancel" @onclick="CancelCalendarEdit">Cancel</button>
+                                    <button class="btn-create" @onclick="SaveCalendarEdit">Save</button>
+                                </div>
+                            </div>
                         }
                     </div>
 
@@ -112,26 +189,393 @@
                 }
                 else if (ActiveTab == "integrations")
                 {
-                    <!-- Outlook Section -->
+                    <!-- Microsoft Accounts Section -->
                     <div class="settings-section">
-                        <h3>Outlook Calendar</h3>
-                        <div class="integration-card">
-                            <div class="integration-info">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
-                                    <line x1="8" y1="21" x2="16" y2="21"></line>
-                                    <line x1="12" y1="17" x2="12" y2="21"></line>
+                        <h3>Microsoft Accounts</h3>
+                        <p class="integration-note">Connect your Microsoft accounts to sync calendar events from Outlook.</p>
+
+                        @if (ConnectedAccounts.Any())
+                        {
+                            <div class="account-list">
+                                @foreach (var account in ConnectedAccounts)
+                                {
+                                    <div class="account-item">
+                                        <div class="account-info">
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                                                <line x1="8" y1="21" x2="16" y2="21"></line>
+                                                <line x1="12" y1="17" x2="12" y2="21"></line>
+                                            </svg>
+                                            <div class="account-details">
+                                                <span class="account-email">@(PrivacyMode ? MaskEmail(account.Email) : account.Email)</span>
+                                                <span class="account-status @(account.Status == AccountStatus.Connected ? "connected" : "expired")">
+                                                    @(account.Status == AccountStatus.Connected ? "Connected" : "Needs re-auth")
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <button class="disconnect-btn" @onclick="() => DisconnectAccount(account.Id)" disabled="@IsDisconnecting">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                }
+                            </div>
+                        }
+
+                        <button class="add-account-btn" @onclick="AddMicrosoftAccount" disabled="@IsConnecting">
+                            @if (IsConnecting)
+                            {
+                                <span>Connecting...</span>
+                            }
+                            else
+                            {
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
                                 </svg>
-                                <div class="integration-details">
-                                    <span class="integration-name">Microsoft Outlook</span>
-                                    <span class="integration-status">Not connected</span>
+                                <span>Add Microsoft Account</span>
+                            }
+                        </button>
+
+                        @if (IsDeviceCodeFlowActive)
+                        {
+                            <div class="device-code-panel">
+                                <h4>Complete sign-in on another device</h4>
+                                <p class="device-code-instruction">Open this URL in a web browser on any device:</p>
+                                <div class="device-code-field">
+                                    <code class="device-code-url">@DeviceCodeUrl</code>
+                                    <button class="copy-btn" @onclick="() => CopyToClipboard(DeviceCodeUrl)">Copy</button>
+                                </div>
+                                <p class="device-code-instruction">Then enter this code:</p>
+                                <div class="device-code-field">
+                                    <code class="device-code-value">@DeviceCodeUserCode</code>
+                                    <button class="copy-btn" @onclick="() => CopyToClipboard(DeviceCodeUserCode)">Copy</button>
+                                </div>
+                                <p class="device-code-waiting">Waiting for sign-in...</p>
+                            </div>
+                        }
+
+                        @if (!string.IsNullOrEmpty(ConnectionError))
+                        {
+                            <p class="integration-error">@ConnectionError</p>
+                        }
+                    </div>
+                }
+                else if (ActiveTab == "sync")
+                {
+                    <!-- Sync Settings Section -->
+                    <div class="settings-section">
+                        <h3>Remote Sync</h3>
+                        <p class="integration-note">Sync your calendars and events across devices using a Sundy server.</p>
+
+                        @if (SyncService.IsSyncEnabled)
+                        {
+                            <!-- Connected State -->
+                            <div class="sync-status-panel">
+                                <div class="sync-status-row">
+                                    <span class="sync-label">Status</span>
+                                    <span class="sync-value @(SyncService.IsOnline ? "online" : "offline")">
+                                        @(SyncService.IsOnline ? "Online" : "Offline")
+                                    </span>
+                                </div>
+                                <div class="sync-status-row">
+                                    <span class="sync-label">Device ID</span>
+                                    <span class="sync-value device-id">@(SyncService.DeviceId ?? "Unknown")</span>
+                                </div>
+                                <div class="sync-status-row">
+                                    <span class="sync-label">Pending Uploads</span>
+                                    <span class="sync-value">@SyncService.PendingUploadCount</span>
+                                </div>
+                                <div class="sync-status-row">
+                                    <span class="sync-label">Last Synced</span>
+                                    <span class="sync-value">@FormatLastSync(SyncService.LastSyncAt)</span>
+                                </div>
+                                <div class="sync-status-row">
+                                    <span class="sync-label">Server Version</span>
+                                    <span class="sync-value">@SyncService.LastServerVersion</span>
                                 </div>
                             </div>
-                            <button class="connect-btn">
-                                <span>Connect</span>
+
+                            @if (!string.IsNullOrEmpty(SyncStatusMessage))
+                            {
+                                <p class="sync-message">@SyncStatusMessage</p>
+                            }
+
+                            <div class="sync-actions">
+                                <button class="sync-now-btn" @onclick="SyncNow" disabled="@IsSyncing">
+                                    @if (IsSyncing)
+                                    {
+                                        <span>Syncing...</span>
+                                    }
+                                    else
+                                    {
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="23 4 23 10 17 10"></polyline>
+                                            <polyline points="1 20 1 14 7 14"></polyline>
+                                            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                                        </svg>
+                                        <span>Sync Now</span>
+                                    }
+                                </button>
+                                <button class="disconnect-sync-btn" @onclick="DisableSync">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                                    </svg>
+                                    <span>Disable Sync</span>
+                                </button>
+                            </div>
+                        }
+                        else
+                        {
+                            <!-- Not Connected State -->
+                            <div class="sync-setup-form">
+                                <div class="form-group">
+                                    <label for="serverUrl">Server URL</label>
+                                    <input type="text"
+                                           id="serverUrl"
+                                           class="form-input"
+                                           placeholder="https://your-sundy-server.com"
+                                           @bind="ServerUrl" />
+                                </div>
+                                <div class="form-group">
+                                    <label for="deviceName">Device Name (optional)</label>
+                                    <input type="text"
+                                           id="deviceName"
+                                           class="form-input"
+                                           placeholder="My Computer"
+                                           @bind="DeviceName" />
+                                </div>
+                                <button class="connect-sync-btn" @onclick="EnableSync" disabled="@(IsConnectingSync || string.IsNullOrWhiteSpace(ServerUrl))">
+                                    @if (IsConnectingSync)
+                                    {
+                                        <span>Connecting...</span>
+                                    }
+                                    else
+                                    {
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                                        </svg>
+                                        <span>Connect to Server</span>
+                                    }
+                                </button>
+                            </div>
+
+                            @if (!string.IsNullOrEmpty(SyncError))
+                            {
+                                <p class="integration-error">@SyncError</p>
+                            }
+                        }
+                    </div>
+                }
+                else if (ActiveTab == "backup")
+                {
+                    <!-- Local Backup Section -->
+                    <div class="settings-section">
+                        <h3>Local Backups</h3>
+                        <p class="integration-note">Export your data as a JSON file for safekeeping.</p>
+
+                        <div class="sync-actions">
+                            <button class="sync-now-btn" @onclick="CreateBackup" disabled="@IsCreatingBackup">
+                                @if (IsCreatingBackup)
+                                {
+                                    <span>Creating backup...</span>
+                                }
+                                else
+                                {
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                        <polyline points="7 10 12 15 17 10"></polyline>
+                                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                                    </svg>
+                                    <span>Create Backup</span>
+                                }
                             </button>
                         </div>
-                        <p class="integration-note">Connect your Outlook account to sync your calendar events.</p>
+
+                        @if (!string.IsNullOrEmpty(BackupMessage))
+                        {
+                            <p class="@(BackupSuccess ? "sync-message" : "integration-error")">@BackupMessage</p>
+                        }
+
+                        @if (LocalBackups.Any())
+                        {
+                            <div class="backup-list">
+                                <h4>Recent Backups</h4>
+                                @foreach (var backup in LocalBackups.Take(5))
+                                {
+                                    <div class="account-item">
+                                        <div class="account-info">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                                <polyline points="14 2 14 8 20 8"></polyline>
+                                            </svg>
+                                            <div class="account-details">
+                                                <span class="account-email">@backup.CreatedAt.ToLocalTime().ToString("MMM d, yyyy h:mm tt")</span>
+                                                <span class="account-status connected">@FormatSize(backup.SizeBytes)</span>
+                                            </div>
+                                        </div>
+                                        <button class="disconnect-btn" @onclick="() => DeleteBackup(backup.Id)" title="Delete backup">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <polyline points="3 6 5 6 21 6"></polyline>
+                                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+
+                    <!-- Automatic Backup Settings -->
+                    <div class="settings-section">
+                        <h3>Automatic Backups</h3>
+
+                        <label class="checkbox-setting">
+                            <input type="checkbox" @bind="AutoBackupEnabled" @bind:after="SaveAutoBackupEnabled" />
+                            <span>Enable automatic backups</span>
+                        </label>
+                        <p class="settings-hint">Automatically create backups on a schedule</p>
+
+                        @if (AutoBackupEnabled)
+                        {
+                            <div class="settings-row">
+                                <label>Backup Frequency</label>
+                                <select class="form-select" @bind="BackupIntervalDays" @bind:after="SaveBackupInterval">
+                                    <option value="1">Daily</option>
+                                    <option value="7">Weekly</option>
+                                    <option value="30">Monthly</option>
+                                </select>
+                            </div>
+
+                            <div class="settings-row">
+                                <label>Keep Last</label>
+                                <select class="form-select" @bind="RetentionCount" @bind:after="SaveRetentionCount">
+                                    <option value="5">5 backups</option>
+                                    <option value="10">10 backups</option>
+                                    <option value="20">20 backups</option>
+                                    <option value="50">50 backups</option>
+                                </select>
+                            </div>
+                        }
+                    </div>
+                }
+                else if (ActiveTab == "privacy")
+                {
+                    <!-- Telemetry Section -->
+                    <div class="settings-section">
+                        <h3>Telemetry</h3>
+                        <p class="integration-note">
+                            Sundy uses Sentry for error reporting and performance monitoring to help improve the app.
+                            When enabled, we collect crash reports, error logs, and performance data.
+                            No personal calendar data is ever sent.
+                        </p>
+
+                        <label class="checkbox-setting">
+                            <input type="checkbox" @bind="TelemetryEnabled" @bind:after="SaveTelemetryEnabled" />
+                            <span>Enable telemetry</span>
+                        </label>
+                        <p class="settings-hint">Help improve Sundy by sharing anonymous error reports and usage data</p>
+
+                        <div class="telemetry-details">
+                            <p class="telemetry-info-title">What we collect when enabled:</p>
+                            <ul class="telemetry-list">
+                                <li>Crash reports and error messages</li>
+                                <li>Performance metrics (app load time, etc.)</li>
+                                <li>Basic device info (OS, browser version)</li>
+                            </ul>
+                            <p class="telemetry-info-title">What we never collect:</p>
+                            <ul class="telemetry-list">
+                                <li>Calendar event content or titles</li>
+                                <li>Email addresses or personal data</li>
+                                <li>Connected account information</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Display Privacy Section -->
+                    <div class="settings-section">
+                        <h3>Display Privacy</h3>
+
+                        <label class="checkbox-setting">
+                            <input type="checkbox" @bind="PrivacyMode" @bind:after="SavePrivacyMode" />
+                            <span>Privacy Mode</span>
+                        </label>
+                        <p class="settings-hint">Hide sensitive information in the UI (useful for screenshots and demos)</p>
+
+                        @if (PrivacyMode)
+                        {
+                            <div class="privacy-options">
+                                <label class="checkbox-setting sub-option">
+                                    <input type="checkbox" @bind="PrivacyHideEmails" @bind:after="SavePrivacyHideEmails" />
+                                    <span>Hide email addresses</span>
+                                </label>
+                                <p class="settings-hint sub-hint">Mask account emails (e.g., j***@@***.com)</p>
+
+                                <label class="checkbox-setting sub-option">
+                                    <input type="checkbox" @bind="PrivacyHideEventTitles" @bind:after="SavePrivacyHideEventTitles" />
+                                    <span>Hide event titles</span>
+                                </label>
+                                <p class="settings-hint sub-hint">Replace event names with "Private Event"</p>
+                            </div>
+                        }
+                    </div>
+                }
+                else if (ActiveTab == "advanced")
+                {
+                    <!-- Outlook Sync Settings -->
+                    <div class="settings-section">
+                        <h3>Outlook Sync</h3>
+                        <p class="integration-note">Configure how frequently external calendars sync with Outlook.</p>
+
+                        <div class="settings-row">
+                            <label>Sync Interval</label>
+                            <select class="form-select" @bind="SyncIntervalMinutes" @bind:after="SaveSyncInterval">
+                                <option value="1">Every 1 minute</option>
+                                <option value="5">Every 5 minutes</option>
+                                <option value="15">Every 15 minutes</option>
+                                <option value="30">Every 30 minutes</option>
+                            </select>
+                        </div>
+
+                        <button class="sync-now-btn" @onclick="TriggerOutlookSync" disabled="@IsOutlookSyncing">
+                            @if (IsOutlookSyncing)
+                            {
+                                <svg class="sync-spinner-small" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 12a9 9 0 1 1-6.219-8.56"></path>
+                                </svg>
+                                <span>Syncing...</span>
+                            }
+                            else
+                            {
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="23 4 23 10 17 10"></polyline>
+                                    <polyline points="1 20 1 14 7 14"></polyline>
+                                    <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                                </svg>
+                                <span>Sync Now</span>
+                            }
+                        </button>
+                    </div>
+
+                    <!-- Developer Options -->
+                    <div class="settings-section">
+                        <h3>Developer Options</h3>
+
+                        <label class="checkbox-setting">
+                            <input type="checkbox" @bind="ShowStatusBar" @bind:after="SaveShowStatusBar" />
+                            <span>Show Status Bar</span>
+                        </label>
+                        <p class="settings-hint">Display activity log at the bottom of the screen</p>
+
+                        <label class="checkbox-setting">
+                            <input type="checkbox" @bind="CollapsePastEvents" @bind:after="SaveCollapsePastEvents" />
+                            <span>Collapse past events in month view</span>
+                        </label>
+                        <p class="settings-hint">Show a summary count instead of individual event badges for past days</p>
                     </div>
                 }
             </div>
@@ -150,8 +594,134 @@
     private string NewCalendarColor { get; set; } = "#4285f4";
     private bool ShowResetConfirmation { get; set; }
 
+    // Edit calendar state
+    private bool ShowEditCalendarModal { get; set; }
+    private CalendarDisplayInfo? EditingCalendar { get; set; }
+    private string EditCalendarName { get; set; } = "";
+
+    // Microsoft account state
+    private List<ConnectedAccount> ConnectedAccounts { get; set; } = new();
+    private bool IsConnecting { get; set; }
+    private bool IsDisconnecting { get; set; }
+    private string? ConnectionError { get; set; }
+
+    // Device code flow state
+    private bool IsDeviceCodeFlowActive { get; set; }
+    private string? DeviceCodeUrl { get; set; }
+    private string? DeviceCodeUserCode { get; set; }
+
+    // Sync state
+    private string ServerUrl { get; set; } = "";
+    private string DeviceName { get; set; } = "";
+    private bool IsConnectingSync { get; set; }
+    private bool IsSyncing { get; set; }
+    private string? SyncError { get; set; }
+    private string? SyncStatusMessage { get; set; }
+
+    // Advanced tab state
+    private int SyncIntervalMinutes { get; set; } = 5;
+    private bool ShowStatusBar { get; set; }
+    private bool CollapsePastEvents { get; set; }
+    private bool IsOutlookSyncing { get; set; }
+
+    // Privacy tab state
+    private bool TelemetryEnabled { get; set; }
+    private bool PrivacyMode { get; set; }
+    private bool PrivacyHideEmails { get; set; }
+    private bool PrivacyHideEventTitles { get; set; }
+
+    // Backup state
+    private List<BackupInfo> LocalBackups { get; set; } = new();
+    private bool IsCreatingBackup { get; set; }
+    private string? BackupMessage { get; set; }
+    private bool BackupSuccess { get; set; }
+    private bool AutoBackupEnabled { get; set; }
+    private int BackupIntervalDays { get; set; } = 1;
+    private int RetentionCount { get; set; } = 10;
+
+    protected override async Task OnInitializedAsync()
+    {
+        AccountManager.DeviceCodeReceived += OnDeviceCodeReceived;
+        await LoadConnectedAccountsAsync();
+        await LoadAdvancedSettingsAsync();
+    }
+
+    private async Task LoadAdvancedSettingsAsync()
+    {
+        SyncIntervalMinutes = await SettingsService.GetSyncIntervalMinutesAsync();
+        ShowStatusBar = await SettingsService.GetShowStatusBarAsync();
+        CollapsePastEvents = await SettingsService.GetCollapsePastEventsAsync();
+    }
+
+    private void OnDeviceCodeReceived(object? sender, DeviceCodeInfo info)
+    {
+        IsDeviceCodeFlowActive = true;
+        DeviceCodeUrl = info.VerificationUrl;
+        DeviceCodeUserCode = info.UserCode;
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        AccountManager.DeviceCodeReceived -= OnDeviceCodeReceived;
+    }
+
+    private async Task LoadConnectedAccountsAsync()
+    {
+        try
+        {
+            ConnectedAccounts = await Mediator.Send(new GetConnectedAccountsQuery());
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Failed to load connected accounts");
+            ConnectedAccounts = new List<ConnectedAccount>();
+        }
+    }
+
     private void SetTabGeneral() => ActiveTab = "general";
-    private void SetTabIntegrations() => ActiveTab = "integrations";
+
+    private async Task SetTabIntegrations()
+    {
+        ActiveTab = "integrations";
+        await LoadConnectedAccountsAsync();
+    }
+
+    private void SetTabSync()
+    {
+        ActiveTab = "sync";
+        SyncError = null;
+        SyncStatusMessage = null;
+    }
+
+    private async Task SetTabBackup()
+    {
+        ActiveTab = "backup";
+        BackupMessage = null;
+        await LoadBackupSettingsAsync();
+        await LoadBackupsAsync();
+    }
+
+    private async Task SetTabAdvanced()
+    {
+        ActiveTab = "advanced";
+        await LoadAdvancedSettingsAsync();
+    }
+
+    private async Task SetTabPrivacy()
+    {
+        ActiveTab = "privacy";
+        await LoadPrivacySettingsAsync();
+    }
+
+    private async Task LoadPrivacySettingsAsync()
+    {
+        TelemetryEnabled = await SettingsService.GetTelemetryEnabledAsync();
+        PrivacyMode = await SettingsService.GetPrivacyModeAsync();
+        PrivacyHideEmails = await SettingsService.GetPrivacyHideEmailsAsync();
+        PrivacyHideEventTitles = await SettingsService.GetPrivacyHideEventTitlesAsync();
+    }
+
     private void ShowResetConfirmationToggle() => ShowResetConfirmation = true;
     private void CancelResetConfirmation() => ShowResetConfirmation = false;
 
@@ -177,31 +747,503 @@
     {
         if (string.IsNullOrWhiteSpace(NewCalendarName)) return;
 
-        var calendar = new Sundy.Core.Calendar
+        try
         {
-            Id = Guid.NewGuid().ToString(),
-            Name = NewCalendarName.Trim(),
-            Color = NewCalendarColor,
-            Type = CalendarType.Local
-        };
+            var calendar = new Sundy.Core.Calendar
+            {
+                Id = Guid.NewGuid().ToString(),
+                Name = NewCalendarName.Trim(),
+                Color = NewCalendarColor,
+                Type = CalendarType.Local
+            };
 
-        await Mediator.Send(new CreateCalendarCommand(calendar));
-        ShowNewCalendarForm = false;
-        NewCalendarName = "";
-        await OnSettingsChanged.InvokeAsync();
+            await Mediator.Send(new CreateCalendarCommand(calendar));
+            ShowNewCalendarForm = false;
+            NewCalendarName = "";
+            await OnSettingsChanged.InvokeAsync();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Failed to create calendar");
+            var message = ex.Message.Contains("SQLITE_CORRUPT")
+                ? "Database is corrupted. Please use 'Reset Database' in Settings to fix this."
+                : $"Failed to create calendar: {ex.Message}";
+            ToastService.ShowError(message);
+        }
     }
 
     private async Task DeleteCalendar(string calendarId)
     {
-        await Mediator.Send(new DeleteCalendarCommand(calendarId));
-        await OnSettingsChanged.InvokeAsync();
+        try
+        {
+            await Mediator.Send(new DeleteCalendarCommand(calendarId));
+            await OnSettingsChanged.InvokeAsync();
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Failed to delete calendar {CalendarId}", calendarId);
+            var message = ex.Message.Contains("SQLITE_CORRUPT")
+                ? "Database is corrupted. Please use 'Reset Database' in Settings to fix this."
+                : $"Failed to delete calendar: {ex.Message}";
+            ToastService.ShowError(message);
+        }
+    }
+
+    private void EditCalendar(CalendarDisplayInfo calendar)
+    {
+        EditingCalendar = calendar;
+        EditCalendarName = calendar.EffectiveName;
+        ShowEditCalendarModal = true;
+    }
+
+    private void CancelCalendarEdit()
+    {
+        ShowEditCalendarModal = false;
+        EditingCalendar = null;
+        EditCalendarName = "";
+    }
+
+    private async Task SaveCalendarEdit()
+    {
+        if (EditingCalendar == null || string.IsNullOrWhiteSpace(EditCalendarName))
+            return;
+
+        try
+        {
+            // Load the full calendar from the store to update it
+            var calendars = await Mediator.Send(new GetAllCalendarsQuery());
+            var calendar = calendars.FirstOrDefault(c => c.Id == EditingCalendar.Id);
+
+            if (calendar != null)
+            {
+                // For external calendars, set DisplayName; for local, update Name directly
+                if (calendar.ExternalAccountId != null)
+                {
+                    calendar.DisplayName = EditCalendarName.Trim();
+                }
+                else
+                {
+                    calendar.Name = EditCalendarName.Trim();
+                }
+
+                await Mediator.Send(new UpdateCalendarCommand(calendar));
+                await OnSettingsChanged.InvokeAsync();
+            }
+
+            ShowEditCalendarModal = false;
+            EditingCalendar = null;
+            EditCalendarName = "";
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Failed to update calendar");
+            var message = ex.Message.Contains("SQLITE_CORRUPT")
+                ? "Database is corrupted. Please use 'Reset Database' in Settings to fix this."
+                : $"Failed to update calendar: {ex.Message}";
+            ToastService.ShowError(message);
+        }
     }
 
     private async Task ResetDatabase()
     {
-        // Re-initialize the database (drops and recreates tables)
-        await Mediator.Send(new InitializeDatabaseCommand());
-        ShowResetConfirmation = false;
+        try
+        {
+            // Delete and recreate the database
+            await Mediator.Send(new ResetDatabaseCommand());
+            ShowResetConfirmation = false;
+            ToastService.ShowSuccess("Database reset successfully");
+            await OnSettingsChanged.InvokeAsync();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Failed to reset database");
+
+            // If database is corrupted, try deleting the OPFS file directly
+            if (ex.Message.Contains("SQLITE_CORRUPT"))
+            {
+                ToastService.ShowInfo("Database corrupted. Attempting recovery...");
+                try
+                {
+                    var deleted = await JSRuntime.InvokeAsync<bool>("databaseHelper.deleteDatabase", "Sundy.db");
+                    if (deleted)
+                    {
+                        ToastService.ShowSuccess("Database deleted. Reloading app...");
+                        await Task.Delay(1500); // Let user see the message
+                        await JSRuntime.InvokeVoidAsync("databaseHelper.reloadPage");
+                    }
+                    else
+                    {
+                        ToastService.ShowError("Failed to delete corrupted database. Try clearing site data manually.");
+                    }
+                }
+                catch (Exception jsEx)
+                {
+                    Logger.LogError(jsEx, "Failed to delete OPFS database");
+                    ToastService.ShowError("Failed to recover. Clear site data in browser settings.");
+                }
+            }
+            else
+            {
+                ToastService.ShowError($"Failed to reset database: {ex.Message}");
+            }
+        }
+    }
+
+    private async Task AddMicrosoftAccount()
+    {
+        IsConnecting = true;
+        ConnectionError = null;
+        IsDeviceCodeFlowActive = false;
+        DeviceCodeUrl = null;
+        DeviceCodeUserCode = null;
+        StateHasChanged();
+
+        try
+        {
+            var result = await Mediator.Send(new ConnectOutlookCommand());
+
+            if (result.Success)
+            {
+                await LoadConnectedAccountsAsync();
+                await OnSettingsChanged.InvokeAsync();
+            }
+            else
+            {
+                ConnectionError = result.ErrorMessage ?? "Failed to connect";
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Failed to add Microsoft account");
+            ConnectionError = ex.Message;
+        }
+        finally
+        {
+            IsConnecting = false;
+            IsDeviceCodeFlowActive = false;
+            DeviceCodeUrl = null;
+            DeviceCodeUserCode = null;
+            StateHasChanged();
+        }
+    }
+
+    private async Task CopyToClipboard(string? text)
+    {
+        if (!string.IsNullOrEmpty(text))
+        {
+            await JSRuntime.InvokeVoidAsync("navigator.clipboard.writeText", text);
+        }
+    }
+
+    private async Task DisconnectAccount(string accountId)
+    {
+        IsDisconnecting = true;
+        StateHasChanged();
+
+        try
+        {
+            var result = await Mediator.Send(new DisconnectOutlookCommand(accountId));
+
+            if (result.Success)
+            {
+                await LoadConnectedAccountsAsync();
+                await OnSettingsChanged.InvokeAsync();
+            }
+            else
+            {
+                ConnectionError = result.ErrorMessage ?? "Failed to disconnect";
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Failed to disconnect account {AccountId}", accountId);
+            ConnectionError = ex.Message;
+        }
+        finally
+        {
+            IsDisconnecting = false;
+            StateHasChanged();
+        }
+    }
+
+    // Sync methods
+    private async Task EnableSync()
+    {
+        if (string.IsNullOrWhiteSpace(ServerUrl))
+            return;
+
+        IsConnectingSync = true;
+        SyncError = null;
+        StateHasChanged();
+
+        try
+        {
+            var success = await SyncService.RegisterDeviceAsync(
+                ServerUrl.Trim(),
+                string.IsNullOrWhiteSpace(DeviceName) ? null : DeviceName.Trim());
+
+            if (success)
+            {
+                SyncStatusMessage = "Connected successfully!";
+                await OnSettingsChanged.InvokeAsync();
+            }
+            else
+            {
+                SyncError = "Failed to connect to server. Please check the URL and try again.";
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Failed to enable sync with server {ServerUrl}", ServerUrl);
+            SyncError = $"Connection error: {ex.Message}";
+        }
+        finally
+        {
+            IsConnectingSync = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task DisableSync()
+    {
+        try
+        {
+            await SyncService.DisableSyncAsync();
+            ServerUrl = "";
+            DeviceName = "";
+            SyncStatusMessage = null;
+            await OnSettingsChanged.InvokeAsync();
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Failed to disable sync");
+            SyncError = $"Error disabling sync: {ex.Message}";
+            StateHasChanged();
+        }
+    }
+
+    private async Task SyncNow()
+    {
+        IsSyncing = true;
+        SyncStatusMessage = "Syncing...";
+        StateHasChanged();
+
+        try
+        {
+            var result = await SyncService.SyncAsync();
+
+            if (result.Success)
+            {
+                SyncStatusMessage = $"Synced: {result.Downloaded} downloaded, {result.Uploaded} uploaded";
+                await OnSettingsChanged.InvokeAsync();
+            }
+            else
+            {
+                SyncStatusMessage = $"Sync failed: {result.Error}";
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Failed to sync");
+            SyncStatusMessage = $"Sync error: {ex.Message}";
+        }
+        finally
+        {
+            IsSyncing = false;
+            StateHasChanged();
+        }
+    }
+
+    private string FormatLastSync(DateTimeOffset? lastSync)
+    {
+        if (!lastSync.HasValue)
+            return "Never";
+
+        var local = lastSync.Value.ToLocalTime();
+        var diff = DateTimeOffset.Now - local;
+
+        if (diff.TotalMinutes < 1)
+            return "Just now";
+        if (diff.TotalMinutes < 60)
+            return $"{(int)diff.TotalMinutes}m ago";
+        if (diff.TotalHours < 24)
+            return $"{(int)diff.TotalHours}h ago";
+
+        return local.ToString("MMM d, h:mm tt");
+    }
+
+    // Advanced tab methods
+    private async Task SaveSyncInterval()
+    {
+        await SettingsService.SetSyncIntervalMinutesAsync(SyncIntervalMinutes);
+        OutlookSyncService.SyncIntervalMinutes = SyncIntervalMinutes;
+    }
+
+    private async Task SaveShowStatusBar()
+    {
+        await SettingsService.SetShowStatusBarAsync(ShowStatusBar);
+    }
+
+    private async Task SavePrivacyMode()
+    {
+        await SettingsService.SetPrivacyModeAsync(PrivacyMode);
         await OnSettingsChanged.InvokeAsync();
+    }
+
+    private async Task SavePrivacyHideEmails()
+    {
+        await SettingsService.SetPrivacyHideEmailsAsync(PrivacyHideEmails);
+        await OnSettingsChanged.InvokeAsync();
+    }
+
+    private async Task SavePrivacyHideEventTitles()
+    {
+        await SettingsService.SetPrivacyHideEventTitlesAsync(PrivacyHideEventTitles);
+        await OnSettingsChanged.InvokeAsync();
+    }
+
+    private async Task SaveTelemetryEnabled()
+    {
+        // Save to SQLite for persistence
+        await SettingsService.SetTelemetryEnabledAsync(TelemetryEnabled);
+
+        // Also save to localStorage for immediate effect on next startup
+        await JSRuntime.InvokeVoidAsync("telemetryHelper.setEnabled", TelemetryEnabled);
+
+        // Update the static config for immediate effect
+        TelemetryConfig.SetEnabled(TelemetryEnabled);
+
+        await OnSettingsChanged.InvokeAsync();
+    }
+
+    private async Task SaveCollapsePastEvents()
+    {
+        await SettingsService.SetCollapsePastEventsAsync(CollapsePastEvents);
+        await OnSettingsChanged.InvokeAsync();
+    }
+
+    private string MaskEmail(string? email)
+    {
+        if (string.IsNullOrEmpty(email)) return "***";
+        var parts = email.Split('@');
+        if (parts.Length != 2) return "***";
+
+        var local = parts[0].Length > 0 ? parts[0][0] + "***" : "***";
+        var domainParts = parts[1].Split('.');
+        var tld = domainParts.Length > 0 ? domainParts[^1] : "***";
+
+        return $"{local}@***.{tld}";
+    }
+
+    private async Task TriggerOutlookSync()
+    {
+        IsOutlookSyncing = true;
+        StateHasChanged();
+
+        try
+        {
+            await OutlookSyncService.SyncNowAsync();
+            await OnSettingsChanged.InvokeAsync();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Failed to trigger Outlook sync");
+        }
+        finally
+        {
+            IsOutlookSyncing = false;
+            StateHasChanged();
+        }
+    }
+
+    // Backup methods
+    private async Task LoadBackupsAsync()
+    {
+        try
+        {
+            LocalBackups = await BackupService.GetBackupHistoryAsync();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Failed to load backup history");
+            LocalBackups = new List<BackupInfo>();
+        }
+    }
+
+    private async Task LoadBackupSettingsAsync()
+    {
+        var autoEnabled = await SettingsService.GetAsync(SettingKeys.AutoBackupEnabled);
+        AutoBackupEnabled = autoEnabled?.ToLowerInvariant() == "true";
+        var intervalStr = await SettingsService.GetAsync(SettingKeys.BackupIntervalDays);
+        BackupIntervalDays = int.TryParse(intervalStr, out var interval) && interval > 0 ? interval : 1;
+        var retentionStr = await SettingsService.GetAsync(SettingKeys.BackupRetentionCount);
+        RetentionCount = int.TryParse(retentionStr, out var retention) && retention > 0 ? retention : 10;
+    }
+
+    private async Task CreateBackup()
+    {
+        IsCreatingBackup = true;
+        BackupMessage = null;
+        StateHasChanged();
+
+        try
+        {
+            var result = await BackupService.CreateBackupAsync();
+            BackupSuccess = true;
+            BackupMessage = $"Backup created: {result.Id}";
+            await LoadBackupsAsync();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Failed to create backup");
+            BackupSuccess = false;
+            BackupMessage = $"Backup failed: {ex.Message}";
+        }
+        finally
+        {
+            IsCreatingBackup = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task DeleteBackup(string backupId)
+    {
+        try
+        {
+            await BackupService.DeleteBackupAsync(backupId);
+            await LoadBackupsAsync();
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Failed to delete backup {BackupId}", backupId);
+            BackupSuccess = false;
+            BackupMessage = $"Delete failed: {ex.Message}";
+            StateHasChanged();
+        }
+    }
+
+    private async Task SaveAutoBackupEnabled()
+    {
+        await SettingsService.SetAsync(SettingKeys.AutoBackupEnabled, AutoBackupEnabled);
+    }
+
+    private async Task SaveBackupInterval()
+    {
+        await SettingsService.SetAsync(SettingKeys.BackupIntervalDays, BackupIntervalDays);
+    }
+
+    private async Task SaveRetentionCount()
+    {
+        await SettingsService.SetAsync(SettingKeys.BackupRetentionCount, RetentionCount);
+    }
+
+    private string FormatSize(long bytes)
+    {
+        if (bytes < 1024) return $"{bytes} B";
+        if (bytes < 1024 * 1024) return $"{bytes / 1024.0:F1} KB";
+        return $"{bytes / (1024.0 * 1024.0):F1} MB";
     }
 }

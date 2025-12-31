@@ -83,14 +83,22 @@ public partial class App : Application
         services.AddSingleton(new OutlookGraphOptions
         {
             UseDevelopmentCredential = false,
-            UseDeviceCodeFlow = false  // Enable device code flow
+            UseDeviceCodeFlow = false  // Use interactive browser flow
         });
-        
-        // Register auth service - browser platform will override this registration
-        // in the Sundy.Browser project with BrowserMicrosoftGraphAuthService
+
+        // Register connected account store
+        services.AddScoped<IConnectedAccountStore, DapperConnectedAccountStore>();
+
+        // Register Desktop auth provider (MSAL-based)
+        services.AddSingleton<IMicrosoftAuthProvider, DesktopMicrosoftAuthProvider>();
+
+        // Register platform-agnostic account manager
+        services.AddSingleton<IMicrosoftAccountManager, MicrosoftAccountManager>();
+        services.AddSingleton<OutlookCalendarProvider>();
+
+        // Legacy auth service (kept for compatibility, may be removed later)
         services.AddSingleton<MicrosoftGraphAuthService>();
         services.AddSingleton<IMicrosoftGraphAuthService>(sp => sp.GetRequiredService<MicrosoftGraphAuthService>());
-        services.AddSingleton<OutlookCalendarProvider>();
 
         // enable copying to clipboard
         services.AddSingleton<Services.IClipboardService, Services.ClipboardService>();
