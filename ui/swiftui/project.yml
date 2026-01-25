@@ -44,7 +44,7 @@ targets:
     sources:
       - path: SundyShared
       - path: SundySwiftUIiOS
-      - path: Sundy.icon
+      - path: SundySwiftUIiOS/Sundy.icon
         type: folder
         buildPhase: resources
     resources:
@@ -66,7 +66,7 @@ targets:
     sources:
       - path: SundyShared
       - path: SundySwiftUIMac
-      - path: Sundy.icon
+      - path: SundySwiftUIMac/Sundy.icon
         type: folder
         buildPhase: resources
     resources:
@@ -90,8 +90,11 @@ targets:
       - target: SundySwiftUI-iOS
     settings:
       base:
+        PRODUCT_NAME: SundyTests
         PRODUCT_BUNDLE_IDENTIFIER: com.sundy.swiftui.tests.ios
         GENERATE_INFOPLIST_FILE: YES
+        TEST_HOST: $(BUILT_PRODUCTS_DIR)/Sundy.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Sundy
+        BUNDLE_LOADER: $(TEST_HOST)
 
   SundySwiftUITests-macOS:
     type: bundle.unit-test
@@ -103,5 +106,8 @@ targets:
       - target: SundySwiftUI-macOS
     settings:
       base:
+        PRODUCT_NAME: SundyTests
         PRODUCT_BUNDLE_IDENTIFIER: com.sundy.swiftui.tests.macos
         GENERATE_INFOPLIST_FILE: YES
+        TEST_HOST: $(BUILT_PRODUCTS_DIR)/Sundy.app/Contents/MacOS/Sundy
+        BUNDLE_LOADER: $(TEST_HOST)

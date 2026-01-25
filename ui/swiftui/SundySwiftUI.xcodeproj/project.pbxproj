@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 63;
+	objectVersion = 77;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -16,9 +16,12 @@
 		1038048B488CE2B8F8E0E8BF /* CalendarViewContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E6C15142632FE9E638C650D /* CalendarViewContainer.swift */; };
 		1D1974890C513ECB84A03FCB /* CalendarShellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9613096FED4B1B3A6E0A621A /* CalendarShellView.swift */; };
 		2050179B596A1C4967DAD738 /* WeekView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0365EF0B4114ED8B7CA9F1BA /* WeekView.swift */; };
+		2311C4D61233CFAC62EED955 /* CalendarEventTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7CBDD0657C05A31D8A10725 /* CalendarEventTests.swift */; };
 		27E6EBF0ECACEA99807C11ED /* DemoModeBannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38CE7FA3EF8FD9ADFDFA5AF3 /* DemoModeBannerView.swift */; };
 		29E8DAC7CAC7D28613E57D6D /* DynamicMonthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D4ECA09AAF0D9E5E2333520 /* DynamicMonthView.swift */; };
 		2B4396A00EB326B5374C677D /* DateUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03A467A82BB8C238460542F3 /* DateUtils.swift */; };
+		2C9487FB98A1317D2ADA2298 /* logo.png in Resources */ = {isa = PBXBuildFile; fileRef = 479D5A11570976925E109DED /* logo.png */; };
+		2EF55218730934BF2F7D251F /* SundyStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A898D63268C483CD2B802F88 /* SundyStoreTests.swift */; };
 		2FE9C72215FC3C239F3D26A1 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EE0CBD75CD5E9D0A3D2F294 /* NotificationService.swift */; };
 		315FDA43D0CB72D8BEE9A6C4 /* SundyDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F62A06548D1A796C1A6DEC2 /* SundyDataStore.swift */; };
 		37CFCF3358E0376129B3E7B0 /* CalendarViewType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C28896033C98E24327A744D /* CalendarViewType.swift */; };
@@ -39,21 +42,26 @@
 		69CDD1B00505E217B2809CD8 /* VerticalMonthPager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34A5F98CE45FDE3531338DAE /* VerticalMonthPager.swift */; };
 		6DD6A1E647AA07C88A6A9C62 /* DayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8233223C277BB4DF320CB37 /* DayView.swift */; };
 		6ED3E1377DC0BBC7401C4007 /* Sundy.icon in Resources */ = {isa = PBXBuildFile; fileRef = 2F678E40D8B67E3B5FC46359 /* Sundy.icon */; };
+		7036920F3BCDB58E4A21170C /* SundyStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A898D63268C483CD2B802F88 /* SundyStoreTests.swift */; };
+		719A588175725264B2652D77 /* DateUtilsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90C1450EAC84419EE1E47C5A /* DateUtilsTests.swift */; };
 		7218DCEB08A8F25BFCD41D7A /* ColorValue+Platform.swift in Sources */ = {isa = PBXBuildFile; fileRef = 308032EA5F9EB47A4AFBC161 /* ColorValue+Platform.swift */; };
 		73008644FCD96F393904DEF0 /* SundyAppRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEAA93930CCDB4777D9982B1 /* SundyAppRootView.swift */; };
 		75F3124F5245754E6966BBF2 /* SundyDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F62A06548D1A796C1A6DEC2 /* SundyDataStore.swift */; };
 		76F9FDA7AA4DB6F5E84714CB /* RenameCalendarModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23FAAA97B06C25C34FA8D55D /* RenameCalendarModalView.swift */; };
 		8520CDCE154230FF88C9D35D /* ToastContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B47F0FCBD025745ADE4CE5BC /* ToastContainerView.swift */; };
 		85253BDF4BF2DCA0D5422648 /* MonthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEE59160E6F0563B3A476F3E /* MonthView.swift */; };
+		8610AC40A67266B3817C6375 /* Sundy.icon in Resources */ = {isa = PBXBuildFile; fileRef = 1D30C2C284941918D4AA158B /* Sundy.icon */; };
+		87B29DB8429111742CC0A513 /* icon.json in Resources */ = {isa = PBXBuildFile; fileRef = 0EF7896F3D9BBD99B98EC289 /* icon.json */; };
 		87FDF4CFED5D02B6567CB1B1 /* CalendarEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63603AC9E2D493E24D50D1E7 /* CalendarEvent.swift */; };
 		88DD53820D2F3B329AAAD5EF /* RenameCalendarModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23FAAA97B06C25C34FA8D55D /* RenameCalendarModalView.swift */; };
 		89E0DD1459FC4B38986BA9A1 /* ColorValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFC57305559E781BDD9C0C25 /* ColorValue.swift */; };
 		8DA416F41BAD5E005E36C7ED /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BE114453581FC3FA275279E /* Settings.swift */; };
 		8DAEA5F2AC290155DB240BF8 /* SundyStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E30FB23791E097C6517A7C4 /* SundyStore.swift */; };
+		9152D4ADFE1D6A97559D24C4 /* logo.png in Resources */ = {isa = PBXBuildFile; fileRef = 12BF43CD09EECAB4DAE249BA /* logo.png */; };
 		98E9F4AE5CB62398C145C0E9 /* SundyAppRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEAA93930CCDB4777D9982B1 /* SundyAppRootView.swift */; };
 		9A5E03199FB9F1FA0765603D /* CalendarViewType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C28896033C98E24327A744D /* CalendarViewType.swift */; };
-		A2C810FD006C8CC94F365377 /* Sundy.icon in Resources */ = {isa = PBXBuildFile; fileRef = 2F678E40D8B67E3B5FC46359 /* Sundy.icon */; };
 		A67D12485EA1558F48AB57EC /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96DB923955B873701071B16B /* Theme.swift */; };
+		A96CD51DFF06A5A42B19DE6D /* CalendarEventTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7CBDD0657C05A31D8A10725 /* CalendarEventTests.swift */; };
 		AE3A27CA7CF6EF04C96FCBA8 /* VerticalMonthPager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34A5F98CE45FDE3531338DAE /* VerticalMonthPager.swift */; };
 		AFF6F83022E0F89780497821 /* DynamicMonthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D4ECA09AAF0D9E5E2333520 /* DynamicMonthView.swift */; };
 		B10855DFD449C7DB72E56584 /* SundyStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E30FB23791E097C6517A7C4 /* SundyStore.swift */; };
@@ -65,7 +73,6 @@
 		BC11E4AD162D4984982289D1 /* TimeGutterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1F7E2E32B4C4DDB2B67F96A /* TimeGutterView.swift */; };
 		BEBE92ECB498DB1C849942C3 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96DB923955B873701071B16B /* Theme.swift */; };
 		BF3EE2A3389A4C01F234FE71 /* WeekView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0365EF0B4114ED8B7CA9F1BA /* WeekView.swift */; };
-		C35EFDBF2F26A28300AB6487 /* Sundy.icon in Resources */ = {isa = PBXBuildFile; fileRef = C35EFDBE2F26A28300AB6487 /* Sundy.icon */; };
 		C7E90BCADC823C661D7AD531 /* SchedulerModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA310D73083BBE1DD8E96B5B /* SchedulerModalView.swift */; };
 		C9B225162AF0C53255152CF8 /* LogEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = F329DDC4AC478A7E058DC3F2 /* LogEntry.swift */; };
 		CE7B9C8EAC4ED0CD10910D8F /* BackupService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EC551C629F7C76F894AD8FE /* BackupService.swift */; };
@@ -75,6 +82,7 @@
 		D4F97B9B1534D5218D996120 /* SchedulerModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA310D73083BBE1DD8E96B5B /* SchedulerModalView.swift */; };
 		D8F34C08B40D8B21B899426C /* SettingsDialogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2E6D55D79E976DC2146B386 /* SettingsDialogView.swift */; };
 		D91B81C47AC02900C54EC318 /* StatusBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CE0868E6F75879730E6E566 /* StatusBarView.swift */; };
+		E02E8A3D6142550B8A9C7DE3 /* DateUtilsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90C1450EAC84419EE1E47C5A /* DateUtilsTests.swift */; };
 		E161817B7E41D7CF113957BC /* DateUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03A467A82BB8C238460542F3 /* DateUtils.swift */; };
 		E57C1F07B03116D569E019F8 /* BackupService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EC551C629F7C76F894AD8FE /* BackupService.swift */; };
 		EC03F4C621C166E45EDE99BC /* ToastItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F80EADA4568351052CA7664 /* ToastItem.swift */; };
@@ -83,48 +91,75 @@
 		F532505D038891CE32A4D24B /* Calendar.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBB19D435C0DA677F9FE7913 /* Calendar.swift */; };
 		F5E9C4D507B6E6EA2F1742D7 /* DemoModeBannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38CE7FA3EF8FD9ADFDFA5AF3 /* DemoModeBannerView.swift */; };
 		F6DB4908866C34BA3115A761 /* MonthCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A35845B44D5F77B5CE760759 /* MonthCellView.swift */; };
+		FDEDADF5A56DC718725A94C7 /* icon.json in Resources */ = {isa = PBXBuildFile; fileRef = 623D656989A549B30196272B /* icon.json */; };
 		FF0E555EE804928B9E1EA85F /* CalendarViewContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E6C15142632FE9E638C650D /* CalendarViewContainer.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		73898DDC7DC6914C915636C8 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CECC992A2A15A377F7A72091 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 5E26DFBD19E78A4133B6B60C;
+			remoteInfo = "SundySwiftUI-iOS";
+		};
+		F59EC97D15B1941BF2CE39EA /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CECC992A2A15A377F7A72091 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 6083B1CB05B0F05026552705;
+			remoteInfo = "SundySwiftUI-macOS";
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		0365EF0B4114ED8B7CA9F1BA /* WeekView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeekView.swift; sourceTree = "<group>"; };
-		0374D443CB2CD9C4B279DEDF /* Sundy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Sundy.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		0374D443CB2CD9C4B279DEDF /* SundySwiftUI-iOS.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = "SundySwiftUI-iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		03A467A82BB8C238460542F3 /* DateUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateUtils.swift; sourceTree = "<group>"; };
 		0BE114453581FC3FA275279E /* Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
+		0EF7896F3D9BBD99B98EC289 /* icon.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = icon.json; sourceTree = "<group>"; };
+		12BF43CD09EECAB4DAE249BA /* logo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = logo.png; sourceTree = "<group>"; };
+		1D30C2C284941918D4AA158B /* Sundy.icon */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Sundy.icon; path = SundySwiftUIMac/Sundy.icon; sourceTree = SOURCE_ROOT; };
 		23FAAA97B06C25C34FA8D55D /* RenameCalendarModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RenameCalendarModalView.swift; sourceTree = "<group>"; };
 		25500754B1292E7D2A7282C1 /* SundySwiftUIMacApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SundySwiftUIMacApp.swift; sourceTree = "<group>"; };
-		2F678E40D8B67E3B5FC46359 /* Sundy.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; name = Sundy.icon; path = SundySwiftUIiOS/Sundy.icon; sourceTree = SOURCE_ROOT; };
+		2F678E40D8B67E3B5FC46359 /* Sundy.icon */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Sundy.icon; path = SundySwiftUIiOS/Sundy.icon; sourceTree = SOURCE_ROOT; };
 		308032EA5F9EB47A4AFBC161 /* ColorValue+Platform.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ColorValue+Platform.swift"; sourceTree = "<group>"; };
 		34A5F98CE45FDE3531338DAE /* VerticalMonthPager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerticalMonthPager.swift; sourceTree = "<group>"; };
 		38CE7FA3EF8FD9ADFDFA5AF3 /* DemoModeBannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoModeBannerView.swift; sourceTree = "<group>"; };
 		3EC551C629F7C76F894AD8FE /* BackupService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupService.swift; sourceTree = "<group>"; };
+		479D5A11570976925E109DED /* logo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = logo.png; sourceTree = "<group>"; };
 		4C28896033C98E24327A744D /* CalendarViewType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarViewType.swift; sourceTree = "<group>"; };
 		4CE0868E6F75879730E6E566 /* StatusBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusBarView.swift; sourceTree = "<group>"; };
 		4E28E282D8E7752B2187D7F9 /* CalendarToolbarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarToolbarView.swift; sourceTree = "<group>"; };
 		4EE0CBD75CD5E9D0A3D2F294 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
 		5E6C15142632FE9E638C650D /* CalendarViewContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarViewContainer.swift; sourceTree = "<group>"; };
+		623D656989A549B30196272B /* icon.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = icon.json; sourceTree = "<group>"; };
 		63603AC9E2D493E24D50D1E7 /* CalendarEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarEvent.swift; sourceTree = "<group>"; };
 		64F04FC18D0A88F10EA2CF05 /* BackupInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupInfo.swift; sourceTree = "<group>"; };
 		6E30FB23791E097C6517A7C4 /* SundyStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SundyStore.swift; sourceTree = "<group>"; };
 		74CDC977F4BBC846DC7A3E91 /* CalendarSidebarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarSidebarView.swift; sourceTree = "<group>"; };
 		7D4ECA09AAF0D9E5E2333520 /* DynamicMonthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DynamicMonthView.swift; sourceTree = "<group>"; };
-		7D5F42921F927AD64D1A505A /* SundySwiftUI-macOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = "SundySwiftUI-macOS.app"; path = Sundy.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		7D5F42921F927AD64D1A505A /* SundySwiftUI-macOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "SundySwiftUI-macOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		7F7996E0BB3508DE465EF261 /* CurrentTimeIndicatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentTimeIndicatorView.swift; sourceTree = "<group>"; };
 		7F80EADA4568351052CA7664 /* ToastItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastItem.swift; sourceTree = "<group>"; };
 		8B06FE1CCBDBD907D4905C01 /* NewEventModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewEventModalView.swift; sourceTree = "<group>"; };
+		90C1450EAC84419EE1E47C5A /* DateUtilsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateUtilsTests.swift; sourceTree = "<group>"; };
 		9613096FED4B1B3A6E0A621A /* CalendarShellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarShellView.swift; sourceTree = "<group>"; };
 		96DB923955B873701071B16B /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		9F62A06548D1A796C1A6DEC2 /* SundyDataStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SundyDataStore.swift; sourceTree = "<group>"; };
 		A2E6D55D79E976DC2146B386 /* SettingsDialogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsDialogView.swift; sourceTree = "<group>"; };
 		A35845B44D5F77B5CE760759 /* MonthCellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonthCellView.swift; sourceTree = "<group>"; };
+		A898D63268C483CD2B802F88 /* SundyStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SundyStoreTests.swift; sourceTree = "<group>"; };
 		AEAA93930CCDB4777D9982B1 /* SundyAppRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SundyAppRootView.swift; sourceTree = "<group>"; };
 		B47F0FCBD025745ADE4CE5BC /* ToastContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastContainerView.swift; sourceTree = "<group>"; };
+		B7CBDD0657C05A31D8A10725 /* CalendarEventTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarEventTests.swift; sourceTree = "<group>"; };
 		BCD0BF9524669478521365E6 /* SundySwiftUIiOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SundySwiftUIiOSApp.swift; sourceTree = "<group>"; };
-		C35EFDBE2F26A28300AB6487 /* Sundy.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; name = Sundy.icon; path = SundySwiftUIMac/Sundy.icon; sourceTree = SOURCE_ROOT; };
 		CEE59160E6F0563B3A476F3E /* MonthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonthView.swift; sourceTree = "<group>"; };
 		CFC57305559E781BDD9C0C25 /* ColorValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorValue.swift; sourceTree = "<group>"; };
 		D1F7E2E32B4C4DDB2B67F96A /* TimeGutterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeGutterView.swift; sourceTree = "<group>"; };
+		D4BC3010260A427891315DA4 /* SundySwiftUITests-macOS.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "SundySwiftUITests-macOS.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		DA310D73083BBE1DD8E96B5B /* SchedulerModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchedulerModalView.swift; sourceTree = "<group>"; };
+		DF6A30F802572E84B54E4BDF /* SundySwiftUITests-iOS.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = "SundySwiftUITests-iOS.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E8233223C277BB4DF320CB37 /* DayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayView.swift; sourceTree = "<group>"; };
 		EBB19D435C0DA677F9FE7913 /* Calendar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Calendar.swift; sourceTree = "<group>"; };
 		F329DDC4AC478A7E058DC3F2 /* LogEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogEntry.swift; sourceTree = "<group>"; };
@@ -132,13 +167,6 @@
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
-		097A80C8B6F9052616B98A18 /* Resources */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Resources;
-			sourceTree = "<group>";
-		};
 		0C6A5B038B98FFDE63A16F69 /* Views */ = {
 			isa = PBXGroup;
 			children = (
@@ -148,6 +176,15 @@
 				A2A3A392B81B432666180C01 /* Settings */,
 			);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		0D6C5DBEA4AF6CB4F399A2F7 /* Sundy.icon */ = {
+			isa = PBXGroup;
+			children = (
+				623D656989A549B30196272B /* icon.json */,
+				C599EB85614068BADEB5D279 /* Assets */,
+			);
+			path = Sundy.icon;
 			sourceTree = "<group>";
 		};
 		1808A49480285797BDCC798D /* Services */ = {
@@ -171,11 +208,21 @@
 			path = Stores;
 			sourceTree = "<group>";
 		};
+		1CC4ED23713805068F107454 /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+				DB9389FA77532FBFD399380F /* Models */,
+				53A908DBC0A16044DD6CEB75 /* Services */,
+				B40BF63152068B0650126867 /* Stores */,
+			);
+			path = Tests;
+			sourceTree = "<group>";
+		};
 		21316976DABC7293F0673166 /* SundySwiftUIiOS */ = {
 			isa = PBXGroup;
 			children = (
 				BCD0BF9524669478521365E6 /* SundySwiftUIiOSApp.swift */,
-				2F678E40D8B67E3B5FC46359 /* Sundy.icon */,
+				A7B51BBA369D4929832E68EF /* Sundy.icon */,
 			);
 			path = SundySwiftUIiOS;
 			sourceTree = "<group>";
@@ -183,8 +230,8 @@
 		2A58CE5DDE95D0A23F29A5C4 /* SundySwiftUIMac */ = {
 			isa = PBXGroup;
 			children = (
-				C35EFDBE2F26A28300AB6487 /* Sundy.icon */,
 				25500754B1292E7D2A7282C1 /* SundySwiftUIMacApp.swift */,
+				0D6C5DBEA4AF6CB4F399A2F7 /* Sundy.icon */,
 			);
 			path = SundySwiftUIMac;
 			sourceTree = "<group>";
@@ -210,16 +257,31 @@
 			path = Calendar;
 			sourceTree = "<group>";
 		};
+		53A908DBC0A16044DD6CEB75 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				90C1450EAC84419EE1E47C5A /* DateUtilsTests.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
 		78A27A53BC720FBAA0CCEB7C /* SundyShared */ = {
 			isa = PBXGroup;
 			children = (
 				9A0D8E861DCF1E2D35D76545 /* Models */,
-				097A80C8B6F9052616B98A18 /* Resources */,
 				1808A49480285797BDCC798D /* Services */,
 				1B92248545EE64C22C92E16A /* Stores */,
 				0C6A5B038B98FFDE63A16F69 /* Views */,
 			);
 			path = SundyShared;
+			sourceTree = "<group>";
+		};
+		7EEB1FCF80F312FFB7790A18 /* Assets */ = {
+			isa = PBXGroup;
+			children = (
+				12BF43CD09EECAB4DAE249BA /* logo.png */,
+			);
+			path = Assets;
 			sourceTree = "<group>";
 		};
 		9A0D8E861DCF1E2D35D76545 /* Models */ = {
@@ -257,23 +319,61 @@
 			path = Settings;
 			sourceTree = "<group>";
 		};
+		A7B51BBA369D4929832E68EF /* Sundy.icon */ = {
+			isa = PBXGroup;
+			children = (
+				0EF7896F3D9BBD99B98EC289 /* icon.json */,
+				7EEB1FCF80F312FFB7790A18 /* Assets */,
+			);
+			path = Sundy.icon;
+			sourceTree = "<group>";
+		};
+		B40BF63152068B0650126867 /* Stores */ = {
+			isa = PBXGroup;
+			children = (
+				A898D63268C483CD2B802F88 /* SundyStoreTests.swift */,
+			);
+			path = Stores;
+			sourceTree = "<group>";
+		};
 		B960996D52691502F4420E6D /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				0374D443CB2CD9C4B279DEDF /* Sundy.app */,
+				0374D443CB2CD9C4B279DEDF /* SundySwiftUI-iOS.app */,
 				7D5F42921F927AD64D1A505A /* SundySwiftUI-macOS.app */,
+				DF6A30F802572E84B54E4BDF /* SundySwiftUITests-iOS.xctest */,
+				D4BC3010260A427891315DA4 /* SundySwiftUITests-macOS.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		C599EB85614068BADEB5D279 /* Assets */ = {
+			isa = PBXGroup;
+			children = (
+				479D5A11570976925E109DED /* logo.png */,
+			);
+			path = Assets;
 			sourceTree = "<group>";
 		};
 		CF8A04C6E83B58D22838FAB7 = {
 			isa = PBXGroup;
 			children = (
+				2F678E40D8B67E3B5FC46359 /* Sundy.icon */,
+				1D30C2C284941918D4AA158B /* Sundy.icon */,
 				78A27A53BC720FBAA0CCEB7C /* SundyShared */,
 				21316976DABC7293F0673166 /* SundySwiftUIiOS */,
 				2A58CE5DDE95D0A23F29A5C4 /* SundySwiftUIMac */,
+				1CC4ED23713805068F107454 /* Tests */,
 				B960996D52691502F4420E6D /* Products */,
 			);
+			sourceTree = "<group>";
+		};
+		DB9389FA77532FBFD399380F /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				B7CBDD0657C05A31D8A10725 /* CalendarEventTests.swift */,
+			);
+			path = Models;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -294,7 +394,7 @@
 			packageProductDependencies = (
 			);
 			productName = "SundySwiftUI-iOS";
-			productReference = 0374D443CB2CD9C4B279DEDF /* Sundy.app */;
+			productReference = 0374D443CB2CD9C4B279DEDF /* SundySwiftUI-iOS.app */;
 			productType = "com.apple.product-type.application";
 		};
 		6083B1CB05B0F05026552705 /* SundySwiftUI-macOS */ = {
@@ -315,6 +415,42 @@
 			productReference = 7D5F42921F927AD64D1A505A /* SundySwiftUI-macOS.app */;
 			productType = "com.apple.product-type.application";
 		};
+		69A87BB36802701FBF4B467D /* SundySwiftUITests-iOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E50330E898EB3C43E189AF27 /* Build configuration list for PBXNativeTarget "SundySwiftUITests-iOS" */;
+			buildPhases = (
+				8BD8F79F5F6EEFB11ECFB161 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				358C64DA7DCD6D709B9CC0BC /* PBXTargetDependency */,
+			);
+			name = "SundySwiftUITests-iOS";
+			packageProductDependencies = (
+			);
+			productName = "SundySwiftUITests-iOS";
+			productReference = DF6A30F802572E84B54E4BDF /* SundySwiftUITests-iOS.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		95593E1BA85C2CABB0F5D3D5 /* SundySwiftUITests-macOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7A3775107E67C2DD99354297 /* Build configuration list for PBXNativeTarget "SundySwiftUITests-macOS" */;
+			buildPhases = (
+				55FCD9B7C77888E85461EEFD /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				148C0593EAFDB18C0592F889 /* PBXTargetDependency */,
+			);
+			name = "SundySwiftUITests-macOS";
+			packageProductDependencies = (
+			);
+			productName = "SundySwiftUITests-macOS";
+			productReference = D4BC3010260A427891315DA4 /* SundySwiftUITests-macOS.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -334,11 +470,14 @@
 			);
 			mainGroup = CF8A04C6E83B58D22838FAB7;
 			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
 				5E26DFBD19E78A4133B6B60C /* SundySwiftUI-iOS */,
 				6083B1CB05B0F05026552705 /* SundySwiftUI-macOS */,
+				69A87BB36802701FBF4B467D /* SundySwiftUITests-iOS */,
+				95593E1BA85C2CABB0F5D3D5 /* SundySwiftUITests-macOS */,
 			);
 		};
 /* End PBXProject section */
@@ -349,6 +488,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				6ED3E1377DC0BBC7401C4007 /* Sundy.icon in Resources */,
+				87B29DB8429111742CC0A513 /* icon.json in Resources */,
+				9152D4ADFE1D6A97559D24C4 /* logo.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -356,8 +497,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C35EFDBF2F26A28300AB6487 /* Sundy.icon in Resources */,
-				A2C810FD006C8CC94F365377 /* Sundy.icon in Resources */,
+				8610AC40A67266B3817C6375 /* Sundy.icon in Resources */,
+				FDEDADF5A56DC718725A94C7 /* icon.json in Resources */,
+				2C9487FB98A1317D2ADA2298 /* logo.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -408,6 +550,16 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		55FCD9B7C77888E85461EEFD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A96CD51DFF06A5A42B19DE6D /* CalendarEventTests.swift in Sources */,
+				E02E8A3D6142550B8A9C7DE3 /* DateUtilsTests.swift in Sources */,
+				2EF55218730934BF2F7D251F /* SundyStoreTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		7247068EDF4F414AE44DD667 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -452,7 +604,30 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		8BD8F79F5F6EEFB11ECFB161 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2311C4D61233CFAC62EED955 /* CalendarEventTests.swift in Sources */,
+				719A588175725264B2652D77 /* DateUtilsTests.swift in Sources */,
+				7036920F3BCDB58E4A21170C /* SundyStoreTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		148C0593EAFDB18C0592F889 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 6083B1CB05B0F05026552705 /* SundySwiftUI-macOS */;
+			targetProxy = F59EC97D15B1941BF2CE39EA /* PBXContainerItemProxy */;
+		};
+		358C64DA7DCD6D709B9CC0BC /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 5E26DFBD19E78A4133B6B60C /* SundySwiftUI-iOS */;
+			targetProxy = 73898DDC7DC6914C915636C8 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		017D3BCF62C8DE7AE4EAEC72 /* Release */ = {
@@ -511,6 +686,25 @@
 				SWIFT_VERSION = 5.9;
 			};
 			name = Release;
+		};
+		132CD4E895514E87B9ED2602 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.sundy.swiftui.tests.macos;
+				PRODUCT_NAME = SundyTests;
+				SDKROOT = macosx;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Sundy.app/Contents/MacOS/Sundy";
+			};
+			name = Debug;
 		};
 		3F28D7D0F2371E28A3766055 /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -598,16 +792,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = Sundy;
-				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = X4ZMW7Q7MK;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Sundy;
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_UILaunchScreenName = "";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UILaunchStoryboardName = Sundy;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -616,6 +806,44 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.sundy.sundy-ios";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		7CEB56C357058C3072ADAD7B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.sundy.swiftui.tests.ios;
+				PRODUCT_NAME = SundyTests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Sundy.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Sundy";
+			};
+			name = Release;
+		};
+		860C05F578DF9D5E01C88735 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.sundy.swiftui.tests.macos;
+				PRODUCT_NAME = SundyTests;
+				SDKROOT = macosx;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Sundy.app/Contents/MacOS/Sundy";
 			};
 			name = Release;
 		};
@@ -637,20 +865,35 @@
 			};
 			name = Release;
 		};
+		C18ADF6CE3276A54FCF53DCB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.sundy.swiftui.tests.ios;
+				PRODUCT_NAME = SundyTests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Sundy.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Sundy";
+			};
+			name = Debug;
+		};
 		DF1D3323A3AD14DACEC5DBE5 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = Sundy;
-				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = X4ZMW7Q7MK;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Sundy;
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_UILaunchScreenName = "";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UILaunchStoryboardName = Sundy;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -683,11 +926,29 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
+		7A3775107E67C2DD99354297 /* Build configuration list for PBXNativeTarget "SundySwiftUITests-macOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				132CD4E895514E87B9ED2602 /* Debug */,
+				860C05F578DF9D5E01C88735 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
 		ACBBFDBF5E5444B6C4A266F2 /* Build configuration list for PBXProject "SundySwiftUI" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				3F28D7D0F2371E28A3766055 /* Debug */,
 				017D3BCF62C8DE7AE4EAEC72 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		E50330E898EB3C43E189AF27 /* Build configuration list for PBXNativeTarget "SundySwiftUITests-iOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C18ADF6CE3276A54FCF53DCB /* Debug */,
+				7CEB56C357058C3072ADAD7B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

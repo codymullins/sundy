@@ -1,31 +1,26 @@
 import XCTest
 @testable import Sundy
 
-/// A mock data store for testing that doesn't persist to disk
-final class MockSundyDataStore: SundyDataStore {
-    private var data: SundyData
-
-    init(initialData: SundyData = .empty) {
-        data = initialData
-        super.init()
-    }
-
-    override func load() -> SundyData {
-        data
-    }
-
-    override func save(_ data: SundyData) {
-        self.data = data
-    }
-}
-
 @MainActor
 final class SundyStoreTests: XCTestCase {
 
+    private var store: SundyStore!
+
+    override func setUp() async throws {
+        // Create a fresh store for each test
+        // SundyDataStore will write to the app's normal location
+        // but we reset data at the start of each test
+        store = SundyStore()
+        store.resetData()
+    }
+
+    override func tearDown() async throws {
+        store = nil
+    }
+
     // MARK: - Calendar Operations
 
-    func testAddCalendarIncreasesCalendarCount() async {
-        let store = SundyStore(dataStore: MockSundyDataStore())
+    func testAddCalendarIncreasesCalendarCount() {
         let initialCount = store.calendars.count
 
         store.addCalendar(name: "Work", color: ColorValue.fromRGB(255, 0, 0))
@@ -33,17 +28,14 @@ final class SundyStoreTests: XCTestCase {
         XCTAssertEqual(store.calendars.count, initialCount + 1)
     }
 
-    func testAddCalendarSetsCorrectName() async {
-        let store = SundyStore(dataStore: MockSundyDataStore())
-
+    func testAddCalendarSetsCorrectName() {
         store.addCalendar(name: "Personal", color: ColorValue.fromRGB(0, 255, 0))
 
         let addedCalendar = store.calendars.last
         XCTAssertEqual(addedCalendar?.name, "Personal")
     }
 
-    func testAddCalendarSetsCorrectColor() async {
-        let store = SundyStore(dataStore: MockSundyDataStore())
+    func testAddCalendarSetsCorrectColor() {
         let color = ColorValue.fromRGB(128, 64, 32)
 
         store.addCalendar(name: "Test", color: color)
@@ -52,8 +44,7 @@ final class SundyStoreTests: XCTestCase {
         XCTAssertEqual(addedCalendar?.color, color)
     }
 
-    func testRenameCalendarUpdatesDisplayName() async {
-        let store = SundyStore(dataStore: MockSundyDataStore())
+    func testRenameCalendarUpdatesDisplayName() {
         store.addCalendar(name: "Original", color: ColorValue.fromRGB(0, 0, 255))
         let calendarId = store.calendars.last!.id
 
@@ -64,8 +55,7 @@ final class SundyStoreTests: XCTestCase {
         XCTAssertEqual(calendar?.effectiveName, "Renamed")
     }
 
-    func testDeleteCalendarRemovesCalendar() async {
-        let store = SundyStore(dataStore: MockSundyDataStore())
+    func testDeleteCalendarRemovesCalendar() {
         store.addCalendar(name: "ToDelete", color: ColorValue.fromRGB(255, 255, 0))
         let calendarId = store.calendars.last!.id
         let countBefore = store.calendars.count
@@ -76,8 +66,7 @@ final class SundyStoreTests: XCTestCase {
         XCTAssertNil(store.calendars.first { $0.id == calendarId })
     }
 
-    func testDeleteCalendarRemovesAssociatedEvents() async {
-        let store = SundyStore(dataStore: MockSundyDataStore())
+    func testDeleteCalendarRemovesAssociatedEvents() {
         store.addCalendar(name: "CalWithEvents", color: ColorValue.fromRGB(0, 0, 0))
         let calendarId = store.calendars.last!.id
 
@@ -98,8 +87,7 @@ final class SundyStoreTests: XCTestCase {
         XCTAssertFalse(store.events.contains { $0.calendarId == calendarId })
     }
 
-    func testToggleCalendarVisibility() async {
-        let store = SundyStore(dataStore: MockSundyDataStore())
+    func testToggleCalendarVisibility() {
         store.addCalendar(name: "Toggleable", color: ColorValue.fromRGB(100, 100, 100))
         let calendarId = store.calendars.last!.id
         let initialVisibility = store.calendars.last!.isVisible
@@ -112,8 +100,7 @@ final class SundyStoreTests: XCTestCase {
 
     // MARK: - Event Operations
 
-    func testCreateEventAddsEvent() async {
-        let store = SundyStore(dataStore: MockSundyDataStore())
+    func testCreateEventAddsEvent() {
         let initialCount = store.events.count
         let draft = EventDraft(
             title: "New Event",
@@ -130,8 +117,7 @@ final class SundyStoreTests: XCTestCase {
         XCTAssertEqual(store.events.count, initialCount + 1)
     }
 
-    func testCreateEventTrimsTitle() async {
-        let store = SundyStore(dataStore: MockSundyDataStore())
+    func testCreateEventTrimsTitle() {
         let draft = EventDraft(
             title: "  Padded Title  ",
             date: Date(),
@@ -148,8 +134,7 @@ final class SundyStoreTests: XCTestCase {
         XCTAssertEqual(event?.title, "Padded Title")
     }
 
-    func testUpdateEventModifiesEvent() async {
-        let store = SundyStore(dataStore: MockSundyDataStore())
+    func testUpdateEventModifiesEvent() {
         let draft = EventDraft(
             title: "Original",
             date: Date(),
@@ -170,8 +155,7 @@ final class SundyStoreTests: XCTestCase {
         XCTAssertEqual(event?.title, "Updated")
     }
 
-    func testDeleteEventRemovesEvent() async {
-        let store = SundyStore(dataStore: MockSundyDataStore())
+    func testDeleteEventRemovesEvent() {
         let draft = EventDraft(
             title: "ToDelete",
             date: Date(),
@@ -193,8 +177,7 @@ final class SundyStoreTests: XCTestCase {
 
     // MARK: - Toast Operations
 
-    func testShowToastAddsToast() async {
-        let store = SundyStore(dataStore: MockSundyDataStore())
+    func testShowToastAddsToast() {
         XCTAssertTrue(store.toasts.isEmpty)
 
         store.showToast(message: "Test toast", type: .success)
@@ -204,8 +187,7 @@ final class SundyStoreTests: XCTestCase {
         XCTAssertEqual(store.toasts.first?.type, .success)
     }
 
-    func testDismissToastRemovesToast() async {
-        let store = SundyStore(dataStore: MockSundyDataStore())
+    func testDismissToastRemovesToast() {
         store.showToast(message: "Toast 1", type: .info)
         store.showToast(message: "Toast 2", type: .error)
         let toastId = store.toasts.first!.id
@@ -218,8 +200,7 @@ final class SundyStoreTests: XCTestCase {
 
     // MARK: - Log Operations
 
-    func testAddLogCreatesEntry() async {
-        let store = SundyStore(dataStore: MockSundyDataStore())
+    func testAddLogCreatesEntry() {
         let initialCount = store.logs.count
 
         store.addLog(message: "Test log", level: .info)
@@ -229,8 +210,7 @@ final class SundyStoreTests: XCTestCase {
         XCTAssertEqual(store.logs.first?.level, .info)
     }
 
-    func testClearLogsRemovesAllLogs() async {
-        let store = SundyStore(dataStore: MockSundyDataStore())
+    func testClearLogsRemovesAllLogs() {
         store.addLog(message: "Log 1", level: .info)
         store.addLog(message: "Log 2", level: .warning)
         XCTAssertFalse(store.logs.isEmpty)
@@ -242,8 +222,7 @@ final class SundyStoreTests: XCTestCase {
 
     // MARK: - Reset
 
-    func testResetDataClearsAllData() async {
-        let store = SundyStore(dataStore: MockSundyDataStore())
+    func testResetDataClearsAllData() {
         store.addCalendar(name: "Extra", color: ColorValue.fromRGB(0, 0, 0))
         store.addLog(message: "Test", level: .info)
         store.showToast(message: "Toast", type: .success)

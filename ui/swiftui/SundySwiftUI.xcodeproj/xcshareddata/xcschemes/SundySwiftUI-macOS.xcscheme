@@ -20,6 +20,20 @@
                ReferencedContainer = "container:SundySwiftUI.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "95593E1BA85C2CABB0F5D3D5"
+               BuildableName = "SundyTests.xctest"
+               BlueprintName = "SundySwiftUITests-macOS"
+               ReferencedContainer = "container:SundySwiftUI.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
@@ -37,6 +51,17 @@
          </BuildableReference>
       </MacroExpansion>
       <Testables>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "95593E1BA85C2CABB0F5D3D5"
+               BuildableName = "SundyTests.xctest"
+               BlueprintName = "SundySwiftUITests-macOS"
+               ReferencedContainer = "container:SundySwiftUI.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction
