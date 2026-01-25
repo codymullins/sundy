@@ -1,0 +1,698 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 63;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		00A68B61D6DE6D170F4A857B /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EE0CBD75CD5E9D0A3D2F294 /* NotificationService.swift */; };
+		03E701547ABEB8F6902EE09E /* SundySwiftUIMacApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25500754B1292E7D2A7282C1 /* SundySwiftUIMacApp.swift */; };
+		0850A745B6D49501169A41F7 /* MonthCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A35845B44D5F77B5CE760759 /* MonthCellView.swift */; };
+		09002E69EE2A2D3D9988E7E1 /* ModalOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDAE94A4DBCA92C1E05B0701 /* ModalOverlayView.swift */; };
+		0B1A1CECD1D21371261445C5 /* CurrentTimeIndicatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F7996E0BB3508DE465EF261 /* CurrentTimeIndicatorView.swift */; };
+		0CD1EF60E77293026730BB71 /* CalendarToolbarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E28E282D8E7752B2187D7F9 /* CalendarToolbarView.swift */; };
+		1038048B488CE2B8F8E0E8BF /* CalendarViewContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E6C15142632FE9E638C650D /* CalendarViewContainer.swift */; };
+		1D1974890C513ECB84A03FCB /* CalendarShellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9613096FED4B1B3A6E0A621A /* CalendarShellView.swift */; };
+		2050179B596A1C4967DAD738 /* WeekView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0365EF0B4114ED8B7CA9F1BA /* WeekView.swift */; };
+		27E6EBF0ECACEA99807C11ED /* DemoModeBannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38CE7FA3EF8FD9ADFDFA5AF3 /* DemoModeBannerView.swift */; };
+		29E8DAC7CAC7D28613E57D6D /* DynamicMonthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D4ECA09AAF0D9E5E2333520 /* DynamicMonthView.swift */; };
+		2B4396A00EB326B5374C677D /* DateUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03A467A82BB8C238460542F3 /* DateUtils.swift */; };
+		2FE9C72215FC3C239F3D26A1 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EE0CBD75CD5E9D0A3D2F294 /* NotificationService.swift */; };
+		315FDA43D0CB72D8BEE9A6C4 /* SundyDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F62A06548D1A796C1A6DEC2 /* SundyDataStore.swift */; };
+		37CFCF3358E0376129B3E7B0 /* CalendarViewType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C28896033C98E24327A744D /* CalendarViewType.swift */; };
+		38137161D0FA788B25E4476F /* CalendarToolbarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E28E282D8E7752B2187D7F9 /* CalendarToolbarView.swift */; };
+		3CB25424719838686B9D1BBF /* BackupInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64F04FC18D0A88F10EA2CF05 /* BackupInfo.swift */; };
+		3D1B6AD9206C4481ED28EF4F /* ModalOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDAE94A4DBCA92C1E05B0701 /* ModalOverlayView.swift */; };
+		3FBA898BB45D47B4B11699F0 /* ColorValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFC57305559E781BDD9C0C25 /* ColorValue.swift */; };
+		4EE9166D0BBE0E62CA197727 /* StatusBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CE0868E6F75879730E6E566 /* StatusBarView.swift */; };
+		4F4A327EE0BAE1D27E7D8111 /* NewEventModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B06FE1CCBDBD907D4905C01 /* NewEventModalView.swift */; };
+		4F6BC784C8ED80BA362086DE /* CalendarSidebarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74CDC977F4BBC846DC7A3E91 /* CalendarSidebarView.swift */; };
+		51B7CF0C69889E5371680968 /* TimeGutterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1F7E2E32B4C4DDB2B67F96A /* TimeGutterView.swift */; };
+		5CE767D509B72A3ED55A6827 /* ToastContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B47F0FCBD025745ADE4CE5BC /* ToastContainerView.swift */; };
+		5E0107137277AAF37664F1CB /* NewEventModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B06FE1CCBDBD907D4905C01 /* NewEventModalView.swift */; };
+		5E60E211B761AD5F1577AB05 /* CalendarSidebarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74CDC977F4BBC846DC7A3E91 /* CalendarSidebarView.swift */; };
+		60FB0625998F681F5FBCCA72 /* SundySwiftUIiOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCD0BF9524669478521365E6 /* SundySwiftUIiOSApp.swift */; };
+		619F26B71211E14ABA773636 /* CalendarShellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9613096FED4B1B3A6E0A621A /* CalendarShellView.swift */; };
+		61E0BCCFD42D372BD6D0CE46 /* BackupInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64F04FC18D0A88F10EA2CF05 /* BackupInfo.swift */; };
+		69CDD1B00505E217B2809CD8 /* VerticalMonthPager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34A5F98CE45FDE3531338DAE /* VerticalMonthPager.swift */; };
+		6DD6A1E647AA07C88A6A9C62 /* DayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8233223C277BB4DF320CB37 /* DayView.swift */; };
+		6ED3E1377DC0BBC7401C4007 /* Sundy.icon in Resources */ = {isa = PBXBuildFile; fileRef = 2F678E40D8B67E3B5FC46359 /* Sundy.icon */; };
+		7218DCEB08A8F25BFCD41D7A /* ColorValue+Platform.swift in Sources */ = {isa = PBXBuildFile; fileRef = 308032EA5F9EB47A4AFBC161 /* ColorValue+Platform.swift */; };
+		73008644FCD96F393904DEF0 /* SundyAppRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEAA93930CCDB4777D9982B1 /* SundyAppRootView.swift */; };
+		75F3124F5245754E6966BBF2 /* SundyDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F62A06548D1A796C1A6DEC2 /* SundyDataStore.swift */; };
+		76F9FDA7AA4DB6F5E84714CB /* RenameCalendarModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23FAAA97B06C25C34FA8D55D /* RenameCalendarModalView.swift */; };
+		8520CDCE154230FF88C9D35D /* ToastContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B47F0FCBD025745ADE4CE5BC /* ToastContainerView.swift */; };
+		85253BDF4BF2DCA0D5422648 /* MonthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEE59160E6F0563B3A476F3E /* MonthView.swift */; };
+		87FDF4CFED5D02B6567CB1B1 /* CalendarEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63603AC9E2D493E24D50D1E7 /* CalendarEvent.swift */; };
+		88DD53820D2F3B329AAAD5EF /* RenameCalendarModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23FAAA97B06C25C34FA8D55D /* RenameCalendarModalView.swift */; };
+		89E0DD1459FC4B38986BA9A1 /* ColorValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFC57305559E781BDD9C0C25 /* ColorValue.swift */; };
+		8DA416F41BAD5E005E36C7ED /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BE114453581FC3FA275279E /* Settings.swift */; };
+		8DAEA5F2AC290155DB240BF8 /* SundyStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E30FB23791E097C6517A7C4 /* SundyStore.swift */; };
+		98E9F4AE5CB62398C145C0E9 /* SundyAppRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEAA93930CCDB4777D9982B1 /* SundyAppRootView.swift */; };
+		9A5E03199FB9F1FA0765603D /* CalendarViewType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C28896033C98E24327A744D /* CalendarViewType.swift */; };
+		A2C810FD006C8CC94F365377 /* Sundy.icon in Resources */ = {isa = PBXBuildFile; fileRef = 2F678E40D8B67E3B5FC46359 /* Sundy.icon */; };
+		A67D12485EA1558F48AB57EC /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96DB923955B873701071B16B /* Theme.swift */; };
+		AE3A27CA7CF6EF04C96FCBA8 /* VerticalMonthPager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34A5F98CE45FDE3531338DAE /* VerticalMonthPager.swift */; };
+		AFF6F83022E0F89780497821 /* DynamicMonthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D4ECA09AAF0D9E5E2333520 /* DynamicMonthView.swift */; };
+		B10855DFD449C7DB72E56584 /* SundyStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E30FB23791E097C6517A7C4 /* SundyStore.swift */; };
+		B37B870A3FD59D539117AD5A /* ToastItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F80EADA4568351052CA7664 /* ToastItem.swift */; };
+		B46EF548F498A44269AD61C7 /* MonthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEE59160E6F0563B3A476F3E /* MonthView.swift */; };
+		B520F4A9A24F9CE988E6247A /* SettingsDialogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2E6D55D79E976DC2146B386 /* SettingsDialogView.swift */; };
+		B75AF5F53983DB4C759D9AED /* Calendar.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBB19D435C0DA677F9FE7913 /* Calendar.swift */; };
+		B78973FD7E7707CCABB1D39E /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BE114453581FC3FA275279E /* Settings.swift */; };
+		BC11E4AD162D4984982289D1 /* TimeGutterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1F7E2E32B4C4DDB2B67F96A /* TimeGutterView.swift */; };
+		BEBE92ECB498DB1C849942C3 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96DB923955B873701071B16B /* Theme.swift */; };
+		BF3EE2A3389A4C01F234FE71 /* WeekView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0365EF0B4114ED8B7CA9F1BA /* WeekView.swift */; };
+		C35EFDBF2F26A28300AB6487 /* Sundy.icon in Resources */ = {isa = PBXBuildFile; fileRef = C35EFDBE2F26A28300AB6487 /* Sundy.icon */; };
+		C7E90BCADC823C661D7AD531 /* SchedulerModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA310D73083BBE1DD8E96B5B /* SchedulerModalView.swift */; };
+		C9B225162AF0C53255152CF8 /* LogEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = F329DDC4AC478A7E058DC3F2 /* LogEntry.swift */; };
+		CE7B9C8EAC4ED0CD10910D8F /* BackupService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EC551C629F7C76F894AD8FE /* BackupService.swift */; };
+		CF95FBCA6F95F1039D10FC47 /* LogEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = F329DDC4AC478A7E058DC3F2 /* LogEntry.swift */; };
+		D322A6006AA2471C69EAD32A /* CurrentTimeIndicatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F7996E0BB3508DE465EF261 /* CurrentTimeIndicatorView.swift */; };
+		D394939790F132E49F5EBD92 /* ColorValue+Platform.swift in Sources */ = {isa = PBXBuildFile; fileRef = 308032EA5F9EB47A4AFBC161 /* ColorValue+Platform.swift */; };
+		D4F97B9B1534D5218D996120 /* SchedulerModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA310D73083BBE1DD8E96B5B /* SchedulerModalView.swift */; };
+		D8F34C08B40D8B21B899426C /* SettingsDialogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2E6D55D79E976DC2146B386 /* SettingsDialogView.swift */; };
+		D91B81C47AC02900C54EC318 /* StatusBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CE0868E6F75879730E6E566 /* StatusBarView.swift */; };
+		E161817B7E41D7CF113957BC /* DateUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03A467A82BB8C238460542F3 /* DateUtils.swift */; };
+		E57C1F07B03116D569E019F8 /* BackupService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EC551C629F7C76F894AD8FE /* BackupService.swift */; };
+		EC03F4C621C166E45EDE99BC /* ToastItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F80EADA4568351052CA7664 /* ToastItem.swift */; };
+		F0E84FE1B73291166EBEF567 /* DayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8233223C277BB4DF320CB37 /* DayView.swift */; };
+		F2D59A9EB249A2C69B2FDB65 /* CalendarEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63603AC9E2D493E24D50D1E7 /* CalendarEvent.swift */; };
+		F532505D038891CE32A4D24B /* Calendar.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBB19D435C0DA677F9FE7913 /* Calendar.swift */; };
+		F5E9C4D507B6E6EA2F1742D7 /* DemoModeBannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38CE7FA3EF8FD9ADFDFA5AF3 /* DemoModeBannerView.swift */; };
+		F6DB4908866C34BA3115A761 /* MonthCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A35845B44D5F77B5CE760759 /* MonthCellView.swift */; };
+		FF0E555EE804928B9E1EA85F /* CalendarViewContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E6C15142632FE9E638C650D /* CalendarViewContainer.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		0365EF0B4114ED8B7CA9F1BA /* WeekView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeekView.swift; sourceTree = "<group>"; };
+		0374D443CB2CD9C4B279DEDF /* Sundy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Sundy.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		03A467A82BB8C238460542F3 /* DateUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateUtils.swift; sourceTree = "<group>"; };
+		0BE114453581FC3FA275279E /* Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
+		23FAAA97B06C25C34FA8D55D /* RenameCalendarModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RenameCalendarModalView.swift; sourceTree = "<group>"; };
+		25500754B1292E7D2A7282C1 /* SundySwiftUIMacApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SundySwiftUIMacApp.swift; sourceTree = "<group>"; };
+		2F678E40D8B67E3B5FC46359 /* Sundy.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; name = Sundy.icon; path = SundySwiftUIiOS/Sundy.icon; sourceTree = SOURCE_ROOT; };
+		308032EA5F9EB47A4AFBC161 /* ColorValue+Platform.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ColorValue+Platform.swift"; sourceTree = "<group>"; };
+		34A5F98CE45FDE3531338DAE /* VerticalMonthPager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerticalMonthPager.swift; sourceTree = "<group>"; };
+		38CE7FA3EF8FD9ADFDFA5AF3 /* DemoModeBannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoModeBannerView.swift; sourceTree = "<group>"; };
+		3EC551C629F7C76F894AD8FE /* BackupService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupService.swift; sourceTree = "<group>"; };
+		4C28896033C98E24327A744D /* CalendarViewType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarViewType.swift; sourceTree = "<group>"; };
+		4CE0868E6F75879730E6E566 /* StatusBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusBarView.swift; sourceTree = "<group>"; };
+		4E28E282D8E7752B2187D7F9 /* CalendarToolbarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarToolbarView.swift; sourceTree = "<group>"; };
+		4EE0CBD75CD5E9D0A3D2F294 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
+		5E6C15142632FE9E638C650D /* CalendarViewContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarViewContainer.swift; sourceTree = "<group>"; };
+		63603AC9E2D493E24D50D1E7 /* CalendarEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarEvent.swift; sourceTree = "<group>"; };
+		64F04FC18D0A88F10EA2CF05 /* BackupInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupInfo.swift; sourceTree = "<group>"; };
+		6E30FB23791E097C6517A7C4 /* SundyStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SundyStore.swift; sourceTree = "<group>"; };
+		74CDC977F4BBC846DC7A3E91 /* CalendarSidebarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarSidebarView.swift; sourceTree = "<group>"; };
+		7D4ECA09AAF0D9E5E2333520 /* DynamicMonthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DynamicMonthView.swift; sourceTree = "<group>"; };
+		7D5F42921F927AD64D1A505A /* SundySwiftUI-macOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = "SundySwiftUI-macOS.app"; path = Sundy.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		7F7996E0BB3508DE465EF261 /* CurrentTimeIndicatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentTimeIndicatorView.swift; sourceTree = "<group>"; };
+		7F80EADA4568351052CA7664 /* ToastItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastItem.swift; sourceTree = "<group>"; };
+		8B06FE1CCBDBD907D4905C01 /* NewEventModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewEventModalView.swift; sourceTree = "<group>"; };
+		9613096FED4B1B3A6E0A621A /* CalendarShellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarShellView.swift; sourceTree = "<group>"; };
+		96DB923955B873701071B16B /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		9F62A06548D1A796C1A6DEC2 /* SundyDataStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SundyDataStore.swift; sourceTree = "<group>"; };
+		A2E6D55D79E976DC2146B386 /* SettingsDialogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsDialogView.swift; sourceTree = "<group>"; };
+		A35845B44D5F77B5CE760759 /* MonthCellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonthCellView.swift; sourceTree = "<group>"; };
+		AEAA93930CCDB4777D9982B1 /* SundyAppRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SundyAppRootView.swift; sourceTree = "<group>"; };
+		B47F0FCBD025745ADE4CE5BC /* ToastContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastContainerView.swift; sourceTree = "<group>"; };
+		BCD0BF9524669478521365E6 /* SundySwiftUIiOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SundySwiftUIiOSApp.swift; sourceTree = "<group>"; };
+		C35EFDBE2F26A28300AB6487 /* Sundy.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; name = Sundy.icon; path = SundySwiftUIMac/Sundy.icon; sourceTree = SOURCE_ROOT; };
+		CEE59160E6F0563B3A476F3E /* MonthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonthView.swift; sourceTree = "<group>"; };
+		CFC57305559E781BDD9C0C25 /* ColorValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorValue.swift; sourceTree = "<group>"; };
+		D1F7E2E32B4C4DDB2B67F96A /* TimeGutterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeGutterView.swift; sourceTree = "<group>"; };
+		DA310D73083BBE1DD8E96B5B /* SchedulerModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchedulerModalView.swift; sourceTree = "<group>"; };
+		E8233223C277BB4DF320CB37 /* DayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayView.swift; sourceTree = "<group>"; };
+		EBB19D435C0DA677F9FE7913 /* Calendar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Calendar.swift; sourceTree = "<group>"; };
+		F329DDC4AC478A7E058DC3F2 /* LogEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogEntry.swift; sourceTree = "<group>"; };
+		FDAE94A4DBCA92C1E05B0701 /* ModalOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModalOverlayView.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		097A80C8B6F9052616B98A18 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		0C6A5B038B98FFDE63A16F69 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				AEAA93930CCDB4777D9982B1 /* SundyAppRootView.swift */,
+				3867F8F683CB5ADDA3668F41 /* Calendar */,
+				A1C33422CD1D1E1500B595E8 /* Components */,
+				A2A3A392B81B432666180C01 /* Settings */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		1808A49480285797BDCC798D /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				3EC551C629F7C76F894AD8FE /* BackupService.swift */,
+				308032EA5F9EB47A4AFBC161 /* ColorValue+Platform.swift */,
+				03A467A82BB8C238460542F3 /* DateUtils.swift */,
+				4EE0CBD75CD5E9D0A3D2F294 /* NotificationService.swift */,
+				96DB923955B873701071B16B /* Theme.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		1B92248545EE64C22C92E16A /* Stores */ = {
+			isa = PBXGroup;
+			children = (
+				9F62A06548D1A796C1A6DEC2 /* SundyDataStore.swift */,
+				6E30FB23791E097C6517A7C4 /* SundyStore.swift */,
+			);
+			path = Stores;
+			sourceTree = "<group>";
+		};
+		21316976DABC7293F0673166 /* SundySwiftUIiOS */ = {
+			isa = PBXGroup;
+			children = (
+				BCD0BF9524669478521365E6 /* SundySwiftUIiOSApp.swift */,
+				2F678E40D8B67E3B5FC46359 /* Sundy.icon */,
+			);
+			path = SundySwiftUIiOS;
+			sourceTree = "<group>";
+		};
+		2A58CE5DDE95D0A23F29A5C4 /* SundySwiftUIMac */ = {
+			isa = PBXGroup;
+			children = (
+				C35EFDBE2F26A28300AB6487 /* Sundy.icon */,
+				25500754B1292E7D2A7282C1 /* SundySwiftUIMacApp.swift */,
+			);
+			path = SundySwiftUIMac;
+			sourceTree = "<group>";
+		};
+		3867F8F683CB5ADDA3668F41 /* Calendar */ = {
+			isa = PBXGroup;
+			children = (
+				9613096FED4B1B3A6E0A621A /* CalendarShellView.swift */,
+				74CDC977F4BBC846DC7A3E91 /* CalendarSidebarView.swift */,
+				4E28E282D8E7752B2187D7F9 /* CalendarToolbarView.swift */,
+				5E6C15142632FE9E638C650D /* CalendarViewContainer.swift */,
+				4C28896033C98E24327A744D /* CalendarViewType.swift */,
+				E8233223C277BB4DF320CB37 /* DayView.swift */,
+				7D4ECA09AAF0D9E5E2333520 /* DynamicMonthView.swift */,
+				A35845B44D5F77B5CE760759 /* MonthCellView.swift */,
+				CEE59160E6F0563B3A476F3E /* MonthView.swift */,
+				8B06FE1CCBDBD907D4905C01 /* NewEventModalView.swift */,
+				23FAAA97B06C25C34FA8D55D /* RenameCalendarModalView.swift */,
+				DA310D73083BBE1DD8E96B5B /* SchedulerModalView.swift */,
+				34A5F98CE45FDE3531338DAE /* VerticalMonthPager.swift */,
+				0365EF0B4114ED8B7CA9F1BA /* WeekView.swift */,
+			);
+			path = Calendar;
+			sourceTree = "<group>";
+		};
+		78A27A53BC720FBAA0CCEB7C /* SundyShared */ = {
+			isa = PBXGroup;
+			children = (
+				9A0D8E861DCF1E2D35D76545 /* Models */,
+				097A80C8B6F9052616B98A18 /* Resources */,
+				1808A49480285797BDCC798D /* Services */,
+				1B92248545EE64C22C92E16A /* Stores */,
+				0C6A5B038B98FFDE63A16F69 /* Views */,
+			);
+			path = SundyShared;
+			sourceTree = "<group>";
+		};
+		9A0D8E861DCF1E2D35D76545 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				64F04FC18D0A88F10EA2CF05 /* BackupInfo.swift */,
+				EBB19D435C0DA677F9FE7913 /* Calendar.swift */,
+				63603AC9E2D493E24D50D1E7 /* CalendarEvent.swift */,
+				CFC57305559E781BDD9C0C25 /* ColorValue.swift */,
+				F329DDC4AC478A7E058DC3F2 /* LogEntry.swift */,
+				0BE114453581FC3FA275279E /* Settings.swift */,
+				7F80EADA4568351052CA7664 /* ToastItem.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		A1C33422CD1D1E1500B595E8 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				7F7996E0BB3508DE465EF261 /* CurrentTimeIndicatorView.swift */,
+				38CE7FA3EF8FD9ADFDFA5AF3 /* DemoModeBannerView.swift */,
+				FDAE94A4DBCA92C1E05B0701 /* ModalOverlayView.swift */,
+				4CE0868E6F75879730E6E566 /* StatusBarView.swift */,
+				D1F7E2E32B4C4DDB2B67F96A /* TimeGutterView.swift */,
+				B47F0FCBD025745ADE4CE5BC /* ToastContainerView.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		A2A3A392B81B432666180C01 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				A2E6D55D79E976DC2146B386 /* SettingsDialogView.swift */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
+		B960996D52691502F4420E6D /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				0374D443CB2CD9C4B279DEDF /* Sundy.app */,
+				7D5F42921F927AD64D1A505A /* SundySwiftUI-macOS.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		CF8A04C6E83B58D22838FAB7 = {
+			isa = PBXGroup;
+			children = (
+				78A27A53BC720FBAA0CCEB7C /* SundyShared */,
+				21316976DABC7293F0673166 /* SundySwiftUIiOS */,
+				2A58CE5DDE95D0A23F29A5C4 /* SundySwiftUIMac */,
+				B960996D52691502F4420E6D /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		5E26DFBD19E78A4133B6B60C /* SundySwiftUI-iOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 30A0DC38C9D58C759048EEC9 /* Build configuration list for PBXNativeTarget "SundySwiftUI-iOS" */;
+			buildPhases = (
+				7247068EDF4F414AE44DD667 /* Sources */,
+				6CEF6094D271E9B4DD86E666 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "SundySwiftUI-iOS";
+			packageProductDependencies = (
+			);
+			productName = "SundySwiftUI-iOS";
+			productReference = 0374D443CB2CD9C4B279DEDF /* Sundy.app */;
+			productType = "com.apple.product-type.application";
+		};
+		6083B1CB05B0F05026552705 /* SundySwiftUI-macOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 172BE8ABD0359A905865DAB2 /* Build configuration list for PBXNativeTarget "SundySwiftUI-macOS" */;
+			buildPhases = (
+				4E1710ACC67D4D903BF91412 /* Sources */,
+				AD2482007FB0895F0CA9117A /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "SundySwiftUI-macOS";
+			packageProductDependencies = (
+			);
+			productName = "SundySwiftUI-macOS";
+			productReference = 7D5F42921F927AD64D1A505A /* SundySwiftUI-macOS.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		CECC992A2A15A377F7A72091 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+			};
+			buildConfigurationList = ACBBFDBF5E5444B6C4A266F2 /* Build configuration list for PBXProject "SundySwiftUI" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = CF8A04C6E83B58D22838FAB7;
+			minimizedProjectReferenceProxies = 1;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				5E26DFBD19E78A4133B6B60C /* SundySwiftUI-iOS */,
+				6083B1CB05B0F05026552705 /* SundySwiftUI-macOS */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		6CEF6094D271E9B4DD86E666 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6ED3E1377DC0BBC7401C4007 /* Sundy.icon in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AD2482007FB0895F0CA9117A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C35EFDBF2F26A28300AB6487 /* Sundy.icon in Resources */,
+				A2C810FD006C8CC94F365377 /* Sundy.icon in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		4E1710ACC67D4D903BF91412 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3CB25424719838686B9D1BBF /* BackupInfo.swift in Sources */,
+				CE7B9C8EAC4ED0CD10910D8F /* BackupService.swift in Sources */,
+				B75AF5F53983DB4C759D9AED /* Calendar.swift in Sources */,
+				F2D59A9EB249A2C69B2FDB65 /* CalendarEvent.swift in Sources */,
+				1D1974890C513ECB84A03FCB /* CalendarShellView.swift in Sources */,
+				4F6BC784C8ED80BA362086DE /* CalendarSidebarView.swift in Sources */,
+				38137161D0FA788B25E4476F /* CalendarToolbarView.swift in Sources */,
+				FF0E555EE804928B9E1EA85F /* CalendarViewContainer.swift in Sources */,
+				37CFCF3358E0376129B3E7B0 /* CalendarViewType.swift in Sources */,
+				D394939790F132E49F5EBD92 /* ColorValue+Platform.swift in Sources */,
+				3FBA898BB45D47B4B11699F0 /* ColorValue.swift in Sources */,
+				D322A6006AA2471C69EAD32A /* CurrentTimeIndicatorView.swift in Sources */,
+				E161817B7E41D7CF113957BC /* DateUtils.swift in Sources */,
+				F0E84FE1B73291166EBEF567 /* DayView.swift in Sources */,
+				27E6EBF0ECACEA99807C11ED /* DemoModeBannerView.swift in Sources */,
+				AFF6F83022E0F89780497821 /* DynamicMonthView.swift in Sources */,
+				C9B225162AF0C53255152CF8 /* LogEntry.swift in Sources */,
+				09002E69EE2A2D3D9988E7E1 /* ModalOverlayView.swift in Sources */,
+				0850A745B6D49501169A41F7 /* MonthCellView.swift in Sources */,
+				85253BDF4BF2DCA0D5422648 /* MonthView.swift in Sources */,
+				5E0107137277AAF37664F1CB /* NewEventModalView.swift in Sources */,
+				2FE9C72215FC3C239F3D26A1 /* NotificationService.swift in Sources */,
+				88DD53820D2F3B329AAAD5EF /* RenameCalendarModalView.swift in Sources */,
+				C7E90BCADC823C661D7AD531 /* SchedulerModalView.swift in Sources */,
+				B78973FD7E7707CCABB1D39E /* Settings.swift in Sources */,
+				D8F34C08B40D8B21B899426C /* SettingsDialogView.swift in Sources */,
+				4EE9166D0BBE0E62CA197727 /* StatusBarView.swift in Sources */,
+				73008644FCD96F393904DEF0 /* SundyAppRootView.swift in Sources */,
+				315FDA43D0CB72D8BEE9A6C4 /* SundyDataStore.swift in Sources */,
+				B10855DFD449C7DB72E56584 /* SundyStore.swift in Sources */,
+				03E701547ABEB8F6902EE09E /* SundySwiftUIMacApp.swift in Sources */,
+				BEBE92ECB498DB1C849942C3 /* Theme.swift in Sources */,
+				BC11E4AD162D4984982289D1 /* TimeGutterView.swift in Sources */,
+				5CE767D509B72A3ED55A6827 /* ToastContainerView.swift in Sources */,
+				EC03F4C621C166E45EDE99BC /* ToastItem.swift in Sources */,
+				69CDD1B00505E217B2809CD8 /* VerticalMonthPager.swift in Sources */,
+				2050179B596A1C4967DAD738 /* WeekView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7247068EDF4F414AE44DD667 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				61E0BCCFD42D372BD6D0CE46 /* BackupInfo.swift in Sources */,
+				E57C1F07B03116D569E019F8 /* BackupService.swift in Sources */,
+				F532505D038891CE32A4D24B /* Calendar.swift in Sources */,
+				87FDF4CFED5D02B6567CB1B1 /* CalendarEvent.swift in Sources */,
+				619F26B71211E14ABA773636 /* CalendarShellView.swift in Sources */,
+				5E60E211B761AD5F1577AB05 /* CalendarSidebarView.swift in Sources */,
+				0CD1EF60E77293026730BB71 /* CalendarToolbarView.swift in Sources */,
+				1038048B488CE2B8F8E0E8BF /* CalendarViewContainer.swift in Sources */,
+				9A5E03199FB9F1FA0765603D /* CalendarViewType.swift in Sources */,
+				7218DCEB08A8F25BFCD41D7A /* ColorValue+Platform.swift in Sources */,
+				89E0DD1459FC4B38986BA9A1 /* ColorValue.swift in Sources */,
+				0B1A1CECD1D21371261445C5 /* CurrentTimeIndicatorView.swift in Sources */,
+				2B4396A00EB326B5374C677D /* DateUtils.swift in Sources */,
+				6DD6A1E647AA07C88A6A9C62 /* DayView.swift in Sources */,
+				F5E9C4D507B6E6EA2F1742D7 /* DemoModeBannerView.swift in Sources */,
+				29E8DAC7CAC7D28613E57D6D /* DynamicMonthView.swift in Sources */,
+				CF95FBCA6F95F1039D10FC47 /* LogEntry.swift in Sources */,
+				3D1B6AD9206C4481ED28EF4F /* ModalOverlayView.swift in Sources */,
+				F6DB4908866C34BA3115A761 /* MonthCellView.swift in Sources */,
+				B46EF548F498A44269AD61C7 /* MonthView.swift in Sources */,
+				4F4A327EE0BAE1D27E7D8111 /* NewEventModalView.swift in Sources */,
+				00A68B61D6DE6D170F4A857B /* NotificationService.swift in Sources */,
+				76F9FDA7AA4DB6F5E84714CB /* RenameCalendarModalView.swift in Sources */,
+				D4F97B9B1534D5218D996120 /* SchedulerModalView.swift in Sources */,
+				8DA416F41BAD5E005E36C7ED /* Settings.swift in Sources */,
+				B520F4A9A24F9CE988E6247A /* SettingsDialogView.swift in Sources */,
+				D91B81C47AC02900C54EC318 /* StatusBarView.swift in Sources */,
+				98E9F4AE5CB62398C145C0E9 /* SundyAppRootView.swift in Sources */,
+				75F3124F5245754E6966BBF2 /* SundyDataStore.swift in Sources */,
+				8DAEA5F2AC290155DB240BF8 /* SundyStore.swift in Sources */,
+				60FB0625998F681F5FBCCA72 /* SundySwiftUIiOSApp.swift in Sources */,
+				A67D12485EA1558F48AB57EC /* Theme.swift in Sources */,
+				51B7CF0C69889E5371680968 /* TimeGutterView.swift in Sources */,
+				8520CDCE154230FF88C9D35D /* ToastContainerView.swift in Sources */,
+				B37B870A3FD59D539117AD5A /* ToastItem.swift in Sources */,
+				AE3A27CA7CF6EF04C96FCBA8 /* VerticalMonthPager.swift in Sources */,
+				BF3EE2A3389A4C01F234FE71 /* WeekView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		017D3BCF62C8DE7AE4EAEC72 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_PREVIEWS = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = Sundy;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.9;
+			};
+			name = Release;
+		};
+		3F28D7D0F2371E28A3766055 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_PREVIEWS = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = Sundy;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.9;
+			};
+			name = Debug;
+		};
+		4567883D8689180AC0D68B6A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = Sundy;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Sundy;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.sundy.sundy-macos";
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		4FD4CCFBE8C635717E978635 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = Sundy;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = X4ZMW7Q7MK;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Sundy;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
+				INFOPLIST_KEY_UILaunchScreenName = "";
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = Sundy;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.sundy.sundy-ios";
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		A5C0DE767E74E95A2D5C6844 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = Sundy;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Sundy;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.sundy.sundy-macos";
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		DF1D3323A3AD14DACEC5DBE5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = Sundy;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = X4ZMW7Q7MK;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Sundy;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
+				INFOPLIST_KEY_UILaunchScreenName = "";
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = Sundy;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.sundy.sundy-ios";
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		172BE8ABD0359A905865DAB2 /* Build configuration list for PBXNativeTarget "SundySwiftUI-macOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4567883D8689180AC0D68B6A /* Debug */,
+				A5C0DE767E74E95A2D5C6844 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		30A0DC38C9D58C759048EEC9 /* Build configuration list for PBXNativeTarget "SundySwiftUI-iOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DF1D3323A3AD14DACEC5DBE5 /* Debug */,
+				4FD4CCFBE8C635717E978635 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		ACBBFDBF5E5444B6C4A266F2 /* Build configuration list for PBXProject "SundySwiftUI" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3F28D7D0F2371E28A3766055 /* Debug */,
+				017D3BCF62C8DE7AE4EAEC72 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = CECC992A2A15A377F7A72091 /* Project object */;
+}

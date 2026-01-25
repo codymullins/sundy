@@ -1,0 +1,120 @@
+@page "/notification-window"
+@inject IJSRuntime JSRuntime
+@implements IAsyncDisposable
+
+<div class="notification-window" @onmousedown="StartDrag">
+    <div class="notification-header">
+        <span class="notification-header-title">Reminders</span>
+        <span class="notification-count">@Notifications.Count</span>
+    </div>
+
+    <div class="notification-list">
+        @if (Notifications.Any())
+        {
+            @foreach (var notification in Notifications)
+            {
+                <div class="notification-item">
+                    <div class="notification-content">
+                        <div class="notification-title">@notification.Title</div>
+                        <div class="notification-body">@notification.Body</div>
+                    </div>
+                    <button class="dismiss-btn" @onclick="() => DismissNotification(notification.Id)" @onclick:stopPropagation="true">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="empty-state">
+                <span>No reminders</span>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    private List<PersistentNotificationDto> Notifications = new();
+    private DotNetObjectReference<NotificationWindow>? _objRef;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _objRef = DotNetObjectReference.Create(this);
+        await JSRuntime.InvokeVoidAsync("notificationWindow.initialize", _objRef);
+        await LoadNotifications();
+    }
+
+    [JSInvokable]
+    public async Task OnNotificationsUpdated()
+    {
+        await LoadNotifications();
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task LoadNotifications()
+    {
+        try
+        {
+            var notifications = await JSRuntime.InvokeAsync<PersistentNotificationDto[]>(
+                "notificationWindow.getNotifications");
+            Notifications = notifications?.ToList() ?? new List<PersistentNotificationDto>();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Failed to load notifications: {ex.Message}");
+            Notifications = new List<PersistentNotificationDto>();
+        }
+    }
+
+    private async Task DismissNotification(string id)
+    {
+        try
+        {
+            await JSRuntime.InvokeVoidAsync("notificationWindow.dismiss", id);
+            // The backend will emit an update event, but we can also update locally for faster UI
+            Notifications.RemoveAll(n => n.Id == id);
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Failed to dismiss notification: {ex.Message}");
+        }
+    }
+
+    private async Task StartDrag()
+    {
+        try
+        {
+            await JSRuntime.InvokeVoidAsync("notificationWindow.startDrag");
+        }
+        catch
+        {
+            // Ignore drag errors
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        try
+        {
+            await JSRuntime.InvokeVoidAsync("notificationWindow.cleanup");
+        }
+        catch
+        {
+            // Ignore cleanup errors during disposal
+        }
+        _objRef?.Dispose();
+    }
+
+    public class PersistentNotificationDto
+    {
+        public string Id { get; set; } = "";
+        public string EventId { get; set; } = "";
+        public string Title { get; set; } = "";
+        public string Body { get; set; } = "";
+        public long CreatedAt { get; set; }
+    }
+}

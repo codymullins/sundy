@@ -3,6 +3,7 @@
 @inject IMediator Mediator
 @inject ISyncStateManager SyncStateManager
 @inject ISettingsService SettingsService
+@inject INotificationService NotificationService
 @implements IAsyncDisposable
 @using Mediator
 @using Sundy.Core
@@ -566,6 +567,9 @@ else
             var demoBannerDismissed = await SettingsService.GetDemoBannerDismissedAsync();
             _showDemoBanner = demoMode && !demoBannerDismissed;
 
+            // Load sidebar state
+            SidebarOpen = await SettingsService.GetAsync<bool>("ui.sidebar_open");
+
             // Start timer to update current time indicator every minute
             _timeUpdateTimer = new System.Threading.Timer(
                 _ => InvokeAsync(() => { _currentTime = DateTime.Now; StateHasChanged(); }),
@@ -736,9 +740,10 @@ else
         await LoadEventsAsync();
     }
 
-    private void ToggleSidebar()
+    private async Task ToggleSidebar()
     {
         SidebarOpen = !SidebarOpen;
+        await SettingsService.SetAsync("ui.sidebar_open", SidebarOpen);
     }
 
     private void ToggleViewDropdown()
@@ -752,9 +757,10 @@ else
         await SetView(view);
     }
 
-    private void CloseSidebar()
+    private async Task CloseSidebar()
     {
         SidebarOpen = false;
+        await SettingsService.SetAsync("ui.sidebar_open", SidebarOpen);
     }
 
     private void OnDemoBannerDismissed()
@@ -1265,7 +1271,15 @@ else
                 Description = NewEvent.Description
             };
 
-            await Mediator.Send(new CreateEventCommand(newEvent));
+            var createdEvent = await Mediator.Send(new CreateEventCommand(newEvent));
+
+            // Sync to notification backend for reminders
+            var reminderMinutes = await SettingsService.GetDefaultReminderMinutesAsync();
+            await NotificationService.SyncEventAsync(
+                createdEvent.Id!,
+                createdEvent.Title ?? "Untitled",
+                createdEvent.StartTime,
+                reminderMinutes);
         }
 
         await LoadEventsAsync();

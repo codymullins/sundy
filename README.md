@@ -1,3 +1,5 @@
+# Sundy
+
 Cross-platform calendar app with intelligent cross-calendar time management.
 
 ## Why This Project?
@@ -73,6 +75,32 @@ cd src/Avalonia/Sundy.Desktop
 dotnet run
 ```
 
-
-
 https://github.com/user-attachments/assets/1f9c9e79-1fa8-4561-a64b-7427b5a94873
+
+## License
+
+Sundy Calendar is licensed under the O'Saasy License — a source-available license that grants broad permissions while protecting against competing commercial offerings. See [osaasy.dev](https://osaasy.dev) for the full license text.
+
+### What you can do
+
+- Use Sundy Cal on your own devices for personal or work purposes
+- Deploy it across your organization for internal use (any company size)
+- Fork, modify, and redistribute Sundy Cal for free
+- Build and share free tools or integrations that use Sundy Cal
+- Offer consulting, setup, or customization services to clients
+- Integrate Sundy Cal into a free, non-commercial product or service
+
+### What requires a commercial license
+
+- Offering a hosted or SaaS product where calendar functionality is a core feature
+- Integrating Sundy Cal into any product or service that generates revenue (sales, subscriptions, ads, donations, sponsorships, etc.)
+- Reselling, white-labeling, or rebranding Sundy Cal
+- Building a sync, backup, or notification backend that competes with Sundy Server
+
+### The short version
+
+If you're not making money from it and not competing with Sundy's offerings, you're good. If money is involved or you're building something that replaces what we sell, let's talk.
+
+### Questions?
+
+If you're unsure whether your use case requires a commercial license, reach out at licensing@voltern.net.

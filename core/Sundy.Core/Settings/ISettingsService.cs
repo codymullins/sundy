@@ -129,4 +129,26 @@ public interface ISettingsService
     /// Raised when any setting changes.
     /// </summary>
     event Action<string>? OnSettingChanged;
+
+    // Notification/Reminder settings
+
+    /// <summary>
+    /// Gets whether event reminders are enabled. Defaults to true.
+    /// </summary>
+    Task<bool> GetRemindersEnabledAsync(CancellationToken ct = default);
+
+    /// <summary>
+    /// Sets whether event reminders are enabled.
+    /// </summary>
+    Task SetRemindersEnabledAsync(bool enabled, CancellationToken ct = default);
+
+    /// <summary>
+    /// Gets the default reminder time in minutes before events. Defaults to 15.
+    /// </summary>
+    Task<int> GetDefaultReminderMinutesAsync(CancellationToken ct = default);
+
+    /// <summary>
+    /// Sets the default reminder time in minutes before events.
+    /// </summary>
+    Task SetDefaultReminderMinutesAsync(int minutes, CancellationToken ct = default);
 }

@@ -93,6 +93,14 @@ builder.Services.AddSingleton<OutlookCalendarProvider>();
 // Register sync state management (for UI reactivity)
 builder.Services.AddSingleton<ISyncStateManager, SyncStateManager>();
 builder.Services.AddSingleton<IToastService, ToastService>();
+
+// Register notification services
+builder.Services.AddSingleton<INotificationService, NotificationService>();
+builder.Services.AddSingleton<IReminderScheduler>(sp =>
+    new ReminderScheduler(
+        sp.GetRequiredService<IEventStore>(),
+        sp.GetRequiredService<ISettingsService>(),
+        sp.GetRequiredService<INotificationService>()));
 builder.Services.AddSingleton<ISyncDeltaStore, DapperSyncDeltaStore>();
 builder.Services.AddSingleton<ISettingsService, DapperSettingsService>();
 
@@ -159,6 +167,30 @@ await outlookSyncService.StartAsync();
 // Start the backup scheduler (if automatic backups are enabled)
 var backupScheduler = host.Services.GetRequiredService<BackupScheduler>();
 await backupScheduler.StartAsync();
+
+// Initialize notifications - sync upcoming events to Rust backend (Tauri mode)
+var notificationService = host.Services.GetRequiredService<INotificationService>();
+var eventStore = host.Services.GetRequiredService<IEventStore>();
+var settingsService = host.Services.GetRequiredService<ISettingsService>();
+var reminderScheduler = host.Services.GetRequiredService<IReminderScheduler>();
+
+try
+{
+    // Get upcoming events for the next week
+    var now = DateTimeOffset.Now;
+    var upcomingEvents = await eventStore.GetEventsInRangeAsync(now, now.AddDays(7));
+    var reminderMinutes = await settingsService.GetDefaultReminderMinutesAsync();
+
+    // Sync to Rust backend for native notifications (Tauri mode only)
+    await notificationService.SyncAllUpcomingEventsAsync(upcomingEvents, reminderMinutes);
+
+    // Start the browser-based reminder scheduler (browser mode only)
+    await reminderScheduler.StartAsync();
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"Failed to initialize notifications: {ex.Message}");
+}
 
 await host.RunAsync();
 

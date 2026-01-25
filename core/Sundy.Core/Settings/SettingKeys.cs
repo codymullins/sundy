@@ -85,4 +85,16 @@ public static class SettingKeys
     /// Whether the demo mode banner has been dismissed by the user.
     /// </summary>
     public const string DemoBannerDismissed = "ui.demo_banner_dismissed";
+
+    // Notification/Reminder settings
+
+    /// <summary>
+    /// Whether event reminders are enabled. Defaults to true.
+    /// </summary>
+    public const string RemindersEnabled = "notifications.reminders_enabled";
+
+    /// <summary>
+    /// Default reminder time in minutes before events. Defaults to 15.
+    /// </summary>
+    public const string DefaultReminderMinutes = "notifications.default_reminder_minutes";
 }

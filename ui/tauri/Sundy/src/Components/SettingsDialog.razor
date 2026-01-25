@@ -7,6 +7,8 @@
 @inject IJSRuntime JSRuntime
 @inject ILogger<SettingsDialog> Logger
 @inject IToastService ToastService
+@inject INotificationService NotificationService
+@inject IReminderScheduler ReminderScheduler
 @using Sundy.Services
 @using Microsoft.JSInterop
 @using Microsoft.Extensions.Logging
@@ -74,6 +76,13 @@
                         <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                     </svg>
                     <span>Privacy</span>
+                </div>
+                <div class="settings-tab @(ActiveTab == "notifications" ? "active" : "")" @onclick="SetTabNotifications">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                    </svg>
+                    <span>Notifications</span>
                 </div>
                 <div class="settings-tab @(ActiveTab == "advanced" ? "active" : "")" @onclick="SetTabAdvanced">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -524,6 +533,95 @@
                         }
                     </div>
                 }
+                else if (ActiveTab == "notifications")
+                {
+                    <!-- Event Reminders Section -->
+                    <div class="settings-section">
+                        <h3>Event Reminders</h3>
+                        <p class="integration-note">Receive notifications before your calendar events.</p>
+
+                        @if (!NotificationsSupported)
+                        {
+                            <p class="integration-warning">Notifications are not supported in this browser.</p>
+                        }
+                        else
+                        {
+                            @if (NotificationPermission != "granted")
+                            {
+                                <div class="permission-request">
+                                    <p>@GetPermissionMessage()</p>
+                                    <button class="sync-now-btn" @onclick="RequestNotificationPermission" disabled="@IsRequestingPermission">
+                                        @if (IsRequestingPermission)
+                                        {
+                                            <span>Requesting...</span>
+                                        }
+                                        else
+                                        {
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                                                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                                            </svg>
+                                            <span>Enable Notifications</span>
+                                        }
+                                    </button>
+                                </div>
+                            }
+                            else
+                            {
+                                <label class="checkbox-setting">
+                                    <input type="checkbox" @bind="RemindersEnabled" @bind:after="SaveRemindersEnabled" />
+                                    <span>Enable event reminders</span>
+                                </label>
+                                <p class="settings-hint">Show notifications before your events start</p>
+
+                                @if (RemindersEnabled)
+                                {
+                                    <div class="settings-row">
+                                        <label>Default Reminder Time</label>
+                                        <select class="form-select" @bind="DefaultReminderMinutes" @bind:after="SaveDefaultReminderMinutes">
+                                            <option value="0">At start time</option>
+                                            <option value="5">5 minutes before</option>
+                                            <option value="10">10 minutes before</option>
+                                            <option value="15">15 minutes before</option>
+                                            <option value="30">30 minutes before</option>
+                                            <option value="60">1 hour before</option>
+                                        </select>
+                                    </div>
+                                }
+
+                                <div class="settings-row">
+                                    <label>Test Notifications</label>
+                                    <button class="btn btn-secondary btn-sm"
+                                            @onclick="SendTestNotification"
+                                            disabled="@IsSendingTestNotification">
+                                        @if (IsSendingTestNotification)
+                                        {
+                                            <span>Sending...</span>
+                                        }
+                                        else
+                                        {
+                                            <span>Send Test Notification</span>
+                                        }
+                                    </button>
+                                </div>
+                                <p class="settings-hint">Send a test notification to verify everything is working</p>
+
+                                @if (IsTauriEnvironment)
+                                {
+                                    <div class="settings-row">
+                                        <label>Notification Display</label>
+                                        <select class="form-select" @bind="NotificationPreference" @bind:after="SaveNotificationPreference">
+                                            <option value="os_only">OS notifications only</option>
+                                            <option value="window_only">Persistent window only</option>
+                                            <option value="both">Both</option>
+                                        </select>
+                                    </div>
+                                    <p class="settings-hint">Choose how reminders are displayed. The persistent window stays visible until dismissed.</p>
+                                }
+                            }
+                        }
+                    </div>
+                }
                 else if (ActiveTab == "advanced")
                 {
                     <!-- Outlook Sync Settings -->
@@ -639,6 +737,16 @@
     private int BackupIntervalDays { get; set; } = 1;
     private int RetentionCount { get; set; } = 10;
 
+    // Notification state
+    private bool NotificationsSupported { get; set; }
+    private string NotificationPermission { get; set; } = "default";
+    private bool RemindersEnabled { get; set; } = true;
+    private int DefaultReminderMinutes { get; set; } = 15;
+    private bool IsRequestingPermission { get; set; }
+    private bool IsTauriEnvironment { get; set; }
+    private bool IsSendingTestNotification { get; set; }
+    private string NotificationPreference { get; set; } = "os_only";
+
     protected override async Task OnInitializedAsync()
     {
         AccountManager.DeviceCodeReceived += OnDeviceCodeReceived;
@@ -712,6 +820,116 @@
     {
         ActiveTab = "privacy";
         await LoadPrivacySettingsAsync();
+    }
+
+    private async Task SetTabNotifications()
+    {
+        ActiveTab = "notifications";
+        await LoadNotificationSettingsAsync();
+    }
+
+    private async Task LoadNotificationSettingsAsync()
+    {
+        IsTauriEnvironment = await NotificationService.IsTauriAsync();
+        NotificationsSupported = await NotificationService.IsSupportedAsync();
+        NotificationPermission = await NotificationService.GetPermissionAsync();
+        RemindersEnabled = await SettingsService.GetRemindersEnabledAsync();
+        DefaultReminderMinutes = await SettingsService.GetDefaultReminderMinutesAsync();
+
+        if (IsTauriEnvironment)
+        {
+            NotificationPreference = await NotificationService.GetNotificationPreferenceAsync();
+        }
+    }
+
+    private string GetPermissionMessage()
+    {
+        return NotificationPermission switch
+        {
+            "denied" => "Notification permission was denied. Please enable notifications in your browser settings.",
+            "default" => "Click below to enable notifications for event reminders.",
+            _ => "Enable notifications to receive event reminders."
+        };
+    }
+
+    private async Task RequestNotificationPermission()
+    {
+        IsRequestingPermission = true;
+        StateHasChanged();
+
+        try
+        {
+            NotificationPermission = await NotificationService.RequestPermissionAsync();
+
+            if (NotificationPermission == "granted")
+            {
+                ToastService.ShowSuccess("Notifications enabled!");
+
+                // Start the reminder scheduler if in browser mode
+                if (!IsTauriEnvironment)
+                {
+                    await ReminderScheduler.StartAsync();
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Failed to request notification permission");
+            ToastService.ShowError("Failed to enable notifications");
+        }
+        finally
+        {
+            IsRequestingPermission = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task SaveRemindersEnabled()
+    {
+        await SettingsService.SetRemindersEnabledAsync(RemindersEnabled);
+
+        if (!IsTauriEnvironment)
+        {
+            if (RemindersEnabled)
+            {
+                await ReminderScheduler.StartAsync();
+            }
+            else
+            {
+                await ReminderScheduler.StopAsync();
+            }
+        }
+    }
+
+    private async Task SaveDefaultReminderMinutes()
+    {
+        await SettingsService.SetDefaultReminderMinutesAsync(DefaultReminderMinutes);
+    }
+
+    private async Task SaveNotificationPreference()
+    {
+        await NotificationService.SetNotificationPreferenceAsync(NotificationPreference);
+    }
+
+    private async Task SendTestNotification()
+    {
+        IsSendingTestNotification = true;
+        StateHasChanged();
+
+        try
+        {
+            await NotificationService.SendTestNotificationAsync();
+            ToastService.ShowSuccess("Test notification sent!");
+        }
+        catch (Exception ex)
+        {
+            ToastService.ShowError($"Failed to send notification: {ex.Message}");
+        }
+        finally
+        {
+            IsSendingTestNotification = false;
+            StateHasChanged();
+        }
     }
 
     private async Task LoadPrivacySettingsAsync()

@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notifications</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      background: transparent;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      overflow: hidden;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
+    .notification-window {
+      background: rgba(30, 30, 32, 0.92);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      overflow: hidden;
+      user-select: none;
+    }
+
+    .notification-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 12px 12px 0 0;
+      cursor: move;
+    }
+
+    .notification-header-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.8);
+      letter-spacing: 0.3px;
+    }
+
+    .notification-count {
+      background: rgba(255, 255, 255, 0.15);
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 10px;
+      min-width: 20px;
+      text-align: center;
+    }
+
+    .notification-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px;
+    }
+
+    .notification-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 8px;
+      margin-bottom: 8px;
+      transition: background 0.15s;
+    }
+
+    .notification-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .notification-item:hover {
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .notification-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .notification-title {
+      font-weight: 600;
+      color: #fff;
+      font-size: 13px;
+      margin-bottom: 4px;
+      line-height: 1.3;
+    }
+
+    .notification-body {
+      color: rgba(255, 255, 255, 0.65);
+      font-size: 12px;
+      line-height: 1.4;
+      white-space: pre-line;
+    }
+
+    .notification-time {
+      font-size: 11px;
+      font-weight: 500;
+      margin-top: 6px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      display: inline-block;
+    }
+
+    .notification-time.upcoming {
+      background: rgba(59, 130, 246, 0.2);
+      color: rgba(147, 197, 253, 0.9);
+    }
+
+    .notification-time.now {
+      background: rgba(239, 68, 68, 0.2);
+      color: rgba(252, 165, 165, 0.9);
+    }
+
+    .notification-time.past {
+      background: rgba(156, 163, 175, 0.15);
+      color: rgba(156, 163, 175, 0.8);
+    }
+
+    .dismiss-btn {
+      flex-shrink: 0;
+      background: transparent;
+      border: none;
+      color: rgba(255, 255, 255, 0.4);
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 6px;
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .dismiss-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .dismiss-btn:active {
+      background: rgba(255, 255, 255, 0.15);
+      transform: scale(0.95);
+    }
+
+    .empty-state {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      color: rgba(255, 255, 255, 0.4);
+      font-size: 13px;
+      height: 100%;
+    }
+
+    /* Scrollbar styling */
+    .notification-list::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .notification-list::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .notification-list::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 3px;
+    }
+
+    .notification-list::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+  </style>
+</head>
+<body>
+  <div class="notification-window">
+    <div class="notification-header" id="drag-region">
+      <span class="notification-header-title">Reminders</span>
+      <span class="notification-count" id="notification-count">0</span>
+    </div>
+    <div class="notification-list" id="notification-list">
+      <div class="empty-state">No reminders</div>
+    </div>
+  </div>
+
+  <script>
+    // Wait for Tauri to be available
+    async function init() {
+      if (!window.__TAURI__) {
+        console.error('[NotificationWindow] Tauri not available');
+        return;
+      }
+
+      const { invoke } = window.__TAURI__.core;
+      const { listen } = window.__TAURI__.event;
+      const { getCurrentWindow } = window.__TAURI__.window;
+
+      // Enable window dragging on header
+      const dragRegion = document.getElementById('drag-region');
+      dragRegion.addEventListener('mousedown', async (e) => {
+        if (e.button === 0) {
+          try {
+            await getCurrentWindow().startDragging();
+          } catch (err) {
+            console.error('[NotificationWindow] Drag failed:', err);
+          }
+        }
+      });
+
+      // Store notifications for time updates
+      let currentNotifications = [];
+
+      // Format relative time for an event
+      function formatRelativeTime(eventStartTime) {
+        const now = Math.floor(Date.now() / 1000);
+        const diff = eventStartTime - now;
+        const diffMinutes = Math.round(diff / 60);
+
+        if (diffMinutes > 60) {
+          const hours = Math.floor(diffMinutes / 60);
+          const mins = diffMinutes % 60;
+          if (mins === 0) {
+            return { text: `in ${hours} hr`, class: 'upcoming' };
+          }
+          return { text: `in ${hours} hr ${mins} min`, class: 'upcoming' };
+        } else if (diffMinutes > 1) {
+          return { text: `in ${diffMinutes} min`, class: 'upcoming' };
+        } else if (diffMinutes === 1) {
+          return { text: 'in 1 min', class: 'upcoming' };
+        } else if (diffMinutes >= -1) {
+          return { text: 'starting now', class: 'now' };
+        } else if (diffMinutes > -60) {
+          const mins = Math.abs(diffMinutes);
+          return { text: `${mins} min ago`, class: 'past' };
+        } else {
+          const hours = Math.floor(Math.abs(diffMinutes) / 60);
+          const mins = Math.abs(diffMinutes) % 60;
+          if (mins === 0) {
+            return { text: `${hours} hr ago`, class: 'past' };
+          }
+          return { text: `${hours} hr ${mins} min ago`, class: 'past' };
+        }
+      }
+
+      // Render notifications
+      function renderNotifications(notifications) {
+        currentNotifications = notifications;
+        const list = document.getElementById('notification-list');
+        const count = document.getElementById('notification-count');
+
+        count.textContent = notifications.length;
+
+        if (notifications.length === 0) {
+          list.innerHTML = '<div class="empty-state">No reminders</div>';
+          return;
+        }
+
+        list.innerHTML = notifications.map(n => {
+          const relTime = formatRelativeTime(n.event_start_time);
+          return `
+            <div class="notification-item" data-id="${n.id}" data-start-time="${n.event_start_time}">
+              <div class="notification-content">
+                <div class="notification-title">${escapeHtml(n.title)}</div>
+                <div class="notification-body">${escapeHtml(n.body)}</div>
+                <div class="notification-time ${relTime.class}">${relTime.text}</div>
+              </div>
+              <button class="dismiss-btn" onclick="dismissNotification('${n.id}')">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // Update just the time displays without re-rendering everything
+      function updateTimeDisplays() {
+        document.querySelectorAll('.notification-item').forEach(item => {
+          const startTime = parseInt(item.dataset.startTime, 10);
+          if (startTime) {
+            const timeEl = item.querySelector('.notification-time');
+            if (timeEl) {
+              const relTime = formatRelativeTime(startTime);
+              timeEl.textContent = relTime.text;
+              timeEl.className = 'notification-time ' + relTime.class;
+            }
+          }
+        });
+      }
+
+      // Start timer to update times every minute
+      setInterval(updateTimeDisplays, 60000);
+
+      function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+      }
+
+      // Dismiss a notification
+      window.dismissNotification = async function(id) {
+        try {
+          await invoke('dismiss_persistent_notification', { notificationId: id });
+          // Refresh will happen via event
+        } catch (err) {
+          console.error('[NotificationWindow] Dismiss failed:', err);
+        }
+      };
+
+      // Load initial notifications
+      async function loadNotifications() {
+        try {
+          const notifications = await invoke('get_persistent_notifications');
+          renderNotifications(notifications);
+        } catch (err) {
+          console.error('[NotificationWindow] Failed to load notifications:', err);
+        }
+      }
+
+      // Listen for updates
+      try {
+        await listen('notifications-updated', async () => {
+          console.log('[NotificationWindow] Received update event');
+          await loadNotifications();
+        });
+        console.log('[NotificationWindow] Listening for updates');
+      } catch (err) {
+        console.error('[NotificationWindow] Failed to listen:', err);
+      }
+
+      // Initial load
+      await loadNotifications();
+      console.log('[NotificationWindow] Initialized');
+    }
+
+    // Start when DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+  </script>
+</body>
+</html>

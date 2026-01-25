@@ -206,4 +206,37 @@ public class DapperSettingsService(IDbConnection connection) : ISettingsService
     {
         await SetAsync(SettingKeys.DemoBannerDismissed, dismissed.ToString(), ct).ConfigureAwait(false);
     }
+
+    // Notification/Reminder settings
+
+    private const int DefaultReminderMinutes = 15;
+
+    public async Task<bool> GetRemindersEnabledAsync(CancellationToken ct = default)
+    {
+        var value = await GetAsync(SettingKeys.RemindersEnabled, ct).ConfigureAwait(false);
+        // Default to true (enabled) when not set
+        return value == null || value.ToLowerInvariant() == "true";
+    }
+
+    public async Task SetRemindersEnabledAsync(bool enabled, CancellationToken ct = default)
+    {
+        await SetAsync(SettingKeys.RemindersEnabled, enabled.ToString(), ct).ConfigureAwait(false);
+    }
+
+    public async Task<int> GetDefaultReminderMinutesAsync(CancellationToken ct = default)
+    {
+        var value = await GetAsync<int>(SettingKeys.DefaultReminderMinutes, ct).ConfigureAwait(false);
+        return value > 0 ? value : DefaultReminderMinutes;
+    }
+
+    public async Task SetDefaultReminderMinutesAsync(int minutes, CancellationToken ct = default)
+    {
+        // Validate reasonable values (0-120 minutes)
+        if (minutes < 0 || minutes > 120)
+        {
+            minutes = DefaultReminderMinutes;
+        }
+
+        await SetAsync(SettingKeys.DefaultReminderMinutes, minutes, ct).ConfigureAwait(false);
+    }
 }

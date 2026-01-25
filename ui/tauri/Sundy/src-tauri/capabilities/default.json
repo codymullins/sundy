@@ -1,18 +1,31 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
-  "description": "Capability for the main window and OAuth",
-  "windows": ["main", "oauth-login"],
+  "description": "Capability for the main window, OAuth, notification window, and notifications",
+  "windows": ["main", "oauth-login", "notification-window"],
   "permissions": [
     "core:default",
     "opener:default",
     "core:window:allow-start-dragging",
     "core:window:allow-close",
     "core:window:allow-create",
+    "core:window:allow-show",
+    "core:window:allow-hide",
+    "core:window:allow-set-size",
+    "core:window:allow-set-position",
+    "core:window:allow-outer-size",
+    "core:window:allow-inner-size",
+    "core:window:allow-primary-monitor",
     "core:window:allow-get-all-windows",
     "core:webview:allow-create-webview-window",
     "core:event:default",
     "core:event:allow-emit",
-    "core:event:allow-listen"
+    "core:event:allow-emit-to",
+    "core:event:allow-listen",
+    "notification:default",
+    "notification:allow-is-permission-granted",
+    "notification:allow-request-permission",
+    "notification:allow-notify",
+    "window-state:default"
   ]
 }

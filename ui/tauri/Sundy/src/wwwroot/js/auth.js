@@ -1,9 +1,10 @@
 // OAuth authentication helpers - supports both Tauri and browser-only modes
 
-// Platform detection
-function isTauri() {
+// Platform detection (use window property to avoid redeclaration errors)
+window.isTauri = window.isTauri || function() {
     return typeof window.__TAURI__ !== 'undefined';
-}
+};
+var isTauri = window.isTauri;
 
 // Store for pending auth promises
 let authResolve = null;
@@ -252,5 +253,5 @@ window.refreshOAuthToken = async function(refreshToken, clientId) {
 
 // Check if running in Tauri (exposed to Blazor)
 window.isTauriEnvironment = function() {
-    return isTauri();
+    return !!window.__TAURI__;
 };
