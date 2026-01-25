@@ -244,9 +244,14 @@ struct CalendarMainView: View {
             }
 
             #if os(iOS)
-            FloatingNewEventButton(action: { onNewEvent(nil) })
-                .padding(.trailing, 20)
-                .padding(.bottom, 20)
+            VStack(spacing: 12) {
+                if !DateUtils.isTodayVisible(for: currentDate, view: currentView) {
+                    FloatingTodayButton(action: goToToday)
+                }
+                FloatingNewEventButton(action: { onNewEvent(nil) })
+            }
+            .padding(.trailing, 20)
+            .padding(.bottom, 20)
             #endif
         }
         .background(ThemeColors.background.swiftUIColor)
@@ -304,5 +309,24 @@ private struct FloatingNewEventButton: View {
         .buttonStyle(.plain)
         .shadow(color: ThemeColors.surfaceElevated.swiftUIColor.opacity(0.6), radius: 12, x: 0, y: 6)
         .accessibilityLabel("New Event")
+    }
+}
+
+private struct FloatingTodayButton: View {
+    var action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Image(systemName: "calendar.badge.clock")
+                .font(.system(size: 18, weight: .semibold))
+                .foregroundStyle(ThemeColors.textSecondary.swiftUIColor)
+                .frame(width: 48, height: 48)
+                .background(
+                    Circle().fill(ThemeColors.surfaceElevated.swiftUIColor)
+                )
+        }
+        .buttonStyle(.plain)
+        .shadow(color: ThemeColors.surfaceElevated.swiftUIColor.opacity(0.4), radius: 8, x: 0, y: 4)
+        .accessibilityLabel("Go to Today")
     }
 }

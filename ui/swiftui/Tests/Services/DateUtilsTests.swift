@@ -142,4 +142,63 @@ final class DateUtilsTests: XCTestCase {
         XCTAssertTrue(title.contains("2025"))
         XCTAssertFalse(title.contains("15"))
     }
+
+    // MARK: - isTodayVisible(for:view:)
+
+    func testIsTodayVisibleDayViewSameDay() {
+        let today = Date()
+        XCTAssertTrue(DateUtils.isTodayVisible(for: today, view: .day))
+    }
+
+    func testIsTodayVisibleDayViewDifferentDay() {
+        let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: Date())!
+        XCTAssertFalse(DateUtils.isTodayVisible(for: yesterday, view: .day))
+
+        let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: Date())!
+        XCTAssertFalse(DateUtils.isTodayVisible(for: tomorrow, view: .day))
+    }
+
+    func testIsTodayVisibleWeekViewSameWeek() {
+        let today = Date()
+        XCTAssertTrue(DateUtils.isTodayVisible(for: today, view: .week))
+
+        // Also test another day in the same week
+        let weekStart = DateUtils.weekStart(for: today)
+        XCTAssertTrue(DateUtils.isTodayVisible(for: weekStart, view: .week))
+    }
+
+    func testIsTodayVisibleWeekViewDifferentWeek() {
+        let lastWeek = Calendar.current.date(byAdding: .day, value: -7, to: Date())!
+        XCTAssertFalse(DateUtils.isTodayVisible(for: lastWeek, view: .week))
+
+        let nextWeek = Calendar.current.date(byAdding: .day, value: 7, to: Date())!
+        XCTAssertFalse(DateUtils.isTodayVisible(for: nextWeek, view: .week))
+    }
+
+    func testIsTodayVisibleMonthViewSameMonth() {
+        let today = Date()
+        XCTAssertTrue(DateUtils.isTodayVisible(for: today, view: .month))
+
+        // Test first day of current month
+        let firstOfMonth = Calendar.current.date(from: Calendar.current.dateComponents([.year, .month], from: today))!
+        XCTAssertTrue(DateUtils.isTodayVisible(for: firstOfMonth, view: .month))
+    }
+
+    func testIsTodayVisibleMonthViewDifferentMonth() {
+        let lastMonth = Calendar.current.date(byAdding: .month, value: -1, to: Date())!
+        XCTAssertFalse(DateUtils.isTodayVisible(for: lastMonth, view: .month))
+
+        let nextMonth = Calendar.current.date(byAdding: .month, value: 1, to: Date())!
+        XCTAssertFalse(DateUtils.isTodayVisible(for: nextMonth, view: .month))
+    }
+
+    func testIsTodayVisibleDynamicViewSameMonth() {
+        let today = Date()
+        XCTAssertTrue(DateUtils.isTodayVisible(for: today, view: .dynamic))
+    }
+
+    func testIsTodayVisibleDynamicViewDifferentMonth() {
+        let lastMonth = Calendar.current.date(byAdding: .month, value: -1, to: Date())!
+        XCTAssertFalse(DateUtils.isTodayVisible(for: lastMonth, view: .dynamic))
+    }
 }

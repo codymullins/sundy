@@ -83,4 +83,20 @@ enum DateUtils {
         if hour < 12 { return "\(hour) AM" }
         return "\(hour - 12) PM"
     }
+
+    static func isTodayVisible(for date: Date, view: CalendarViewType) -> Bool {
+        let calendar = Calendar.current
+        let today = Date()
+
+        switch view {
+        case .day:
+            return calendar.isDate(date, inSameDayAs: today)
+        case .week:
+            let viewWeekStart = weekStart(for: date)
+            let todayWeekStart = weekStart(for: today)
+            return calendar.isDate(viewWeekStart, inSameDayAs: todayWeekStart)
+        case .month, .dynamic:
+            return calendar.isDate(date, equalTo: today, toGranularity: .month)
+        }
+    }
 }
