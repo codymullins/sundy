@@ -25,23 +25,27 @@ struct CalendarViewContainer: View {
                 )
             }
         case .week:
-            WeekView(
-                currentDate: currentDate,
-                calendars: calendars,
-                events: events,
-                hideEventTitles: hideEventTitles,
-                onDayClick: onDayClick,
-                onEventClick: onEventClick
-            )
+            HorizontalPager(currentDate: $currentDate, dateIncrement: .week) { date in
+                WeekView(
+                    currentDate: date,
+                    calendars: calendars,
+                    events: events,
+                    hideEventTitles: hideEventTitles,
+                    onDayClick: onDayClick,
+                    onEventClick: onEventClick
+                )
+            }
         case .day:
-            DayView(
-                currentDate: currentDate,
-                calendars: calendars,
-                events: events,
-                hideEventTitles: hideEventTitles,
-                onDayClick: onDayClick,
-                onEventClick: onEventClick
-            )
+            HorizontalPager(currentDate: $currentDate, dateIncrement: .day) { date in
+                DayView(
+                    currentDate: date,
+                    calendars: calendars,
+                    events: events,
+                    hideEventTitles: hideEventTitles,
+                    onDayClick: onDayClick,
+                    onEventClick: onEventClick
+                )
+            }
         case .dynamic:
             VerticalMonthPager(currentDate: $currentDate) { date in
                 DynamicMonthView(

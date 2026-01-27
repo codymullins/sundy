@@ -1,16 +1,8 @@
 import SwiftUI
 
-private enum MonthKeyFormatter {
-    static let shared: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM"
-        formatter.locale = Locale(identifier: "en_US_POSIX")
-        return formatter
-    }()
-}
-
-struct VerticalMonthPager<Content: View>: View {
+struct HorizontalPager<Content: View>: View {
     @Binding var currentDate: Date
+    let dateIncrement: DateIncrement
     let content: (Date) -> Content
 
     @State private var dragOffset: CGFloat = 0
@@ -22,55 +14,78 @@ struct VerticalMonthPager<Content: View>: View {
     private let transitionDuration: TimeInterval = 0.25
     private let dragMinimumDistance: CGFloat = 1
 
+    enum DateIncrement {
+        case day
+        case week
+
+        var calendarComponent: Calendar.Component {
+            switch self {
+            case .day: return .day
+            case .week: return .weekOfYear
+            }
+        }
+
+        var value: Int {
+            switch self {
+            case .day: return 1
+            case .week: return 1
+            }
+        }
+    }
+
     var body: some View {
         GeometryReader { proxy in
-            let height = max(proxy.size.height, 1)
             let width = max(proxy.size.width, 1)
+            let height = max(proxy.size.height, 1)
             ZStack {
                 content(previousDate)
-                    .id("prev-\(monthKey(for: previousDate))")
+                    .id("prev-\(dateKey(for: previousDate))")
                     .frame(width: width, height: height)
-                    .offset(y: dragOffset - height)
+                    .offset(x: dragOffset - width)
                 content(currentDate)
-                    .id("current-\(monthKey(for: currentDate))")
+                    .id("current-\(dateKey(for: currentDate))")
                     .frame(width: width, height: height)
-                    .offset(y: dragOffset)
+                    .offset(x: dragOffset)
                 content(nextDate)
-                    .id("next-\(monthKey(for: nextDate))")
+                    .id("next-\(dateKey(for: nextDate))")
                     .frame(width: width, height: height)
-                    .offset(y: dragOffset + height)
+                    .offset(x: dragOffset + width)
             }
             .clipped()
             .contentShape(Rectangle())
-            .gesture(
+            .simultaneousGesture(
                 DragGesture(minimumDistance: dragMinimumDistance, coordinateSpace: .local)
                     .onChanged { value in
-                        handleDragChanged(value, height: height)
+                        handleDragChanged(value, width: width)
                     }
                     .onEnded { value in
-                        handleDragEnded(value, height: height)
+                        handleDragEnded(value, width: width)
                     }
             )
         }
     }
 
     private var previousDate: Date {
-        shiftMonth(by: -1)
+        shiftDate(by: -1)
     }
 
     private var nextDate: Date {
-        shiftMonth(by: 1)
+        shiftDate(by: 1)
     }
 
-    private func shiftMonth(by value: Int) -> Date {
-        Calendar.current.date(byAdding: .month, value: value, to: currentDate) ?? currentDate
+    private func shiftDate(by multiplier: Int) -> Date {
+        let component = dateIncrement.calendarComponent
+        let value = dateIncrement.value * multiplier
+        return Calendar.current.date(byAdding: component, value: value, to: currentDate) ?? currentDate
     }
 
-    private func monthKey(for date: Date) -> String {
-        MonthKeyFormatter.shared.string(from: date)
+    private func dateKey(for date: Date) -> String {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withFullDate]
+        return formatter.string(from: date)
     }
 
-    private func handleDragChanged(_ value: DragGesture.Value, height: CGFloat) {
+    private func handleDragChanged(_ value: DragGesture.Value, width: CGFloat) {
         guard !isTransitioning else { return }
         let translation = value.translation
 
@@ -79,14 +94,14 @@ struct VerticalMonthPager<Content: View>: View {
             if dragAxis == nil { return }
         }
 
-        guard dragAxis == .vertical else { return }
-        dragOffset = logic.resistedOffset(translation.height, limit: height)
+        guard dragAxis == .horizontal else { return }
+        dragOffset = logic.resistedOffset(translation.width, limit: width)
     }
 
-    private func handleDragEnded(_ value: DragGesture.Value, height: CGFloat) {
+    private func handleDragEnded(_ value: DragGesture.Value, width: CGFloat) {
         defer { dragAxis = nil }
         guard !isTransitioning else { return }
-        guard dragAxis == .vertical else {
+        guard dragAxis == .horizontal else {
             if dragOffset != 0 {
                 withAnimation(transitionAnimation) {
                     dragOffset = 0
@@ -95,16 +110,17 @@ struct VerticalMonthPager<Content: View>: View {
             return
         }
 
-        let threshold = height * logic.swipeThresholdRatio
-        let translation = value.translation.height
-        let predicted = value.predictedEndTranslation.height
+        let threshold = width * logic.swipeThresholdRatio
+        let translation = value.translation.width
+        let predicted = value.predictedEndTranslation.width
+
         let direction = logic.shouldNavigate(translation: translation, predicted: predicted, threshold: threshold)
 
         switch direction {
         case .forward:
-            transition(to: shiftMonth(by: 1), finalOffset: -height)
+            transition(to: shiftDate(by: 1), finalOffset: -width)
         case .backward:
-            transition(to: shiftMonth(by: -1), finalOffset: height)
+            transition(to: shiftDate(by: -1), finalOffset: width)
         case .none:
             withAnimation(transitionAnimation) {
                 dragOffset = 0
@@ -126,5 +142,4 @@ struct VerticalMonthPager<Content: View>: View {
             isTransitioning = false
         }
     }
-
 }
